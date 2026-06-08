@@ -1,14 +1,35 @@
+"use client";
+
+import { addCollection, Icon } from "@iconify/react";
+import { icons as materialSymbolsIcons } from "@iconify-json/material-symbols";
 import Image from "next/image";
+
+addCollection(materialSymbolsIcons);
 
 const navigationGroups = [
 	{
 		label: "Gestión",
-		items: ["Clientes", "Eventos", "Colaboradores", "Inventario"],
+		items: [
+			{ label: "Clientes", icon: "material-symbols:groups-rounded" },
+			{ label: "Eventos", icon: "material-symbols:event-rounded" },
+			{ label: "Colaboradores", icon: "material-symbols:family-star" },
+			{ label: "Inventario", icon: "material-symbols:inventory-2-rounded" },
+		],
 	},
 	{
 		label: "Métricas",
-		items: ["General", "Ventas"],
+		items: [
+			{ label: "General", icon: "material-symbols:dashboard-rounded" },
+			{ label: "Ventas", icon: "material-symbols:monitoring-rounded" },
+		],
 	},
+];
+
+const mobileNavigationItems = [
+	navigationGroups[0].items[0],
+	navigationGroups[0].items[1],
+	navigationGroups[0].items[2],
+	{ label: "Métricas", icon: "material-symbols:dashboard-rounded" },
 ];
 
 const pipeline = [
@@ -51,7 +72,7 @@ export default function Home() {
 	return (
 		<main className='min-h-screen bg-[var(--background-color)] text-[var(--text-primary)]'>
 			<div className='flex min-h-screen'>
-				<aside className='hidden w-72 shrink-0 flex-col border-r border-[color:var(--border-color)] bg-[var(--primary-active)] px-6 py-6 text-[var(--on-primary)] lg:flex'>
+				<aside className='sticky top-0 hidden h-screen w-72 shrink-0 flex-col overflow-y-auto border-r border-[color:var(--border-color)] bg-[var(--primary-active)] px-6 py-6 text-[var(--on-primary)] lg:flex'>
 					<Image
 						src='/okidokicrm_logo.png'
 						alt='OkiDoki CRM'
@@ -72,27 +93,24 @@ export default function Home() {
 								</h2>
 								<div className='space-y-2'>
 									{group.items.map(item => {
-										const isActive = item === "Clientes";
+										const isActive = item.label === "Clientes";
 
 										return (
 											<a
 												href='#'
-												key={item}
+												key={item.label}
 												className={`flex min-h-12 items-center gap-3 rounded-md px-4 py-3 font-semibold transition ${
 													isActive
 														? "bg-[var(--accent-color)] text-[var(--on-accent)]"
 														: "text-[var(--on-primary)] opacity-85 hover:bg-[var(--primary-hover)]"
 												}`}
 											>
-												<span
-													className={`h-3 w-3 rounded-sm ${
-														isActive
-															? "bg-[var(--success-color)]"
-															: "bg-[var(--secondary-color)]"
-													}`}
+												<Icon
+													icon={item.icon}
+													className='h-6 w-6 shrink-0'
 													aria-hidden='true'
 												/>
-												<span>{item}</span>
+												<span>{item.label}</span>
 											</a>
 										);
 									})}
@@ -105,7 +123,11 @@ export default function Home() {
 						href='#quote'
 						className='mt-auto flex min-h-14 items-center justify-center gap-3 rounded-md bg-[var(--accent-color)] px-4 py-3 text-lg font-black text-[var(--on-accent)] shadow-sm transition hover:bg-[var(--accent-hover)]'
 					>
-						<span aria-hidden='true'>+</span>
+						<Icon
+							icon='material-symbols:add-circle-rounded'
+							className='h-6 w-6 shrink-0'
+							aria-hidden='true'
+						/>
 						<span>Nueva cotización</span>
 					</a>
 				</aside>
@@ -129,21 +151,24 @@ export default function Home() {
 							</a>
 						</div>
 						<div className='flex gap-2 overflow-x-auto pb-1'>
-							{["Clientes", "Eventos", "Colaboradores", "Métricas"].map(
-								item => (
-									<a
-										href='#'
-										key={item}
-										className={`whitespace-nowrap rounded-md px-4 py-3 text-base font-bold ${
-											item === "Clientes"
-												? "bg-[var(--accent-color)] text-[var(--on-accent)]"
-												: "bg-[var(--primary-hover)] text-[var(--on-primary)]"
-										}`}
-									>
-										{item}
-									</a>
-								),
-							)}
+							{mobileNavigationItems.map(item => (
+								<a
+									href='#'
+									key={item.label}
+									className={`flex items-center gap-2 whitespace-nowrap rounded-md px-4 py-3 text-base font-bold ${
+										item.label === "Clientes"
+											? "bg-[var(--accent-color)] text-[var(--on-accent)]"
+											: "bg-[var(--primary-hover)] text-[var(--on-primary)]"
+									}`}
+								>
+									<Icon
+										icon={item.icon}
+										className='h-5 w-5 shrink-0'
+										aria-hidden='true'
+									/>
+									<span>{item.label}</span>
+								</a>
+							))}
 						</div>
 					</div>
 
