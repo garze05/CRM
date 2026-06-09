@@ -70,6 +70,32 @@ const navigationGroups = [
 	},
 ];
 
+const mockUser = {
+	name: "Huberth Rodríguez",
+	role: "Administrador",
+	initials: "HR",
+};
+
+const accountItems = [
+	{
+		label: "Ajustes",
+		href: "/ajustes",
+		icon: "material-symbols:settings-rounded",
+	},
+	{
+		label: "Cerrar sesión",
+		href: "/",
+		icon: "material-symbols:logout-rounded",
+	},
+];
+
+const paperworkItem: NavigationItem = {
+	label: "Papelería",
+	href: "/papeleria",
+	icon: "material-symbols:delete-outline-rounded",
+	activeMatch: "/papeleria",
+};
+
 function isNavigationItemActive(pathname: string, item: NavigationItem) {
 	if (!item.activeMatch) {
 		return false;
@@ -113,7 +139,7 @@ function NavigationLink({
 function NavigationContent({ onNavigate }: { onNavigate?: () => void }) {
 	return (
 		<>
-			<nav className='space-y-8 text-lg'>
+			<nav className='space-y-7 text-lg'>
 				<section aria-labelledby='inicio'>
 					<h2
 						id='inicio'
@@ -144,19 +170,85 @@ function NavigationContent({ onNavigate }: { onNavigate?: () => void }) {
 					</section>
 				))}
 			</nav>
+		</>
+	);
+}
 
-			<Link
-				href='/cotizaciones/nueva'
-				onClick={onNavigate}
-				className='mt-auto flex min-h-14 items-center justify-center gap-3 rounded-full bg-[var(--accent-color)] px-5 py-3 text-lg font-black text-[var(--on-accent)] shadow-[var(--crisp-shadow)] transition hover:bg-[var(--accent-hover)]'
-			>
-				<Icon
-					icon='material-symbols:add-circle-rounded'
-					className='h-6 w-6 shrink-0'
-					aria-hidden='true'
-				/>
-				<span>Nueva cotización</span>
-			</Link>
+function SidebarUser() {
+	return (
+		<div className='mb-6 flex items-center gap-4'>
+			<div className='grid h-14 w-14 shrink-0 place-items-center rounded-full bg-[var(--accent-color)] text-sm font-black text-[var(--on-accent)] shadow-[inset_0_-4px_0_rgba(132,52,0,0.2),var(--crisp-shadow)]'>
+				{mockUser.initials}
+			</div>
+			<div className='min-w-0'>
+				<p className='truncate text-lg font-black text-[var(--primary-color)]'>
+					{mockUser.name}
+				</p>
+				<p className='text-base font-semibold text-[var(--text-secondary)]'>
+					{mockUser.role}
+				</p>
+			</div>
+		</div>
+	);
+}
+
+function NewQuoteLink({ onNavigate }: { onNavigate?: () => void }) {
+	return (
+		<Link
+			href='/cotizaciones/nueva'
+			onClick={onNavigate}
+			className='mb-8 flex min-h-14 justify-center items-center gap-3 px-5 py-3 text-lg font-black rounded-lg transition hover:text-[var(--primary-color)] bg-[var(--secondary-color)] shadow-[var(--crisp-shadow)] text-white'
+		>
+			<Icon
+				icon='material-symbols:add-circle-rounded'
+				className='h-6 w-6 shrink-0'
+				aria-hidden='true'
+			/>
+			<span>Nueva cotización</span>
+		</Link>
+	);
+}
+
+function AccountActions({ onNavigate }: { onNavigate?: () => void }) {
+	return (
+		<div className='border-t border-[color:var(--border-color)] pt-5'>
+			<div className='space-y-2 text-lg'>
+				{accountItems.map(item => (
+					<Link
+						key={item.label}
+						href={item.href}
+						onClick={onNavigate}
+						className='flex min-h-12 items-center gap-3 rounded-lg px-4 py-3 font-extrabold text-[var(--text-secondary)] transition hover:bg-[#f0ebe4] hover:text-[var(--primary-color)]'
+					>
+						<Icon
+							icon={item.icon}
+							className='h-6 w-6 shrink-0'
+							aria-hidden='true'
+						/>
+						<span>{item.label}</span>
+					</Link>
+				))}
+			</div>
+		</div>
+	);
+}
+
+function SidebarPaperworkLink({ onNavigate }: { onNavigate?: () => void }) {
+	return (
+		<div className='mt-auto pb-5 text-lg'>
+			<NavigationLink item={paperworkItem} onClick={onNavigate} />
+		</div>
+	);
+}
+
+function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+	return (
+		<>
+			<SidebarUser />
+			<NewQuoteLink onNavigate={onNavigate} />
+			<NavigationContent onNavigate={onNavigate} />
+			<SidebarPaperworkLink onNavigate={onNavigate} />
+			<AccountActions onNavigate={onNavigate} />
 		</>
 	);
 }
@@ -242,7 +334,7 @@ export function CrmShell({ children }: { children: ReactNode }) {
 		<main className='min-h-screen bg-[var(--background-color)] text-[var(--text-primary)]'>
 			<div className='flex min-h-screen'>
 				<aside className='sticky top-0 hidden h-screen w-72 shrink-0 flex-col overflow-y-auto border-r border-[color:var(--border-color)] bg-[var(--surface-color)] px-5 py-6 text-[var(--text-primary)] lg:flex'>
-					<Link href='/' className='mb-8 block'>
+					<Link href='/' className='mb-5 block'>
 						<Image
 							src='/okidokicrm_black_logo.png'
 							alt='OkiDoki CRM'
@@ -252,7 +344,7 @@ export function CrmShell({ children }: { children: ReactNode }) {
 							className='h-auto max-h-36 w-full object-contain'
 						/>
 					</Link>
-					<NavigationContent />
+					<SidebarContent />
 				</aside>
 
 				<section className='flex min-w-0 flex-1 flex-col'>

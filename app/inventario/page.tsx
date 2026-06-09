@@ -1,6 +1,10 @@
 import Image from "next/image";
 import { CrmShell } from "../components/crm-shell";
-import { ManagementTable, type ManagementColumn } from "../components/management-table";
+import { IconLabel } from "../components/icon-label";
+import {
+	ManagementTable,
+	type ManagementColumn,
+} from "../components/management-table";
 import { StatusBadge } from "../components/status-badge";
 import { inventoryItems, type InventoryItem } from "../lib/mock-data";
 
@@ -45,9 +49,7 @@ const columns: ManagementColumn<InventoryItem>[] = [
 		key: "active",
 		header: "Estado",
 		width: "minmax(110px, 0.75fr)",
-		render: item => (
-			<StatusBadge value={item.active ? "ACTIVO" : "PAUSADO"} />
-		),
+		render: item => <StatusBadge value={item.active ? "ACTIVO" : "PAUSADO"} />,
 	},
 	{
 		key: "availability",
@@ -77,7 +79,7 @@ const columns: ManagementColumn<InventoryItem>[] = [
 	},
 	{
 		key: "tags",
-		header: "Tags",
+		header: "Etiquetas",
 		width: "minmax(190px, 1.1fr)",
 		render: item => item.tags.join(", "),
 	},
@@ -89,12 +91,8 @@ export default function InventoryPage() {
 			<header className='px-5 pb-6 pt-8 md:px-8 md:pt-10'>
 				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
 					<div>
-						<p className='page-kicker mb-2'>
-							Gestión
-						</p>
-						<h1 className='page-heading'>
-							Inventario
-						</h1>
+						<p className='page-kicker mb-2'>Gestión</p>
+						<h1 className='page-heading'>Inventario</h1>
 						<p className='mt-2 max-w-3xl text-lg text-[var(--text-secondary)]'>
 							Catálogo visual de personajes, inflables, decoración y servicios
 							disponibles para cotizaciones.
@@ -102,9 +100,9 @@ export default function InventoryPage() {
 					</div>
 					<button
 						type='button'
-						className='primary-action min-h-12 w-fit rounded-full px-5 py-3 text-base font-black transition'
+						className='primary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
 					>
-						Nuevo ítem
+						<IconLabel label='Nuevo ítem' />
 					</button>
 				</div>
 			</header>

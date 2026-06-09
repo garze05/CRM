@@ -133,16 +133,6 @@ export default function Home() {
 							})}
 						</div>
 					</section>
-
-					<section className='surface-card min-w-0 bg-[linear-gradient(90deg,var(--surface-color)_0%,var(--surface-color)_45%,#ece8e1_45%,#ece8e1_100%)] p-5 md:p-7'>
-						<h2 className='text-2xl font-black text-[var(--text-primary)]'>
-							Visión 360 de tu negocio
-						</h2>
-						<p className='mt-2 text-lg text-[var(--text-secondary)]'>
-							Analiza tasa de cierre, ingresos del mes, eventos por tipo y
-							tiempo promedio de respuesta.
-						</p>
-					</section>
 				</div>
 
 				<aside className='min-w-0 space-y-5'>

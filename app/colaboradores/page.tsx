@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { CrmShell } from "../components/crm-shell";
+import { IconLabel } from "../components/icon-label";
 import { ManagementTable, type ManagementColumn } from "../components/management-table";
 import { StatusBadge } from "../components/status-badge";
 import { collaborators, type Collaborator } from "../lib/mock-data";
@@ -83,9 +84,9 @@ export default function CollaboratorsPage() {
 					</div>
 					<button
 						type='button'
-						className='primary-action min-h-12 w-fit rounded-full px-5 py-3 text-base font-black transition'
+						className='primary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
 					>
-						Nuevo colaborador
+						<IconLabel label='Nuevo colaborador' />
 					</button>
 				</div>
 			</header>
