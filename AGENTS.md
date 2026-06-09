@@ -33,14 +33,14 @@ Todo prospecto o cliente activo tiene un estado que determina en qué etapa del 
 El sistema debe hacer visible este pipeline en todo momento.
 
 ```
-LEAD → CONTACTADO → COTIZADO → RESERVADO → CONFIRMADO → REALIZADO → RECURRENTE
+PROSPECTO → CONTACTADO → COTIZADO → RESERVADO → CONFIRMADO → REALIZADO → RECURRENTE
                                                               ↓
                                                           CANCELADO (desde cualquier estado)
 ```
 
 | Estado       | Descripción                                                   |
 | ------------ | ------------------------------------------------------------- |
-| `LEAD`       | Primer contacto recibido, sin información completa aún        |
+| `PROSPECTO`  | Primer contacto recibido, sin información completa aún        |
 | `CONTACTADO` | Se obtuvo contexto del evento; pendiente de enviar cotización |
 | `COTIZADO`   | Cotización enviada; esperando respuesta                       |
 | `RESERVADO`  | Cliente aceptó; reservación generada; pendiente pago inicial  |
@@ -345,7 +345,7 @@ Estos principios aplican a toda la interfaz y deben respetarse en cada component
 ## Convenciones del proyecto
 
 - **Idioma del código:** inglés (variables, funciones, esquema de BD).
-- **Idioma de la UI y documentación:** español.
+- **Idioma de la UI y documentación:** español sin excepciones. En lugar de "Lead" Prospecto, en lugar de "Pipeline" Embudo, etc.
 - **Fechas:** siempre almacenadas en UTC; mostradas en hora local de Costa Rica (America/Costa_Rica).
 - **Moneda:** colones costarricenses (CRC) como default; el sistema debe soportar mostrar en USD como referencia.
 - **IDs:** UUID v4 para todas las entidades principales.

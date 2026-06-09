@@ -1,82 +1,94 @@
 @import "tailwindcss";
 
 :root {
-  --primary-color: #1e3a5f;
-  --primary-hover: #294d7a;
-  --primary-active: #16304d;
+	--primary-color: #a64600;
+	--primary-hover: #bf5608;
+	--primary-active: #843400;
 
-  --secondary-color: #5b6675;
-  --secondary-hover: #4b5563;
+	--secondary-color: #007c73;
+	--secondary-hover: #006a63;
 
-  --accent-color: #c97a2b;
-  --accent-hover: #b66d24;
+	--accent-color: #ff8c42;
+	--accent-hover: #ec762b;
+	--tertiary-color: #ffd166;
 
-  --background-color: #f8fafc;
-  --surface-color: #ffffff;
-  --card-color: #ffffff;
+	--background-color: #f7f5ef;
+	--surface-color: #fffdf8;
+	--card-color: #fffefa;
 
-  --border-color: #e2e8f0;
+	--border-color: #ead8cd;
 
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #64748b;
+	--text-primary: #202321;
+	--text-secondary: #5f4c42;
+	--text-muted: #927d72;
 
-  --success-color: #4d8b5b;
-  --warning-color: #d9a441;
-  --error-color: #c95a5a;
-  --info-color: #3b82f6;
+	--success-color: #007c73;
+	--warning-color: #8a6b00;
+	--error-color: #c91d2b;
+	--info-color: #4ecdc4;
 
-  --on-primary: #ffffff;
-  --on-accent: #0f172a;
+	--on-primary: #ffffff;
+	--on-accent: #3d1b00;
+	--soft-shadow: 0 16px 40px rgba(77, 51, 31, 0.08);
+	--crisp-shadow: 0 6px 18px rgba(77, 51, 31, 0.08);
 }
 
 .dark {
-  --primary-color: #4a6d92;
-  --primary-hover: #5a7ca1;
-  --primary-active: #35516f;
+	--primary-color: #ff8c42;
+	--primary-hover: #ffa166;
+	--primary-active: #a64600;
 
-  --secondary-color: #94a3b8;
-  --secondary-hover: #cbd5e1;
+	--secondary-color: #4ecdc4;
+	--secondary-hover: #7edbd5;
 
-  --accent-color: #d59a56;
-  --accent-hover: #e0aa68;
+	--accent-color: #ffd166;
+	--accent-hover: #ffdc85;
+	--tertiary-color: #ffd166;
 
-  --background-color: #0f172a;
-  --surface-color: #1e293b;
-  --card-color: #172030;
+	--background-color: #171513;
+	--surface-color: #24201d;
+	--card-color: #201d1a;
 
-  --border-color: #334155;
+	--border-color: #4b3930;
 
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
+	--text-primary: #fff9ef;
+	--text-secondary: #e7d5c8;
+	--text-muted: #b99f8c;
 
-  --success-color: #5f9e6e;
-  --warning-color: #e0b35c;
-  --error-color: #d46a6a;
-  --info-color: #60a5fa;
+	--success-color: #4ecdc4;
+	--warning-color: #ffd166;
+	--error-color: #ff6872;
+	--info-color: #70ded7;
 
-  --on-primary: #ffffff;
-  --on-accent: #0f172a;
+	--on-primary: #ffffff;
+	--on-accent: #211000;
 }
 
 @theme inline {
-  --color-background: var(--background-color);
-  --color-foreground: var(--text-primary);
+	--color-background: var(--background-color);
+	--color-foreground: var(--text-primary);
 }
 
 body {
-  background: var(--background-color);
-  color: var(--text-primary);
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 16px;
+	background: var(--background-color);
+	color: var(--text-primary);
+	font-family:
+		"Plus Jakarta Sans",
+		Inter,
+		ui-sans-serif,
+		system-ui,
+		-apple-system,
+		BlinkMacSystemFont,
+		"Segoe UI",
+		sans-serif;
+	font-size: 16px;
 }
 
 button,
 input,
 select,
 textarea {
-  font: inherit;
+	font: inherit;
 }
 
 button,
@@ -84,5 +96,68 @@ a,
 input,
 select,
 textarea {
-  border-radius: 6px;
+	border-radius: 8px;
+}
+
+::selection {
+	background: color-mix(in srgb, var(--accent-color) 35%, transparent);
+}
+
+.page-heading {
+	color: var(--primary-color);
+	font-size: clamp(2.5rem, 4vw, 4.25rem);
+	font-weight: 900;
+	letter-spacing: 0;
+	line-height: 0.95;
+}
+
+.page-kicker {
+	color: var(--secondary-color);
+	font-size: 1rem;
+	font-weight: 800;
+	text-transform: uppercase;
+}
+
+.surface-card {
+	background: var(--card-color);
+	border: 1px solid var(--border-color);
+	border-radius: 8px;
+	box-shadow: var(--soft-shadow);
+}
+
+.form-control {
+	min-height: 3.5rem;
+	width: 100%;
+	border: 1px solid var(--border-color);
+	background: #f3f0eb;
+	padding-inline: 1rem;
+	color: var(--text-primary);
+	font-size: 1.125rem;
+	font-weight: 650;
+	outline: none;
+}
+
+.form-control:focus {
+	border-color: var(--accent-color);
+	box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-color) 22%, transparent);
+}
+
+.primary-action {
+	background: var(--primary-color);
+	color: var(--on-primary);
+	box-shadow: var(--crisp-shadow);
+}
+
+.primary-action:hover {
+	background: var(--primary-hover);
+}
+
+.secondary-action {
+	border: 1px solid var(--border-color);
+	background: var(--surface-color);
+	color: var(--primary-color);
+}
+
+.secondary-action:hover {
+	border-color: var(--primary-color);
 }

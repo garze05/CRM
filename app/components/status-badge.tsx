@@ -1,0 +1,48 @@
+const badgeStyles: Record<string, string> = {
+	LEAD: "bg-[#fff0cf] text-[#6f5600]",
+	CONTACTADO: "bg-[#ffe2cf] text-[var(--primary-active)]",
+	COTIZADO: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
+	RESERVADO: "bg-[#ffe2cf] text-[var(--primary-color)]",
+	CONFIRMADO: "bg-[#d8f5f2] text-[var(--secondary-color)]",
+	REALIZADO: "bg-[#eee8e1] text-[var(--text-secondary)]",
+	RECURRENTE: "bg-[#f5ddc8] text-[var(--primary-active)]",
+	CANCELADO: "bg-[#ffe0e3] text-[var(--error-color)]",
+	FAMILIAR: "bg-[#fff0cf] text-[#6f5600]",
+	EDUCATIVO: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
+	CORPORATIVO: "bg-[#f5ddc8] text-[var(--primary-active)]",
+	INSTITUCIONAL: "bg-[#d8f5f2] text-[var(--secondary-color)]",
+	INFANTIL: "bg-[#ffe2cf] text-[var(--primary-color)]",
+	PENDIENTE_ANTICIPO: "bg-[#fff0cf] text-[#6f5600]",
+	ANTICIPO_RECIBIDO: "bg-[#d8f5f2] text-[var(--secondary-color)]",
+	SALDO_PENDIENTE: "bg-[#ffe2cf] text-[var(--primary-color)]",
+	PAGADO_COMPLETO: "bg-[#f5ddc8] text-[var(--primary-active)]",
+	DISPONIBLE: "bg-[#d8f5f2] text-[var(--secondary-color)]",
+	ASIGNADO: "bg-[#fff0cf] text-[#6f5600]",
+	INACTIVO: "bg-[#eee8e1] text-[var(--text-secondary)]",
+	PERSONAJE: "bg-[#ffe2cf] text-[var(--primary-color)]",
+	INFLABLE: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
+	DECORACION: "bg-[#d8f5f2] text-[var(--secondary-color)]",
+	OTRO: "bg-[#eee8e1] text-[var(--text-secondary)]",
+	RESERVADO_INVENTARIO: "bg-[#f5ddc8] text-[var(--primary-active)]",
+	MANTENIMIENTO_PENDIENTE: "bg-[#fff0cf] text-[#6f5600]",
+	ACTIVO: "bg-[#d8f5f2] text-[var(--secondary-color)]",
+	PAUSADO: "bg-[#eee8e1] text-[var(--text-secondary)]",
+};
+
+export function StatusBadge({
+	value,
+	label,
+}: {
+	value: string;
+	label?: string;
+}) {
+	return (
+		<span
+			className={`inline-flex min-h-8 w-fit items-center rounded-full px-3 py-1 text-sm font-black ${
+				badgeStyles[value] ?? "bg-[var(--background-color)] text-[var(--text-primary)]"
+			}`}
+		>
+			{label ?? value.replaceAll("_", " ")}
+		</span>
+	);
+}
