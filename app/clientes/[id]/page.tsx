@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Breadcrumb } from "../../components/breadcrumb";
 import { CrmShell } from "../../components/crm-shell";
 import { StatusBadge } from "../../components/status-badge";
 import {
@@ -30,9 +31,13 @@ export default async function ClientDetailPage({
 			<header className='px-5 pb-6 pt-8 md:px-8 md:pt-10'>
 				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
 					<div>
-						<p className='page-kicker mb-2'>
-							Clientes &gt; {getClientFullName(client)}
-						</p>
+						<Breadcrumb
+							items={[
+								{ label: "Inicio", href: "/" },
+								{ label: "Clientes", href: "/clientes" },
+								{ label: getClientFullName(client) },
+							]}
+						/>
 						<div className='flex flex-wrap items-center gap-3'>
 							<h1 className='page-heading'>
 								{getClientFullName(client)}

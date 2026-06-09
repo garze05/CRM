@@ -1,4 +1,5 @@
 import { CrmShell } from "./components/crm-shell";
+import { Breadcrumb } from "./components/breadcrumb";
 import { StatusBadge } from "./components/status-badge";
 import {
 	events,
@@ -29,7 +30,7 @@ export default function Home() {
 			<header className='px-5 pb-6 pt-8 md:px-8 md:pt-10'>
 				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
 					<div>
-						<p className='page-kicker mb-2'>Inicio</p>
+						<Breadcrumb items={[{ label: "Inicio" }]} />
 						<h1 className='page-heading'>Página Principal</h1>
 						<p className='mt-2 max-w-3xl text-lg text-[var(--text-secondary)]'>
 							Vista diaria para seguimiento comercial, eventos activos y trabajo

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Breadcrumb } from "../components/breadcrumb";
 import { CrmShell } from "../components/crm-shell";
 import { IconLabel } from "../components/icon-label";
 import { ManagementTable, type ManagementColumn } from "../components/management-table";
@@ -89,7 +90,12 @@ export default function QuotesPage() {
 			<header className='px-5 pb-6 pt-8 md:px-8 md:pt-10'>
 				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
 					<div>
-						<p className='page-kicker mb-2'>Gestión</p>
+						<Breadcrumb
+							items={[
+								{ label: "Inicio", href: "/" },
+								{ label: "Cotizaciones" },
+							]}
+						/>
 						<h1 className='page-heading'>Cotizaciones</h1>
 						<p className='mt-2 max-w-3xl text-lg text-[var(--text-secondary)]'>
 							Control de cotizaciones emitidas, aceptadas y pendientes de

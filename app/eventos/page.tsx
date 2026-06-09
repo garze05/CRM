@@ -1,4 +1,5 @@
 import { CrmShell } from "../components/crm-shell";
+import { Breadcrumb } from "../components/breadcrumb";
 import { IconLabel } from "../components/icon-label";
 import { ManagementTable, type ManagementColumn } from "../components/management-table";
 import { StatusBadge } from "../components/status-badge";
@@ -72,9 +73,12 @@ export default function EventsPage() {
 			<header className='px-5 pb-6 pt-8 md:px-8 md:pt-10'>
 				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
 					<div>
-						<p className='page-kicker mb-2'>
-							Gestión
-						</p>
+						<Breadcrumb
+							items={[
+								{ label: "Inicio", href: "/" },
+								{ label: "Eventos" },
+							]}
+						/>
 						<h1 className='page-heading'>
 							Eventos
 						</h1>
