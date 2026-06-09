@@ -84,23 +84,18 @@ const mockUser = {
 
 const accountItems = [
 	{
+		label: "Papelería",
+		href: "/papeleria",
+		icon: "material-symbols:delete-outline-rounded",
+		activeMatch: "/papeleria",
+	},
+	{
 		label: "Ajustes",
 		href: "/ajustes",
 		icon: "material-symbols:settings-rounded",
-	},
-	{
-		label: "Cerrar sesión",
-		href: "/",
-		icon: "material-symbols:logout-rounded",
+		activeMatch: "/ajustes",
 	},
 ];
-
-const paperworkItem: NavigationItem = {
-	label: "Papelería",
-	href: "/papeleria",
-	icon: "material-symbols:delete-outline-rounded",
-	activeMatch: "/papeleria",
-};
 
 function isNavigationItemActive(pathname: string, item: NavigationItem) {
 	if (!item.activeMatch) {
@@ -182,8 +177,8 @@ function NavigationContent({ onNavigate }: { onNavigate?: () => void }) {
 
 function SidebarUser() {
 	return (
-		<div className='mb-6 flex items-center gap-4'>
-			<div className='grid h-14 w-14 shrink-0 place-items-center rounded-full bg-[var(--accent-color)] text-sm font-black text-[var(--on-accent)] shadow-[inset_0_-4px_0_rgba(132,52,0,0.2),var(--crisp-shadow)]'>
+		<div className='mb-6 flex items-center gap-3'>
+			<div className='grid h-14 w-14 shrink-0 place-items-center rounded-full bg-[var(--accent-color)] text-md font-black text-[var(--on-accent)]'>
 				{mockUser.initials}
 			</div>
 			<div className='min-w-0'>
@@ -200,32 +195,12 @@ function SidebarUser() {
 
 function AccountActions({ onNavigate }: { onNavigate?: () => void }) {
 	return (
-		<div className='border-t border-[color:var(--border-color)] pt-5'>
+		<div className='mt-auto border-t border-[color:var(--border-color)] pt-5'>
 			<div className='space-y-2 text-lg'>
 				{accountItems.map(item => (
-					<Link
-						key={item.label}
-						href={item.href}
-						onClick={onNavigate}
-						className='flex min-h-12 items-center gap-3 rounded-lg px-4 py-3 font-extrabold text-[var(--text-secondary)] transition hover:bg-[#f0ebe4] hover:text-[var(--primary-color)]'
-					>
-						<Icon
-							icon={item.icon}
-							className='h-6 w-6 shrink-0'
-							aria-hidden='true'
-						/>
-						<span>{item.label}</span>
-					</Link>
+					<NavigationLink key={item.label} item={item} onClick={onNavigate} />
 				))}
 			</div>
-		</div>
-	);
-}
-
-function SidebarPaperworkLink({ onNavigate }: { onNavigate?: () => void }) {
-	return (
-		<div className='mt-auto pb-5 text-lg'>
-			<NavigationLink item={paperworkItem} onClick={onNavigate} />
 		</div>
 	);
 }
@@ -235,7 +210,6 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 		<>
 			<SidebarUser />
 			<NavigationContent onNavigate={onNavigate} />
-			<SidebarPaperworkLink onNavigate={onNavigate} />
 			<AccountActions onNavigate={onNavigate} />
 		</>
 	);
@@ -244,31 +218,44 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 function GlobalSearch() {
 	return (
 		<header className='sticky top-0 z-30 border-b border-[color:var(--border-color)] bg-[var(--surface-color)]/95 px-4 py-4 backdrop-blur md:px-8'>
-			<div className='mx-auto flex w-full max-w-2xl items-center justify-center gap-3'>
-				<label className='relative min-w-0 flex-1'>
-					<span className='sr-only'>Buscar cliente o evento</span>
-					<Icon
-						icon='material-symbols:search-rounded'
-						className='pointer-events-none absolute left-4 top-1/2 h-6 w-6 -translate-y-1/2 text-[var(--text-muted)]'
-						aria-hidden='true'
-					/>
-					<input
-						type='search'
-						placeholder='Buscar cliente o evento'
-						className='h-14 w-full rounded-lg border border-[color:var(--border-color)] bg-[#efede8] pl-12 pr-4 text-base font-bold text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[color:var(--accent-color)] focus:bg-[var(--surface-color)] focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--accent-color)_20%,transparent)]'
-					/>
-				</label>
-				<button
-					type='button'
-					className='flex h-14 shrink-0 items-center gap-2 rounded-full bg-[var(--secondary-color)] px-4 text-base font-black text-white shadow-[var(--crisp-shadow)] transition hover:bg-[var(--secondary-hover)]'
+			<div className='flex w-full items-center justify-between gap-4'>
+				<div className='flex w-full max-w-2xl items-center justify-start gap-3'>
+					<label className='relative min-w-0 flex-1'>
+						<span className='sr-only'>Buscar cliente o evento</span>
+						<Icon
+							icon='material-symbols:search-rounded'
+							className='pointer-events-none absolute left-4 top-1/2 h-6 w-6 -translate-y-1/2 text-[var(--text-muted)]'
+							aria-hidden='true'
+						/>
+						<input
+							type='search'
+							placeholder='Buscar cliente o evento'
+							className='h-14 w-full rounded-lg border border-[color:var(--border-color)] bg-[#efede8] pl-12 pr-4 text-base font-bold text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[color:var(--accent-color)] focus:bg-[var(--surface-color)] focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--accent-color)_20%,transparent)]'
+						/>
+					</label>
+					<button
+						type='button'
+						className='flex h-14 shrink-0 items-center gap-2 rounded-full bg-[var(--secondary-color)] px-4 text-base font-black text-white shadow-[var(--crisp-shadow)] transition hover:bg-[var(--secondary-hover)]'
+					>
+						<Icon
+							icon='material-symbols:mic-rounded'
+							className='h-6 w-6 shrink-0'
+							aria-hidden='true'
+						/>
+						<span>Voz</span>
+					</button>
+				</div>
+				<Link
+					href='/'
+					className='flex h-14 shrink-0 items-center gap-2 rounded-full px-4 text-base font-black text-[var(--text-secondary)] transition hover:bg-[#f0ebe4] hover:text-[var(--primary-color)]'
 				>
 					<Icon
-						icon='material-symbols:mic-rounded'
+						icon='material-symbols:logout-rounded'
 						className='h-6 w-6 shrink-0'
 						aria-hidden='true'
 					/>
-					<span>Voz</span>
-				</button>
+					<span>Cerrar sesión</span>
+				</Link>
 			</div>
 		</header>
 	);
