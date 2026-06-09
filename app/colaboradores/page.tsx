@@ -1,6 +1,7 @@
-import Image from "next/image";
 import { CrmShell } from "../components/crm-shell";
 import { Breadcrumb } from "../components/breadcrumb";
+import { DeleteAction } from "../components/delete-action";
+import { CollaboratorThumbnail } from "../components/entity-thumbnail";
 import { IconLabel } from "../components/icon-label";
 import { ManagementTable, type ManagementColumn } from "../components/management-table";
 import { StatusBadge } from "../components/status-badge";
@@ -12,15 +13,7 @@ const columns: ManagementColumn<Collaborator>[] = [
 		header: "Colaborador",
 		render: collaborator => (
 			<div className='flex items-center gap-3'>
-				<div className='grid h-14 w-14 shrink-0 place-items-center rounded-lg border border-[color:var(--border-color)] bg-[#f0ebe4] p-2'>
-					<Image
-						src={collaborator.thumbnailUrl}
-						alt={`Miniatura de ${collaborator.firstName} ${collaborator.lastName}`}
-						width={40}
-						height={40}
-						className='h-10 w-10 object-contain'
-					/>
-				</div>
+				<CollaboratorThumbnail />
 				<div>
 					<p className='font-black text-[var(--text-primary)]'>
 						{collaborator.firstName} {collaborator.lastName}
@@ -55,14 +48,8 @@ const columns: ManagementColumn<Collaborator>[] = [
 	{
 		key: "action",
 		header: "Acción",
-		render: () => (
-			<button
-				type='button'
-				className='secondary-action min-h-11 rounded-full px-4 py-2 text-base font-black'
-			>
-				Ver perfil
-			</button>
-		),
+		width: "minmax(130px, 0.75fr)",
+		render: () => <DeleteAction />,
 	},
 ];
 
@@ -116,7 +103,11 @@ export default function CollaboratorsPage() {
 						</label>
 					</div>
 
-					<ManagementTable columns={columns} rows={collaborators} />
+					<ManagementTable
+						columns={columns}
+						rows={collaborators}
+						rowHref={collaborator => `/colaboradores/${collaborator.id}`}
+					/>
 				</section>
 			</div>
 		</CrmShell>

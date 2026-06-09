@@ -1,6 +1,7 @@
-import Image from "next/image";
 import { CrmShell } from "../components/crm-shell";
 import { Breadcrumb } from "../components/breadcrumb";
+import { DeleteAction } from "../components/delete-action";
+import { InventoryThumbnail } from "../components/entity-thumbnail";
 import { IconLabel } from "../components/icon-label";
 import {
 	ManagementTable,
@@ -24,15 +25,7 @@ const columns: ManagementColumn<InventoryItem>[] = [
 		width: "minmax(250px, 1.7fr)",
 		render: item => (
 			<div className='flex items-center gap-3'>
-				<div className='grid h-14 w-14 shrink-0 place-items-center rounded-lg border border-[color:var(--border-color)] bg-[#f0ebe4] p-2'>
-					<Image
-						src={item.thumbnailUrl}
-						alt={`Miniatura de ${item.name}`}
-						width={40}
-						height={40}
-						className='h-10 w-10 object-contain'
-					/>
-				</div>
+				<InventoryThumbnail category={item.category} />
 				<div>
 					<p className='font-black text-[var(--text-primary)]'>{item.name}</p>
 					<p className='mt-1 line-clamp-1 text-base'>{item.description}</p>
@@ -83,6 +76,12 @@ const columns: ManagementColumn<InventoryItem>[] = [
 		header: "Etiquetas",
 		width: "minmax(190px, 1.1fr)",
 		render: item => item.tags.join(", "),
+	},
+	{
+		key: "action",
+		header: "Acción",
+		width: "minmax(130px, 0.75fr)",
+		render: () => <DeleteAction />,
 	},
 ];
 
@@ -140,7 +139,11 @@ export default function InventoryPage() {
 						conectarse luego con un módulo operativo dedicado.
 					</div>
 
-					<ManagementTable columns={columns} rows={inventoryItems} />
+					<ManagementTable
+						columns={columns}
+						rows={inventoryItems}
+						rowHref={item => `/inventario/${item.id}`}
+					/>
 				</section>
 			</div>
 		</CrmShell>

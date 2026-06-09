@@ -38,11 +38,20 @@ export function ManagementTable<Row extends { id: string }>({
 			{rows.map(row => {
 				const content = (
 					<div
-						className='grid min-w-[860px] items-center border-t border-[color:var(--border-color)] px-5 py-5 text-lg text-[var(--text-secondary)] transition hover:bg-[#f7f2ec]'
+						className='grid min-w-[860px] items-center px-5 py-5 text-lg text-[var(--text-secondary)]'
 						style={{ gridTemplateColumns }}
 					>
 						{columns.map(column => (
-							<div key={column.key} className={column.className}>
+							<div
+								key={column.key}
+								className={`relative z-10 ${
+									column.key === "action"
+										? "pointer-events-auto"
+										: rowHref
+											? "pointer-events-none"
+											: ""
+								} ${column.className ?? ""}`}
+							>
 								{column.render(row)}
 							</div>
 						))}
@@ -50,13 +59,28 @@ export function ManagementTable<Row extends { id: string }>({
 				);
 
 				if (!rowHref) {
-					return <div key={row.id}>{content}</div>;
+					return (
+						<div
+							key={row.id}
+							className='border-t border-[color:var(--border-color)] transition hover:bg-[#f7f2ec]'
+						>
+							{content}
+						</div>
+					);
 				}
 
 				return (
-					<Link key={row.id} href={rowHref(row)} className='block'>
+					<div
+						key={row.id}
+						className='relative border-t border-[color:var(--border-color)] transition hover:bg-[#f7f2ec]'
+					>
+						<Link
+							href={rowHref(row)}
+							className='absolute inset-0 z-0'
+							aria-label='Abrir detalle'
+						/>
 						{content}
-					</Link>
+					</div>
 				);
 			})}
 		</div>

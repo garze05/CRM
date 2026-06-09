@@ -1,5 +1,6 @@
 import { CrmShell } from "../components/crm-shell";
 import { Breadcrumb } from "../components/breadcrumb";
+import { DeleteAction } from "../components/delete-action";
 import { IconLabel } from "../components/icon-label";
 import { ManagementTable, type ManagementColumn } from "../components/management-table";
 import { StatusBadge } from "../components/status-badge";
@@ -65,6 +66,12 @@ const columns: ManagementColumn<EventRecord>[] = [
 			</span>
 		),
 	},
+	{
+		key: "action",
+		header: "Acción",
+		width: "minmax(130px, 0.75fr)",
+		render: () => <DeleteAction />,
+	},
 ];
 
 export default function EventsPage() {
@@ -118,7 +125,11 @@ export default function EventsPage() {
 						</label>
 					</div>
 
-					<ManagementTable columns={columns} rows={events} />
+					<ManagementTable
+						columns={columns}
+						rows={events}
+						rowHref={event => `/eventos/${event.id}`}
+					/>
 				</section>
 			</div>
 		</CrmShell>

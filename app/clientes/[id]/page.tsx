@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "../../components/breadcrumb";
 import { CrmShell } from "../../components/crm-shell";
+import { PhotoThumbnailControl } from "../../components/photo-thumbnail-control";
 import { StatusBadge } from "../../components/status-badge";
 import {
 	formatCrc,
@@ -144,7 +145,7 @@ export default async function ClientDetailPage({
 							{linkedEvents.map(event => (
 								<Link
 									key={event.id}
-									href='/eventos'
+									href={`/eventos/${event.id}`}
 									className='grid min-w-[760px] grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr_0.7fr] items-center border-t border-[color:var(--border-color)] px-5 py-5 text-lg text-[var(--text-secondary)] transition hover:bg-[#f7f2ec]'
 								>
 									<span className='font-bold text-[var(--text-primary)]'>
@@ -169,9 +170,11 @@ export default async function ClientDetailPage({
 				<aside className='min-w-0 space-y-5'>
 					<section className='surface-card p-5'>
 						<div className='mb-5 flex items-center gap-4'>
-							<div className='grid h-24 w-24 place-items-center rounded-full bg-[#ffe2cf] text-4xl font-black text-[var(--primary-color)] ring-4 ring-[var(--tertiary-color)]'>
-								{initials}
-							</div>
+							<PhotoThumbnailControl
+								kind='client'
+								name={getClientFullName(client)}
+								initials={initials}
+							/>
 							<div>
 								<h2 className='text-2xl font-black text-[var(--text-primary)]'>
 									{getClientFullName(client)}

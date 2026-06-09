@@ -1,5 +1,6 @@
 import { CrmShell } from "../components/crm-shell";
 import { Breadcrumb } from "../components/breadcrumb";
+import { DeleteAction } from "../components/delete-action";
 import { IconLabel } from "../components/icon-label";
 import {
 	ManagementTable,
@@ -44,12 +45,18 @@ const columns: ManagementColumn<Client>[] = [
 	},
 	{
 		key: "events",
-		header: "Eventos",
+		header: "# Eventos",
 		render: client => (
 			<span className='font-black text-[var(--text-primary)]'>
 				{getClientEvents(client.id).length}
 			</span>
 		),
+	},
+	{
+		key: "action",
+		header: "Acción",
+		width: "minmax(130px, 0.75fr)",
+		render: () => <DeleteAction />,
 	},
 ];
 
@@ -60,10 +67,7 @@ export default function ClientsPage() {
 				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
 					<div>
 						<Breadcrumb
-							items={[
-								{ label: "Inicio", href: "/" },
-								{ label: "Clientes" },
-							]}
+							items={[{ label: "Inicio", href: "/" }, { label: "Clientes" }]}
 						/>
 						<h1 className='page-heading'>Clientes</h1>
 						<p className='mt-2 max-w-3xl text-lg text-[var(--text-secondary)]'>

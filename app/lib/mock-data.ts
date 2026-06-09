@@ -74,6 +74,17 @@ export type InventoryItem = {
 	thumbnailUrl: string;
 };
 
+export type QuoteStatus = "BORRADOR" | "ENVIADA" | "ACEPTADA";
+
+export type QuoteRecord = {
+	id: string;
+	number: string;
+	eventId: string;
+	status: QuoteStatus;
+	total: number;
+	validUntil: string;
+};
+
 export const clients: Client[] = [
 	{
 		id: "cliente-1",
@@ -311,6 +322,27 @@ export const suggestedQuote = {
 	total: 185000,
 };
 
+export const quotes: QuoteRecord[] = events
+	.filter(event =>
+		["COTIZADO", "RESERVADO", "CONFIRMADO"].includes(event.pipelineStatus),
+	)
+	.map((event, index) => ({
+		id: `cotizacion-${event.id}`,
+		number:
+			index === 0
+				? suggestedQuote.number
+				: `COT-2026-${String(44 + index).padStart(4, "0")}`,
+		eventId: event.id,
+		status:
+			event.pipelineStatus === "COTIZADO"
+				? "ENVIADA"
+				: event.pipelineStatus === "RESERVADO"
+					? "ACEPTADA"
+					: "BORRADOR",
+		total: event.estimatedTotal,
+		validUntil: event.date,
+	}));
+
 export function getClientFullName(client: Client) {
 	return `${client.firstName} ${client.lastName}`;
 }
@@ -319,12 +351,32 @@ export function getClientById(id: string) {
 	return clients.find(client => client.id === id);
 }
 
+export function getEventById(id: string) {
+	return events.find(event => event.id === id);
+}
+
+export function getCollaboratorById(id: string) {
+	return collaborators.find(collaborator => collaborator.id === id);
+}
+
+export function getInventoryItemById(id: string) {
+	return inventoryItems.find(item => item.id === id);
+}
+
+export function getQuoteById(id: string) {
+	return quotes.find(quote => quote.id === id);
+}
+
 export function getClientEvents(clientId: string) {
 	return events.filter(event => event.clientId === clientId);
 }
 
 export function getEventClient(event: EventRecord) {
 	return clients.find(client => client.id === event.clientId);
+}
+
+export function getQuoteEvent(quote: QuoteRecord) {
+	return events.find(event => event.id === quote.eventId);
 }
 
 export function formatCrc(amount: number) {

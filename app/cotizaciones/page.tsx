@@ -1,64 +1,40 @@
 import Link from "next/link";
 import { Breadcrumb } from "../components/breadcrumb";
 import { CrmShell } from "../components/crm-shell";
+import { DeleteAction } from "../components/delete-action";
 import { IconLabel } from "../components/icon-label";
 import { ManagementTable, type ManagementColumn } from "../components/management-table";
 import { StatusBadge } from "../components/status-badge";
 import {
-	events,
 	formatCrc,
 	formatDate,
 	getEventClient,
-	suggestedQuote,
-	type EventRecord,
+	getQuoteEvent,
+	quotes,
+	type QuoteRecord,
 } from "../lib/mock-data";
 
-type QuoteRow = {
-	id: string;
-	number: string;
-	event: EventRecord;
-	status: "BORRADOR" | "ENVIADA" | "ACEPTADA";
-	total: number;
-	validUntil: string;
-};
-
-const quoteRows: QuoteRow[] = events
-	.filter(event =>
-		["COTIZADO", "RESERVADO", "CONFIRMADO"].includes(event.pipelineStatus),
-	)
-	.map((event, index) => ({
-		id: `cotizacion-${event.id}`,
-		number:
-			index === 0
-				? suggestedQuote.number
-				: `COT-2026-${String(44 + index).padStart(4, "0")}`,
-		event,
-		status:
-			event.pipelineStatus === "COTIZADO"
-				? "ENVIADA"
-				: event.pipelineStatus === "RESERVADO"
-					? "ACEPTADA"
-					: "BORRADOR",
-		total: event.estimatedTotal,
-		validUntil: event.date,
-	}));
-
-const columns: ManagementColumn<QuoteRow>[] = [
+const columns: ManagementColumn<QuoteRecord>[] = [
 	{
 		key: "number",
 		header: "Cotización",
-		render: quote => (
-			<div>
-				<p className='font-black text-[var(--text-primary)]'>{quote.number}</p>
-				<p className='mt-1 text-base'>{quote.event.name}</p>
-			</div>
-		),
+		render: quote => {
+			const event = getQuoteEvent(quote);
+
+			return (
+				<div>
+					<p className='font-black text-[var(--text-primary)]'>{quote.number}</p>
+					<p className='mt-1 text-base'>{event?.name ?? "Sin evento"}</p>
+				</div>
+			);
+		},
 	},
 	{
 		key: "client",
 		header: "Cliente",
 		render: quote => {
-			const client = getEventClient(quote.event);
+			const event = getQuoteEvent(quote);
+			const client = event ? getEventClient(event) : undefined;
 
 			return client ? `${client.firstName} ${client.lastName}` : "Sin cliente";
 		},
@@ -81,6 +57,12 @@ const columns: ManagementColumn<QuoteRow>[] = [
 		key: "validUntil",
 		header: "Vigencia",
 		render: quote => formatDate(quote.validUntil),
+	},
+	{
+		key: "action",
+		header: "Acción",
+		width: "minmax(130px, 0.75fr)",
+		render: () => <DeleteAction />,
 	},
 ];
 
@@ -133,7 +115,11 @@ export default function QuotesPage() {
 						</label>
 					</div>
 
-					<ManagementTable columns={columns} rows={quoteRows} />
+					<ManagementTable
+						columns={columns}
+						rows={quotes}
+						rowHref={quote => `/cotizaciones/${quote.id}`}
+					/>
 				</section>
 			</div>
 		</CrmShell>

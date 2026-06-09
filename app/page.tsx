@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CrmShell } from "./components/crm-shell";
 import { Breadcrumb } from "./components/breadcrumb";
 import { StatusBadge } from "./components/status-badge";
@@ -88,12 +89,12 @@ export default function Home() {
 									Eventos cotizados, reservados o confirmados.
 								</p>
 							</div>
-							<a
+							<Link
 								href='/eventos'
 								className='secondary-action flex min-h-12 w-fit items-center rounded-full px-4 py-3 text-base font-black transition'
 							>
 								Ver calendario
-							</a>
+							</Link>
 						</div>
 
 						<div className='max-w-full overflow-x-auto rounded-lg border border-[color:var(--border-color)]'>
@@ -107,8 +108,9 @@ export default function Home() {
 								const client = getEventClient(event);
 
 								return (
-									<div
+									<Link
 										key={event.id}
+										href={`/eventos/${event.id}`}
 										className='grid min-w-[760px] grid-cols-[1.2fr_0.8fr_0.8fr_1fr] items-center border-t border-[color:var(--border-color)] px-5 py-5 text-lg text-[var(--text-secondary)]'
 									>
 										<span className='font-bold text-[var(--text-primary)]'>
@@ -123,7 +125,7 @@ export default function Home() {
 												? `${client.firstName} ${client.lastName}`
 												: "Sin cliente"}
 										</span>
-									</div>
+									</Link>
 								);
 							})}
 						</div>
@@ -192,12 +194,12 @@ export default function Home() {
 								</dd>
 							</div>
 						</dl>
-						<a
+						<Link
 							href='/cotizaciones/nueva'
 							className='mt-5 flex min-h-12 w-full items-center justify-center rounded-full bg-white px-4 py-3 text-base font-black text-[var(--secondary-color)] transition hover:bg-[#eefaf8]'
 						>
 							Abrir workflow
-						</a>
+						</Link>
 					</section>
 				</aside>
 			</div>
