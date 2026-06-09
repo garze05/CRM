@@ -4,7 +4,7 @@ import { icons as materialSymbolsIcons } from "@iconify-json/material-symbols";
 import { addCollection, Icon } from "@iconify/react";
 import { useRef, useState, type ChangeEvent } from "react";
 import type { InventoryCategory } from "../lib/mock-data";
-import { CollaboratorThumbnail, InventoryThumbnail } from "./entity-thumbnail";
+import { InitialsThumbnail, InventoryThumbnail } from "./entity-thumbnail";
 
 addCollection(materialSymbolsIcons);
 
@@ -17,6 +17,7 @@ type PhotoThumbnailControlProps =
 	| {
 			kind: "collaborator";
 			name: string;
+			initials: string;
 	  }
 	| {
 			kind: "inventory";
@@ -62,14 +63,8 @@ export function PhotoThumbnailControl(props: PhotoThumbnailControlProps) {
 	const isInventory = props.kind === "inventory";
 	const boxClass = isInventory ? "h-44 w-full rounded-lg" : "h-28 w-28 rounded-full";
 	const defaultThumbnail =
-		props.kind === "client" ? (
-			<div
-				className={`${boxClass} grid shrink-0 place-items-center border-4 border-white bg-[var(--accent-color)] text-4xl font-black text-[var(--on-accent)] shadow-[var(--crisp-shadow)]`}
-			>
-				{props.initials}
-			</div>
-		) : props.kind === "collaborator" ? (
-			<CollaboratorThumbnail size='profile' />
+		props.kind === "client" || props.kind === "collaborator" ? (
+			<InitialsThumbnail initials={props.initials} size='profile' />
 		) : (
 			<InventoryThumbnail category={props.category} size='lg' />
 		);

@@ -13,21 +13,26 @@ const inventoryCategoryIcons: Record<InventoryCategory, string> = {
 	OTRO: "material-symbols:widgets-rounded",
 };
 
-export function CollaboratorThumbnail({
+export function InitialsThumbnail({
+	initials,
 	size = "sm",
 }: {
-	size?: "sm" | "lg" | "profile";
+	initials: string;
+	size?: "sm" | "profile";
 }) {
-	const iconSize = size === "sm" ? "h-10 w-10" : "h-16 w-16";
 	const boxSize =
-		size === "profile" ? "h-28 w-28 rounded-full" : size === "lg" ? "h-24 w-24 rounded-lg" : "h-14 w-14 rounded-lg";
+		size === "profile" ? "h-28 w-28 text-4xl" : "h-14 w-14 text-xl";
+	const borderClass =
+		size === "profile"
+			? "border-4 border-white shadow-[var(--crisp-shadow)]"
+			: "border border-white shadow-sm";
 
 	return (
 		<div
-			className={`grid ${boxSize} shrink-0 place-items-center border border-[color:var(--border-color)] bg-[#f0ebe4] text-[var(--primary-color)]`}
+			className={`grid ${boxSize} ${borderClass} shrink-0 place-items-center rounded-full bg-[var(--accent-color)] font-black uppercase text-[var(--on-accent)]`}
 			aria-hidden='true'
 		>
-			<Icon icon='material-symbols:person-rounded' className={iconSize} />
+			{initials}
 		</div>
 	);
 }

@@ -1,11 +1,15 @@
 import { CrmShell } from "../components/crm-shell";
 import { Breadcrumb } from "../components/breadcrumb";
 import { DeleteAction } from "../components/delete-action";
-import { CollaboratorThumbnail } from "../components/entity-thumbnail";
+import { InitialsThumbnail } from "../components/entity-thumbnail";
 import { IconLabel } from "../components/icon-label";
 import { ManagementTable, type ManagementColumn } from "../components/management-table";
 import { StatusBadge } from "../components/status-badge";
 import { collaborators, type Collaborator } from "../lib/mock-data";
+
+function getCollaboratorInitials(collaborator: Collaborator) {
+	return `${collaborator.firstName[0]}${collaborator.lastName[0]}`;
+}
 
 const columns: ManagementColumn<Collaborator>[] = [
 	{
@@ -13,7 +17,7 @@ const columns: ManagementColumn<Collaborator>[] = [
 		header: "Colaborador",
 		render: collaborator => (
 			<div className='flex items-center gap-3'>
-				<CollaboratorThumbnail />
+				<InitialsThumbnail initials={getCollaboratorInitials(collaborator)} />
 				<div>
 					<p className='font-black text-[var(--text-primary)]'>
 						{collaborator.firstName} {collaborator.lastName}

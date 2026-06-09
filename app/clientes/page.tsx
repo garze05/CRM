@@ -1,6 +1,7 @@
 import { CrmShell } from "../components/crm-shell";
 import { Breadcrumb } from "../components/breadcrumb";
 import { DeleteAction } from "../components/delete-action";
+import { InitialsThumbnail } from "../components/entity-thumbnail";
 import { IconLabel } from "../components/icon-label";
 import {
 	ManagementTable,
@@ -15,16 +16,23 @@ import {
 	type Client,
 } from "../lib/mock-data";
 
+function getClientInitials(client: Client) {
+	return `${client.firstName[0]}${client.lastName[0]}`;
+}
+
 const columns: ManagementColumn<Client>[] = [
 	{
 		key: "name",
 		header: "Cliente",
 		render: client => (
-			<div>
-				<p className='font-black text-[var(--text-primary)]'>
-					{getClientFullName(client)}
-				</p>
-				<p className='mt-1 text-base'>{client.phone}</p>
+			<div className='flex items-center gap-3'>
+				<InitialsThumbnail initials={getClientInitials(client)} />
+				<div>
+					<p className='font-black text-[var(--text-primary)]'>
+						{getClientFullName(client)}
+					</p>
+					<p className='mt-1 text-base'>{client.phone}</p>
+				</div>
 			</div>
 		),
 	},
@@ -77,7 +85,7 @@ export default function ClientsPage() {
 					</div>
 					<button
 						type='button'
-						className='primary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-blacktransition'
+						className='primary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
 					>
 						<IconLabel label='Nuevo cliente' />
 					</button>

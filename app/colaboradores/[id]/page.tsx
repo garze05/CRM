@@ -18,6 +18,7 @@ export default async function CollaboratorDetailPage({
 	}
 
 	const fullName = `${collaborator.firstName} ${collaborator.lastName}`;
+	const initials = `${collaborator.firstName[0]}${collaborator.lastName[0]}`;
 
 	return (
 		<CrmShell>
@@ -102,7 +103,11 @@ export default async function CollaboratorDetailPage({
 				<aside className='min-w-0 space-y-5'>
 					<section className='surface-card p-5'>
 						<div className='mb-5'>
-							<PhotoThumbnailControl kind='collaborator' name={fullName} />
+							<PhotoThumbnailControl
+								kind='collaborator'
+								name={fullName}
+								initials={initials}
+							/>
 						</div>
 						<div className='mb-5'>
 							<div>
