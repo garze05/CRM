@@ -36,12 +36,6 @@ export default function Home() {
 							pendiente.
 						</p>
 					</div>
-					<a
-						href='/cotizaciones/nueva'
-						className='primary-action flex min-h-12 w-fit items-center rounded-full px-5 py-3 text-base font-black transition'
-					>
-						Nueva cotización
-					</a>
 				</div>
 			</header>
 

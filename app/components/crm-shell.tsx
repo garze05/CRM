@@ -51,6 +51,12 @@ const navigationGroups = [
 				icon: "material-symbols:inventory-2-rounded",
 				activeMatch: "/inventario",
 			},
+			{
+				label: "Cotizaciones",
+				href: "/cotizaciones",
+				icon: "material-symbols:request-quote-rounded",
+				activeMatch: "/cotizaciones",
+			},
 		],
 	},
 	{
@@ -192,23 +198,6 @@ function SidebarUser() {
 	);
 }
 
-function NewQuoteLink({ onNavigate }: { onNavigate?: () => void }) {
-	return (
-		<Link
-			href='/cotizaciones/nueva'
-			onClick={onNavigate}
-			className='mb-8 flex min-h-14 justify-center items-center gap-3 px-5 py-3 text-lg font-black rounded-lg transition hover:text-[var(--primary-color)] bg-[var(--secondary-color)] shadow-[var(--crisp-shadow)] text-white'
-		>
-			<Icon
-				icon='material-symbols:add-circle-rounded'
-				className='h-6 w-6 shrink-0'
-				aria-hidden='true'
-			/>
-			<span>Nueva cotización</span>
-		</Link>
-	);
-}
-
 function AccountActions({ onNavigate }: { onNavigate?: () => void }) {
 	return (
 		<div className='border-t border-[color:var(--border-color)] pt-5'>
@@ -245,7 +234,6 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 	return (
 		<>
 			<SidebarUser />
-			<NewQuoteLink onNavigate={onNavigate} />
 			<NavigationContent onNavigate={onNavigate} />
 			<SidebarPaperworkLink onNavigate={onNavigate} />
 			<AccountActions onNavigate={onNavigate} />
@@ -291,9 +279,9 @@ const mobileNavigationItems = [
 	navigationGroups[0].items[0],
 	navigationGroups[0].items[1],
 	{
-		label: "Cotizar",
-		href: "/cotizaciones/nueva",
-		icon: "material-symbols:add-circle-rounded",
+		label: "Cotizaciones",
+		href: "/cotizaciones",
+		icon: "material-symbols:request-quote-rounded",
 		activeMatch: "/cotizaciones",
 	},
 ];

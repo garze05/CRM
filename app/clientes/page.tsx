@@ -1,6 +1,9 @@
 import { CrmShell } from "../components/crm-shell";
 import { IconLabel } from "../components/icon-label";
-import { ManagementTable, type ManagementColumn } from "../components/management-table";
+import {
+	ManagementTable,
+	type ManagementColumn,
+} from "../components/management-table";
 import { StatusBadge } from "../components/status-badge";
 import {
 	clients,
@@ -55,12 +58,8 @@ export default function ClientsPage() {
 			<header className='px-5 pb-6 pt-8 md:px-8 md:pt-10'>
 				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
 					<div>
-						<p className='page-kicker mb-2'>
-							Gestión
-						</p>
-						<h1 className='page-heading'>
-							Clientes
-						</h1>
+						<p className='page-kicker mb-2'>Gestión</p>
+						<h1 className='page-heading'>Clientes</h1>
 						<p className='mt-2 max-w-3xl text-lg text-[var(--text-secondary)]'>
 							Repositorio central de contactos para WhatsApp, seguimiento y
 							cotizaciones.
@@ -68,7 +67,7 @@ export default function ClientsPage() {
 					</div>
 					<button
 						type='button'
-						className='primary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
+						className='primary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-blacktransition'
 					>
 						<IconLabel label='Nuevo cliente' />
 					</button>

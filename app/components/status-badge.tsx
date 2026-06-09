@@ -27,6 +27,11 @@ const badgeStyles: Record<string, string> = {
 	MANTENIMIENTO_PENDIENTE: "bg-[#fff0cf] text-[#6f5600]",
 	ACTIVO: "bg-[#d8f5f2] text-[var(--secondary-color)]",
 	PAUSADO: "bg-[#eee8e1] text-[var(--text-secondary)]",
+	BORRADOR: "bg-[#eee8e1] text-[var(--text-secondary)]",
+	ENVIADA: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
+	ACEPTADA: "bg-[#d8f5f2] text-[var(--secondary-color)]",
+	VENCIDA: "bg-[#fff0cf] text-[#6f5600]",
+	RECHAZADA: "bg-[#ffe0e3] text-[var(--error-color)]",
 };
 
 export function StatusBadge({
