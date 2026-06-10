@@ -1,11 +1,14 @@
-import { Breadcrumb } from "../components/breadcrumb";
+import Link from "next/link";
 import { DeleteAction } from "../components/delete-action";
 import { InventoryThumbnail } from "../components/entity-thumbnail";
 import { IconLabel } from "../components/icon-label";
+import { ListFilters } from "../components/list-filters";
 import {
 	ManagementTable,
 	type ManagementColumn,
 } from "../components/management-table";
+import { PageHeader } from "../components/page-header";
+import { SectionCard } from "../components/section-card";
 import { StatusBadge } from "../components/status-badge";
 import { inventoryItems, type InventoryItem } from "../lib/mock-data";
 
@@ -87,51 +90,34 @@ const columns: ManagementColumn<InventoryItem>[] = [
 export default function InventoryPage() {
 	return (
 		<>
-			<header className='px-5 pb-6 pt-8 md:px-8 md:pt-10'>
-				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
-					<div>
-						<Breadcrumb
-							items={[
-								{ label: "Inicio", href: "/" },
-								{ label: "Inventario" },
-							]}
-						/>
-						<h1 className='page-heading'>Inventario</h1>
-						<p className='mt-2 max-w-3xl text-lg text-[var(--text-secondary)]'>
-							Catálogo visual de personajes, inflables, decoración y servicios
-							disponibles para cotizaciones.
-						</p>
-					</div>
-					<button
-						type='button'
+			<PageHeader
+				breadcrumb={[{ label: "Inicio", href: "/" }, { label: "Inventario" }]}
+				title='Inventario'
+				description='Catálogo visual de personajes, inflables, decoración y servicios disponibles para cotizaciones.'
+				actions={
+					<Link
+						href='/inventario/nuevo'
 						className='primary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
 					>
 						<IconLabel label='Nuevo ítem' />
-					</button>
-				</div>
-			</header>
+					</Link>
+				}
+			/>
 
 			<div className='space-y-5 px-5 pb-28 md:px-8 md:pb-8'>
-				<section className='surface-card p-5 md:p-7'>
-					<div className='mb-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_240px]'>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-							<span>Buscar inventario</span>
-							<input
-								placeholder='Nombre, categoría o tag'
-								className='form-control'
-							/>
-						</label>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-							<span>Categoría</span>
-							<select className='form-control'>
-								<option>Todas</option>
-								<option>Personaje</option>
-								<option>Inflable</option>
-								<option>Decoración</option>
-								<option>Otro</option>
-							</select>
-						</label>
-					</div>
+				<SectionCard>
+					<ListFilters
+						searchLabel='Buscar inventario'
+						searchPlaceholder='Nombre, categoría o tag'
+						selectLabel='Categoría'
+						selectOptions={[
+							{ label: "Todas" },
+							{ label: "Personaje" },
+							{ label: "Inflable" },
+							{ label: "Decoración" },
+							{ label: "Otro" },
+						]}
+					/>
 
 					<div className='mb-5 rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f0ebe4] p-4 text-lg text-[var(--text-secondary)]'>
 						Disponibilidad y mantenimiento quedan visibles como columnas para
@@ -143,7 +129,7 @@ export default function InventoryPage() {
 						rows={inventoryItems}
 						rowHref={item => `/inventario/${item.id}`}
 					/>
-				</section>
+				</SectionCard>
 			</div>
 		</>
 	);

@@ -1,7 +1,13 @@
-import { Breadcrumb } from "../components/breadcrumb";
+import Link from "next/link";
 import { DeleteAction } from "../components/delete-action";
 import { IconLabel } from "../components/icon-label";
-import { ManagementTable, type ManagementColumn } from "../components/management-table";
+import { ListFilters } from "../components/list-filters";
+import {
+	ManagementTable,
+	type ManagementColumn,
+} from "../components/management-table";
+import { PageHeader } from "../components/page-header";
+import { SectionCard } from "../components/section-card";
 import { StatusBadge } from "../components/status-badge";
 import {
 	events,
@@ -76,60 +82,41 @@ const columns: ManagementColumn<EventRecord>[] = [
 export default function EventsPage() {
 	return (
 		<>
-			<header className='px-5 pb-6 pt-8 md:px-8 md:pt-10'>
-				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
-					<div>
-						<Breadcrumb
-							items={[
-								{ label: "Inicio", href: "/" },
-								{ label: "Eventos" },
-							]}
-						/>
-						<h1 className='page-heading'>
-							Eventos
-						</h1>
-						<p className='mt-2 max-w-3xl text-lg text-[var(--text-secondary)]'>
-							Seguimiento de eventos cotizados, reservados, confirmados y
-							realizados.
-						</p>
-					</div>
-					<button
-						type='button'
+			<PageHeader
+				breadcrumb={[{ label: "Inicio", href: "/" }, { label: "Eventos" }]}
+				title='Eventos'
+				description='Seguimiento de eventos cotizados, reservados, confirmados y realizados.'
+				actions={
+					<Link
+						href='/eventos/nuevo'
 						className='primary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
 					>
 						<IconLabel label='Nuevo evento' />
-					</button>
-				</div>
-			</header>
+					</Link>
+				}
+			/>
 
 			<div className='space-y-5 px-5 pb-28 md:px-8 md:pb-8'>
-				<section className='surface-card p-5 md:p-7'>
-					<div className='mb-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_240px]'>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-							<span>Buscar evento</span>
-							<input
-								placeholder='Nombre, cliente, lugar o fecha'
-								className='form-control'
-							/>
-						</label>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-							<span>Estado</span>
-							<select className='form-control'>
-								<option>Todos</option>
-								<option>Cotizado</option>
-								<option>Reservado</option>
-								<option>Confirmado</option>
-								<option>Realizado</option>
-							</select>
-						</label>
-					</div>
+				<SectionCard>
+					<ListFilters
+						searchLabel='Buscar evento'
+						searchPlaceholder='Nombre, cliente, lugar o fecha'
+						selectLabel='Estado'
+						selectOptions={[
+							{ label: "Todos" },
+							{ label: "Cotizado" },
+							{ label: "Reservado" },
+							{ label: "Confirmado" },
+							{ label: "Realizado" },
+						]}
+					/>
 
 					<ManagementTable
 						columns={columns}
 						rows={events}
 						rowHref={event => `/eventos/${event.id}`}
 					/>
-				</section>
+				</SectionCard>
 			</div>
 		</>
 	);

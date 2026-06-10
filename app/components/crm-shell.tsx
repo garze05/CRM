@@ -57,6 +57,12 @@ const navigationGroups = [
 				icon: "material-symbols:request-quote-rounded",
 				activeMatch: "/cotizaciones",
 			},
+			{
+				label: "Reservaciones",
+				href: "/reservaciones",
+				icon: "material-symbols:payments-rounded",
+				activeMatch: "/reservaciones",
+			},
 		],
 	},
 	{

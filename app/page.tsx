@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { Breadcrumb } from "./components/breadcrumb";
+import { MetricCard } from "./components/metric-card";
+import { PageHeader } from "./components/page-header";
+import { SectionCard } from "./components/section-card";
 import { StatusBadge } from "./components/status-badge";
 import {
 	events,
@@ -24,24 +26,55 @@ export default function Home() {
 	const activeEvents = events.filter(event =>
 		["COTIZADO", "RESERVADO", "CONFIRMADO"].includes(event.pipelineStatus),
 	);
+	const confirmedIncome = events
+		.filter(event => ["CONFIRMADO", "REALIZADO"].includes(event.pipelineStatus))
+		.reduce((total, event) => total + event.estimatedTotal, 0);
+	const projectedIncome = activeEvents.reduce(
+		(total, event) => total + event.estimatedTotal,
+		0,
+	);
+	const nextEvents = events
+		.filter(event => event.pipelineStatus !== "CANCELADO")
+		.sort((a, b) => a.date.localeCompare(b.date))
+		.slice(0, 4);
 
 	return (
 		<>
-			<header className='px-5 pb-6 pt-8 md:px-8 md:pt-10'>
-				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
-					<div>
-						<Breadcrumb items={[{ label: "Inicio" }]} />
-						<h1 className='page-heading'>Página Principal</h1>
-						<p className='mt-2 max-w-3xl text-lg text-[var(--text-secondary)]'>
-							Vista diaria para seguimiento comercial, eventos activos y trabajo
-							pendiente.
-						</p>
-					</div>
-				</div>
-			</header>
+			<PageHeader
+				breadcrumb={[{ label: "Inicio" }]}
+				title='Página Principal'
+				description='Vista diaria para seguimiento comercial, eventos activos y trabajo pendiente.'
+			/>
 
 			<div className='grid min-w-0 flex-1 gap-5 px-5 pb-28 md:px-8 md:pb-8 xl:grid-cols-[minmax(0,1fr)_360px]'>
 				<div className='min-w-0 space-y-5'>
+					<section className='grid gap-4 md:grid-cols-2 xl:grid-cols-4'>
+						<MetricCard
+							label='Tasa de cierre'
+							value='38%'
+							helper='Leads a eventos realizados'
+							accentColor='var(--secondary-color)'
+						/>
+						<MetricCard
+							label='Ingreso confirmado'
+							value={formatCrc(confirmedIncome)}
+							helper='Eventos confirmados o realizados'
+							accentColor='var(--success-color)'
+						/>
+						<MetricCard
+							label='Ingreso proyectado'
+							value={formatCrc(projectedIncome)}
+							helper='Cotizado, reservado y confirmado'
+							accentColor='var(--accent-color)'
+						/>
+						<MetricCard
+							label='Respuesta promedio'
+							value='1.8 días'
+							helper='Entre cotización y respuesta'
+							accentColor='var(--warning-color)'
+						/>
+					</section>
+
 					<section className='surface-card min-w-0 border-t-4 border-t-[var(--accent-color)] p-5 md:p-7'>
 						<div className='mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
 							<div>
@@ -78,24 +111,18 @@ export default function Home() {
 						</div>
 					</section>
 
-					<section className='surface-card min-w-0 border-t-4 border-t-[var(--secondary-color)] p-5 md:p-7'>
-						<div className='mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
-							<div>
-								<h2 className='text-2xl font-black text-[var(--text-primary)]'>
-									Eventos activos
-								</h2>
-								<p className='mt-1 text-lg text-[var(--text-secondary)]'>
-									Eventos cotizados, reservados o confirmados.
-								</p>
-							</div>
+					<SectionCard
+						title='Eventos activos'
+						description='Eventos cotizados, reservados o confirmados.'
+						action={
 							<Link
 								href='/eventos'
 								className='secondary-action flex min-h-12 w-fit items-center rounded-full px-4 py-3 text-base font-black transition'
 							>
 								Ver calendario
 							</Link>
-						</div>
-
+						}
+					>
 						<div className='max-w-full overflow-x-auto rounded-lg border border-[color:var(--border-color)]'>
 							<div className='grid min-w-[760px] grid-cols-[1.2fr_0.8fr_0.8fr_1fr] bg-[#f0ebe4] px-5 py-4 text-base font-black text-[var(--text-secondary)]'>
 								<span>Nombre</span>
@@ -128,7 +155,44 @@ export default function Home() {
 								);
 							})}
 						</div>
-					</section>
+					</SectionCard>
+
+					<SectionCard
+						title='Calendario próximo'
+						description='Vista compacta para detectar fechas críticas y preparación operativa.'
+					>
+						<div className='grid gap-3 md:grid-cols-2'>
+							{nextEvents.map(event => {
+								const client = getEventClient(event);
+
+								return (
+									<Link
+										key={event.id}
+										href={`/eventos/${event.id}`}
+										className='rounded-lg border border-[color:var(--border-color)] bg-[#f0ebe4] p-4 transition hover:bg-[#f7f2ec]'
+									>
+										<div className='flex items-start justify-between gap-3'>
+											<div>
+												<p className='text-lg font-black text-[var(--text-primary)]'>
+													{event.name}
+												</p>
+												<p className='mt-1 text-base font-semibold text-[var(--text-secondary)]'>
+													{formatDate(event.date)} · {event.startTime}
+												</p>
+											</div>
+											<StatusBadge value={event.pipelineStatus} />
+										</div>
+										<p className='mt-3 text-base font-semibold text-[var(--text-secondary)]'>
+											{client
+												? `${client.firstName} ${client.lastName}`
+												: "Sin cliente"}{" "}
+											· {event.venueName}
+										</p>
+									</Link>
+								);
+							})}
+						</div>
+					</SectionCard>
 				</div>
 
 				<aside className='min-w-0 space-y-5'>

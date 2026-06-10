@@ -1,11 +1,14 @@
-import { Breadcrumb } from "../components/breadcrumb";
+import Link from "next/link";
 import { DeleteAction } from "../components/delete-action";
 import { InitialsThumbnail } from "../components/entity-thumbnail";
 import { IconLabel } from "../components/icon-label";
+import { ListFilters } from "../components/list-filters";
 import {
 	ManagementTable,
 	type ManagementColumn,
 } from "../components/management-table";
+import { PageHeader } from "../components/page-header";
+import { SectionCard } from "../components/section-card";
 import { StatusBadge } from "../components/status-badge";
 import {
 	clients,
@@ -70,54 +73,40 @@ const columns: ManagementColumn<Client>[] = [
 export default function ClientsPage() {
 	return (
 		<>
-			<header className='px-5 pb-6 pt-8 md:px-8 md:pt-10'>
-				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
-					<div>
-						<Breadcrumb
-							items={[{ label: "Inicio", href: "/" }, { label: "Clientes" }]}
-						/>
-						<h1 className='page-heading'>Clientes</h1>
-						<p className='mt-2 max-w-3xl text-lg text-[var(--text-secondary)]'>
-							Repositorio central de contactos para WhatsApp, seguimiento y
-							cotizaciones.
-						</p>
-					</div>
-					<button
-						type='button'
+			<PageHeader
+				breadcrumb={[{ label: "Inicio", href: "/" }, { label: "Clientes" }]}
+				title='Clientes'
+				description='Repositorio central de contactos para WhatsApp, seguimiento y cotizaciones.'
+				actions={
+					<Link
+						href='/clientes/nuevo'
 						className='primary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
 					>
 						<IconLabel label='Nuevo cliente' />
-					</button>
-				</div>
-			</header>
+					</Link>
+				}
+			/>
 
 			<div className='space-y-5 px-5 pb-28 md:px-8 md:pb-8'>
-				<section className='surface-card p-5 md:p-7'>
-					<div className='mb-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_240px]'>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-							<span>Buscar cliente</span>
-							<input
-								placeholder='Nombre, teléfono o tipo de cliente'
-								className='form-control'
-							/>
-						</label>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-							<span>Estado</span>
-							<select className='form-control'>
-								<option>Todos</option>
-								<option>Cotizado</option>
-								<option>Reservado</option>
-								<option>Recurrente</option>
-							</select>
-						</label>
-					</div>
+				<SectionCard>
+					<ListFilters
+						searchLabel='Buscar cliente'
+						searchPlaceholder='Nombre, teléfono o tipo de cliente'
+						selectLabel='Estado'
+						selectOptions={[
+							{ label: "Todos" },
+							{ label: "Cotizado" },
+							{ label: "Reservado" },
+							{ label: "Recurrente" },
+						]}
+					/>
 
 					<ManagementTable
 						columns={columns}
 						rows={clients}
 						rowHref={client => `/clientes/${client.id}`}
 					/>
-				</section>
+				</SectionCard>
 			</div>
 		</>
 	);
