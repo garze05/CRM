@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CrmShell } from "./components/crm-shell";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,7 +17,9 @@ export default function RootLayout({
       lang="es"
       className="h-full antialiased"
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <CrmShell>{children}</CrmShell>
+      </body>
     </html>
   );
 }

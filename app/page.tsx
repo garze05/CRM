@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { CrmShell } from "./components/crm-shell";
 import { Breadcrumb } from "./components/breadcrumb";
 import { StatusBadge } from "./components/status-badge";
 import {
@@ -27,7 +26,7 @@ export default function Home() {
 	);
 
 	return (
-		<CrmShell>
+		<>
 			<header className='px-5 pb-6 pt-8 md:px-8 md:pt-10'>
 				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
 					<div>
@@ -203,6 +202,6 @@ export default function Home() {
 					</section>
 				</aside>
 			</div>
-		</CrmShell>
+		</>
 	);
 }

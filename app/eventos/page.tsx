@@ -1,4 +1,3 @@
-import { CrmShell } from "../components/crm-shell";
 import { Breadcrumb } from "../components/breadcrumb";
 import { DeleteAction } from "../components/delete-action";
 import { IconLabel } from "../components/icon-label";
@@ -76,7 +75,7 @@ const columns: ManagementColumn<EventRecord>[] = [
 
 export default function EventsPage() {
 	return (
-		<CrmShell>
+		<>
 			<header className='px-5 pb-6 pt-8 md:px-8 md:pt-10'>
 				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
 					<div>
@@ -132,6 +131,6 @@ export default function EventsPage() {
 					/>
 				</section>
 			</div>
-		</CrmShell>
+		</>
 	);
 }

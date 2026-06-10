@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "../../components/breadcrumb";
-import { CrmShell } from "../../components/crm-shell";
 import { PhotoThumbnailControl } from "../../components/photo-thumbnail-control";
 import { StatusBadge } from "../../components/status-badge";
 import { getInventoryItemById } from "../../lib/mock-data";
@@ -23,7 +22,7 @@ export default async function InventoryDetailPage({
 			: item.availabilityStatus;
 
 	return (
-		<CrmShell>
+		<>
 			<header className='px-5 pb-6 pt-8 md:px-8 md:pt-10'>
 				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
 					<div>
@@ -117,6 +116,6 @@ export default async function InventoryDetailPage({
 					</section>
 				</aside>
 			</div>
-		</CrmShell>
+		</>
 	);
 }

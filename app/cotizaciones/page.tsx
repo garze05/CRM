@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Breadcrumb } from "../components/breadcrumb";
-import { CrmShell } from "../components/crm-shell";
 import { DeleteAction } from "../components/delete-action";
 import { IconLabel } from "../components/icon-label";
 import { ManagementTable, type ManagementColumn } from "../components/management-table";
@@ -68,7 +67,7 @@ const columns: ManagementColumn<QuoteRecord>[] = [
 
 export default function QuotesPage() {
 	return (
-		<CrmShell>
+		<>
 			<header className='px-5 pb-6 pt-8 md:px-8 md:pt-10'>
 				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
 					<div>
@@ -122,6 +121,6 @@ export default function QuotesPage() {
 					/>
 				</section>
 			</div>
-		</CrmShell>
+		</>
 	);
 }
