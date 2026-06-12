@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Breadcrumb } from "../../components/breadcrumb";
-import { CrmShell } from "../../components/crm-shell";
+import { PageHeader } from "../../components/page-header";
 import { StatusBadge } from "../../components/status-badge";
+import { TaskPanel } from "../../components/task-panel";
 import {
 	formatCrc,
 	formatDate,
 	getEventClient,
 	getQuoteById,
 	getQuoteEvent,
+	getQuoteTasks,
 	suggestedQuote,
 } from "../../lib/mock-data";
 
@@ -26,29 +27,24 @@ export default async function QuoteDetailPage({
 
 	const event = getQuoteEvent(quote);
 	const client = event ? getEventClient(event) : undefined;
+	const quoteTasks = getQuoteTasks(quote.id);
 
 	return (
-		<CrmShell>
-			<header className='px-5 pb-6 pt-8 md:px-8 md:pt-10'>
-				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
-					<div>
-						<Breadcrumb
-							items={[
-								{ label: "Inicio", href: "/" },
-								{ label: "Cotizaciones", href: "/cotizaciones" },
-								{ label: quote.number },
-							]}
-						/>
-						<div className='flex flex-wrap items-center gap-3'>
-							<h1 className='page-heading'>{quote.number}</h1>
-							<StatusBadge value={quote.status} />
-						</div>
-					</div>
+		<>
+			<PageHeader
+				breadcrumb={[
+					{ label: "Inicio", href: "/" },
+					{ label: "Cotizaciones", href: "/cotizaciones" },
+					{ label: quote.number },
+				]}
+				title={quote.number}
+				badges={<StatusBadge value={quote.status} />}
+				actions={
 					<button className='primary-action min-h-12 rounded-full px-5 py-3 text-base font-black transition'>
 						Guardar cambios
 					</button>
-				</div>
-			</header>
+				}
+			/>
 
 			<div className='grid min-w-0 flex-1 gap-5 px-5 pb-28 md:px-8 md:pb-8 xl:grid-cols-[minmax(0,1fr)_360px]'>
 				<section className='surface-card min-w-0 p-5 md:p-7'>
@@ -144,8 +140,15 @@ export default async function QuoteDetailPage({
 							</Link>
 						) : null}
 					</section>
+
+					<TaskPanel
+						title='Tareas de la cotización'
+						entityHref={`/cotizaciones/${quote.id}`}
+						entityLabel={quote.number}
+						tasks={quoteTasks}
+					/>
 				</aside>
 			</div>
-		</CrmShell>
+		</>
 	);
 }

@@ -12,7 +12,7 @@ Cubre el ciclo completo: captación de prospectos → seguimiento → cotizació
 - Tipos de cliente: Familiar, Institución Educativa, Corporativo — cada uno con lógica de precios distinta.
 - Variables de cotización: paquete base + servicios adicionales + transporte (calculado via Google Maps API) + tipo de cliente.
 - Usuarios del sistema: 2–3 personas (equipo familiar/pequeño). No se requieren roles complejos en el MVP.
-- Stack definido: Next.js 14, PostgreSQL + Prisma, NextAuth con Google OAuth.
+- Stack definido: Next.js 16, PostgreSQL + Prisma, NextAuth con Google OAuth.
 
 ---
 
@@ -162,7 +162,7 @@ PROSPECTO → CONTACTADO → COTIZADO → RESERVADO → CONFIRMADO → REALIZADO
 
 - `id` — UUID
 - `evento_id` — FK a Eventos, requerido
-- `numero_cotizacion` — string legible, generado automáticamente (ej: `COT-2025-0043`)
+- `numero_cotizacion` — string legible, generado automáticamente con formato `C{DDMM}-{YY}{consecutivo}` (ej: `C1503-26101`)
 - `subtotal` — decimal calculado
 - `costo_transporte` — decimal, calculado por Google Maps API
 - `descuento` — decimal, opcional
@@ -193,7 +193,7 @@ PROSPECTO → CONTACTADO → COTIZADO → RESERVADO → CONFIRMADO → REALIZADO
 - `id` — UUID
 - `evento_id` — FK a Eventos, requerido
 - `cotizacion_id` — FK a Cotizaciones, requerido
-- `numero_reservacion` — string legible (ej: `RES-2025-0021`)
+- `numero_reservacion` — string legible, generado automáticamente con formato `R{DDMM}-{YY}{consecutivo}` (ej: `R1503-26101`)
 - `total_acordado` — decimal (puede diferir del total cotizado si hubo ajuste)
 - `pago_anticipo` — decimal (50% del total, calculado automáticamente)
 - `pago_anticipo_fecha_limite` — date (2 semanas antes del evento)
@@ -336,7 +336,7 @@ Lo siguiente está identificado pero se construye en fases posteriores:
 
 Estos principios aplican a toda la interfaz y deben respetarse en cada componente construido:
 
-- **Tipografía grande:** el tamaño de fuente base de la interfaz debe ser generoso (mínimo 16px body, títulos y etiquetas de campo proporcionalmente mayores). El sistema lo usa gente que opera rápido; la legibilidad es prioridad sobre la densidad de información.
+- **Tipografía normal y accesible:** el tamaño base de la interfaz debe mantenerse en 16px para legibilidad, pero sin escalar títulos, etiquetas, tablas o formularios de forma exagerada. La UI debe evitar que la información se salga de contenedores; si un usuario necesita verla más grande, puede usar los controles de zoom del navegador. Priorizar jerarquía clara, contraste suficiente, objetivos táctiles accesibles y texto que respire sin romper layouts.
 - **Iconos con etiqueta obligatoria:** ningún ícono debe aparecer solo. Todo ícono debe ir acompañado de un texto descriptivo visible a su lado. No se permiten íconos sin label, ni tooltips como sustituto de la etiqueta (los tooltips son complemento, no reemplazo).
 - **Diseño de referencia:** el wireframe en papel existente es el punto de partida; cualquier decisión de layout debe partir de él antes de proponer cambios.
 

@@ -40,37 +40,45 @@ const navigationGroups = [
 				activeMatch: "/eventos",
 			},
 			{
+				label: "Cotizaciones",
+				href: "/cotizaciones",
+				icon: "material-symbols:request-quote-rounded",
+				activeMatch: "/cotizaciones",
+			},
+			{
+				label: "Reservaciones",
+				href: "/reservaciones",
+				icon: "material-symbols:payments-rounded",
+				activeMatch: "/reservaciones",
+			},
+			{
 				label: "Colaboradores",
 				href: "/colaboradores",
 				icon: "material-symbols:family-star",
 				activeMatch: "/colaboradores",
 			},
 			{
-				label: "Inventario",
-				href: "/inventario",
-				icon: "material-symbols:inventory-2-rounded",
-				activeMatch: "/inventario",
-			},
-			{
-				label: "Cotizaciones",
-				href: "/cotizaciones",
-				icon: "material-symbols:request-quote-rounded",
-				activeMatch: "/cotizaciones",
+				label: "Tareas",
+				href: "/tareas",
+				icon: "material-symbols:checklist-rounded",
+				activeMatch: "/tareas",
 			},
 		],
 	},
 	{
-		label: "Métricas",
+		label: "Oferta",
 		items: [
 			{
-				label: "General",
-				href: "/",
-				icon: "material-symbols:dashboard-rounded",
+				label: "Paquetes y servicios",
+				href: "/paquetes",
+				icon: "material-symbols:package-rounded",
+				activeMatch: "/paquetes",
 			},
 			{
-				label: "Ventas",
-				href: "/",
-				icon: "material-symbols:monitoring-rounded",
+				label: "Catálogo",
+				href: "/inventario",
+				icon: "material-symbols:photo-library-rounded",
+				activeMatch: "/inventario",
 			},
 		],
 	},
@@ -125,13 +133,14 @@ function NavigationLink({
 		<Link
 			href={item.href}
 			onClick={onClick}
-			className={`flex min-h-12 items-center gap-3 rounded-lg px-4 py-3 font-extrabold transition ${
+			aria-current={isActive ? "page" : undefined}
+			className={`flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-[0.95rem] font-extrabold transition ${
 				isActive
 					? "bg-[var(--accent-color)] text-[var(--on-accent)] shadow-sm"
 					: "text-[var(--text-secondary)] hover:bg-[#f0ebe4] hover:text-[var(--primary-color)]"
 			}`}
 		>
-			<Icon icon={item.icon} className='h-6 w-6 shrink-0' aria-hidden='true' />
+			<Icon icon={item.icon} className='h-5 w-5 shrink-0' aria-hidden='true' />
 			<span>{item.label}</span>
 		</Link>
 	);
@@ -140,11 +149,11 @@ function NavigationLink({
 function NavigationContent({ onNavigate }: { onNavigate?: () => void }) {
 	return (
 		<>
-			<nav className='space-y-7 text-lg'>
+			<nav className='space-y-5'>
 				<section aria-labelledby='inicio'>
 					<h2
 						id='inicio'
-						className='mb-3 text-sm font-black uppercase text-[var(--text-muted)]'
+						className='mb-2 text-xs font-black uppercase text-[var(--text-muted)]'
 					>
 						Inicio
 					</h2>
@@ -155,11 +164,11 @@ function NavigationContent({ onNavigate }: { onNavigate?: () => void }) {
 					<section key={group.label} aria-labelledby={group.label}>
 						<h2
 							id={group.label}
-							className='mb-3 text-sm font-black uppercase text-[var(--text-muted)]'
+							className='mb-2 text-xs font-black uppercase text-[var(--text-muted)]'
 						>
 							{group.label}
 						</h2>
-						<div className='space-y-2'>
+						<div className='space-y-1.5'>
 							{group.items.map(item => (
 								<NavigationLink
 									key={item.label}
@@ -177,15 +186,15 @@ function NavigationContent({ onNavigate }: { onNavigate?: () => void }) {
 
 function SidebarUser() {
 	return (
-		<div className='mb-6 flex items-center gap-3'>
-			<div className='grid h-14 w-14 shrink-0 place-items-center rounded-full bg-[var(--accent-color)] text-md font-black text-[var(--on-accent)]'>
+		<div className='mb-5 flex items-center gap-3'>
+			<div className='grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[var(--accent-color)] text-sm font-black text-[var(--on-accent)]'>
 				{mockUser.initials}
 			</div>
 			<div className='min-w-0'>
-				<p className='truncate text-lg font-black text-[var(--primary-color)]'>
+				<p className='truncate text-[0.95rem] font-black text-[var(--primary-color)]'>
 					{mockUser.name}
 				</p>
-				<p className='text-base font-semibold text-[var(--text-secondary)]'>
+				<p className='text-sm font-semibold text-[var(--text-secondary)]'>
 					{mockUser.role}
 				</p>
 			</div>
@@ -195,8 +204,8 @@ function SidebarUser() {
 
 function AccountActions({ onNavigate }: { onNavigate?: () => void }) {
 	return (
-		<div className='mt-auto border-t border-[color:var(--border-color)] pt-5'>
-			<div className='space-y-2 text-lg'>
+		<div className='mt-auto border-t border-[color:var(--border-color)] pt-4'>
+			<div className='space-y-1.5'>
 				{accountItems.map(item => (
 					<NavigationLink key={item.label} item={item} onClick={onNavigate} />
 				))}
@@ -217,29 +226,29 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
 function GlobalSearch() {
 	return (
-		<header className='sticky top-0 z-30 border-b border-[color:var(--border-color)] bg-[var(--surface-color)]/95 px-4 py-4 backdrop-blur md:px-8'>
+		<header className='sticky top-0 z-30 border-b border-[color:var(--border-color)] bg-[var(--surface-color)]/95 px-4 py-3 backdrop-blur md:px-6'>
 			<div className='flex w-full items-center justify-between gap-4'>
-				<div className='flex w-full max-w-2xl items-center justify-start gap-3'>
+				<div className='flex w-full max-w-xl items-center justify-start gap-3'>
 					<label className='relative min-w-0 flex-1'>
 						<span className='sr-only'>Buscar cliente o evento</span>
 						<Icon
 							icon='material-symbols:search-rounded'
-							className='pointer-events-none absolute left-4 top-1/2 h-6 w-6 -translate-y-1/2 text-[var(--text-muted)]'
+							className='pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--text-muted)]'
 							aria-hidden='true'
 						/>
 						<input
 							type='search'
 							placeholder='Buscar cliente o evento'
-							className='h-14 w-full rounded-lg border border-[color:var(--border-color)] bg-[#efede8] pl-12 pr-4 text-base font-bold text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[color:var(--accent-color)] focus:bg-[var(--surface-color)] focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--accent-color)_20%,transparent)]'
+							className='h-11 w-full rounded-lg border border-[color:var(--border-color)] bg-[#efede8] pl-11 pr-4 text-sm font-bold text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[color:var(--accent-color)] focus:bg-[var(--surface-color)] focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--accent-color)_20%,transparent)]'
 						/>
 					</label>
 					<button
 						type='button'
-						className='flex h-14 shrink-0 items-center gap-2 rounded-full bg-[var(--secondary-color)] px-4 text-base font-black text-white shadow-[var(--crisp-shadow)] transition hover:bg-[var(--secondary-hover)]'
+						className='flex h-11 shrink-0 items-center gap-2 rounded-lg bg-[var(--secondary-color)] px-4 text-sm font-black text-white shadow-[var(--crisp-shadow)] transition hover:bg-[var(--secondary-hover)]'
 					>
 						<Icon
 							icon='material-symbols:mic-rounded'
-							className='h-6 w-6 shrink-0'
+							className='h-5 w-5 shrink-0'
 							aria-hidden='true'
 						/>
 						<span>Voz</span>
@@ -247,11 +256,11 @@ function GlobalSearch() {
 				</div>
 				<Link
 					href='/'
-					className='flex h-14 shrink-0 items-center gap-2 rounded-full px-4 text-base font-black text-[var(--text-secondary)] transition hover:bg-[#f0ebe4] hover:text-[var(--primary-color)]'
+					className='flex h-11 shrink-0 items-center gap-2 rounded-lg px-3 text-sm font-black text-[var(--text-secondary)] transition hover:bg-[#f0ebe4] hover:text-[var(--primary-color)]'
 				>
 					<Icon
 						icon='material-symbols:logout-rounded'
-						className='h-6 w-6 shrink-0'
+						className='h-5 w-5 shrink-0'
 						aria-hidden='true'
 					/>
 					<span>Cerrar sesión</span>
@@ -261,16 +270,12 @@ function GlobalSearch() {
 	);
 }
 
+// Inicio · Eventos · Tareas · Clientes: lo que se consulta en campo.
 const mobileNavigationItems = [
 	homeItem,
-	navigationGroups[0].items[0],
 	navigationGroups[0].items[1],
-	{
-		label: "Cotizaciones",
-		href: "/cotizaciones",
-		icon: "material-symbols:request-quote-rounded",
-		activeMatch: "/cotizaciones",
-	},
+	navigationGroups[0].items[5],
+	navigationGroups[0].items[0],
 ];
 
 function MobileNavigation() {
@@ -285,6 +290,7 @@ function MobileNavigation() {
 					<Link
 						key={item.label}
 						href={item.href}
+						aria-current={isActive ? "page" : undefined}
 						className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg px-1 text-xs font-black transition ${
 							isActive
 								? "bg-[var(--accent-color)] text-[var(--on-accent)]"
@@ -305,24 +311,38 @@ function MobileNavigation() {
 }
 
 export function CrmShell({ children }: { children: ReactNode }) {
+	const pathname = usePathname();
+
+	// La vista pública del catálogo vive fuera del shell autenticado
+	// (en la fase 1 esto se formaliza con el grupo de rutas (app) + middleware).
+	if (pathname.startsWith("/catalogo")) {
+		return <main id='contenido-principal'>{children}</main>;
+	}
+
 	return (
 		<main className='min-h-screen bg-[var(--background-color)] text-[var(--text-primary)]'>
+			<a
+				href='#contenido-principal'
+				className='sr-only z-50 rounded-lg bg-[var(--primary-color)] px-4 py-3 text-base font-black text-white focus:not-sr-only focus:absolute focus:left-4 focus:top-4'
+			>
+				Saltar al contenido principal
+			</a>
 			<div className='flex min-h-screen'>
-				<aside className='sticky top-0 hidden h-screen w-72 shrink-0 flex-col overflow-y-auto border-r border-[color:var(--border-color)] bg-[var(--surface-color)] px-5 py-6 text-[var(--text-primary)] lg:flex'>
-					<Link href='/' className='mb-5 block'>
+				<aside className='sticky top-0 hidden h-screen w-60 shrink-0 flex-col overflow-y-auto border-r border-[color:var(--border-color)] bg-[var(--surface-color)] px-4 py-5 text-[var(--text-primary)] lg:flex'>
+					<Link href='/' className='mb-4 block'>
 						<Image
 							src='/okidokicrm_black_logo.png'
 							alt='OkiDoki CRM'
 							width={220}
 							height={80}
 							priority
-							className='h-auto max-h-36 w-full object-contain'
+							className='h-auto max-h-28 w-full object-contain'
 						/>
 					</Link>
 					<SidebarContent />
 				</aside>
 
-				<section className='flex min-w-0 flex-1 flex-col'>
+				<section id='contenido-principal' className='flex min-w-0 flex-1 flex-col'>
 					<GlobalSearch />
 
 					{children}

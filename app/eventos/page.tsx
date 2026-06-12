@@ -1,137 +1,156 @@
-import { CrmShell } from "../components/crm-shell";
-import { Breadcrumb } from "../components/breadcrumb";
-import { DeleteAction } from "../components/delete-action";
+import Link from "next/link";
 import { IconLabel } from "../components/icon-label";
-import { ManagementTable, type ManagementColumn } from "../components/management-table";
-import { StatusBadge } from "../components/status-badge";
+import { PageHeader } from "../components/page-header";
+import { SectionCard } from "../components/section-card";
 import {
+	EventsCalendar,
+	type CalendarRange,
+} from "./calendar/events-calendar";
+import type { CalendarEvent } from "./calendar/event-card";
+import { EventsTable, type EventRow } from "./events-table";
+import {
+	collaborators,
 	events,
-	formatCrc,
-	formatDate,
+	getEventAssignments,
 	getEventClient,
-	type EventRecord,
 } from "../lib/mock-data";
 
-const columns: ManagementColumn<EventRecord>[] = [
-	{
-		key: "event",
-		header: "Evento",
-		render: event => (
-			<div>
-				<p className='font-black text-[var(--text-primary)]'>{event.name}</p>
-				<p className='mt-1 text-base'>{event.venueName}</p>
-			</div>
-		),
-	},
-	{
-		key: "client",
-		header: "Cliente",
-		render: event => {
-			const client = getEventClient(event);
+function buildAlerts(event: EventRow, collaboratorNames: string[]): string[] {
+	const alerts: string[] = [];
 
-			return client ? `${client.firstName} ${client.lastName}` : "Sin cliente";
-		},
-	},
-	{
-		key: "date",
-		header: "Fecha",
-		render: event => (
-			<div>
-				<p>{formatDate(event.date)}</p>
-				<p className='mt-1 text-base'>{event.startTime}</p>
-			</div>
-		),
-	},
-	{
-		key: "type",
-		header: "Tipo",
-		render: event => <StatusBadge value={event.type} />,
-	},
-	{
-		key: "status",
-		header: "Estado",
-		render: event => <StatusBadge value={event.pipelineStatus} />,
-	},
-	{
-		key: "payment",
-		header: "Pago",
-		render: event => <StatusBadge value={event.paymentStatus} />,
-	},
-	{
-		key: "total",
-		header: "Total",
-		render: event => (
-			<span className='font-black text-[var(--text-primary)]'>
-				{formatCrc(event.estimatedTotal)}
-			</span>
-		),
-	},
-	{
-		key: "action",
-		header: "Acción",
-		width: "minmax(130px, 0.75fr)",
-		render: () => <DeleteAction />,
-	},
-];
+	if (
+		["RESERVADO", "CONFIRMADO"].includes(event.pipelineStatus) &&
+		event.paymentStatus === "PENDIENTE_ANTICIPO"
+	) {
+		alerts.push("Anticipo pendiente");
+	}
+	if (event.pipelineStatus === "CONFIRMADO" && collaboratorNames.length === 0) {
+		alerts.push("Sin colaboradores asignados");
+	}
 
-export default function EventsPage() {
+	return alerts;
+}
+
+export default async function EventsPage({
+	searchParams,
+}: {
+	searchParams: Promise<{
+		etapa?: string;
+		vista?: string;
+		rango?: string;
+		fecha?: string;
+	}>;
+}) {
+	const { etapa, vista, rango, fecha } = await searchParams;
+
+	const isCalendar = vista === "calendario";
+	const calendarRange: CalendarRange = ["mes", "semana", "dia"].includes(
+		rango ?? "",
+	)
+		? (rango as CalendarRange)
+		: "mes";
+	const today = new Date().toISOString().slice(0, 10);
+	const referenceDate = /^\d{4}-\d{2}-\d{2}$/.test(fecha ?? "")
+		? (fecha as string)
+		: today;
+
+	const rows: CalendarEvent[] = events.map(event => {
+		const client = getEventClient(event);
+		const collaboratorNames = getEventAssignments(event.id)
+			.map(assignment => {
+				const collaborator = collaborators.find(
+					person => person.id === assignment.collaboratorId,
+				);
+				return collaborator
+					? `${collaborator.firstName} ${collaborator.lastName}`
+					: null;
+			})
+			.filter((name): name is string => name !== null);
+
+		const base: EventRow = {
+			...event,
+			clientName: client
+				? `${client.firstName} ${client.lastName}`
+				: "Sin cliente",
+			clientPhone: client?.phone ?? "",
+		};
+
+		return {
+			...base,
+			collaboratorNames,
+			alerts: buildAlerts(base, collaboratorNames),
+		};
+	});
+
+	const calendarRows = etapa
+		? rows.filter(event => event.pipelineStatus === etapa)
+		: rows;
+
+	const tableHref = etapa ? `/eventos?etapa=${etapa}` : "/eventos";
+	const calendarHref = `/eventos?vista=calendario${etapa ? `&etapa=${etapa}` : ""}`;
+
 	return (
-		<CrmShell>
-			<header className='px-5 pb-6 pt-8 md:px-8 md:pt-10'>
-				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
-					<div>
-						<Breadcrumb
-							items={[
-								{ label: "Inicio", href: "/" },
-								{ label: "Eventos" },
-							]}
-						/>
-						<h1 className='page-heading'>
-							Eventos
-						</h1>
-						<p className='mt-2 max-w-3xl text-lg text-[var(--text-secondary)]'>
-							Seguimiento de eventos cotizados, reservados, confirmados y
-							realizados.
-						</p>
-					</div>
-					<button
-						type='button'
+		<>
+			<PageHeader
+				breadcrumb={[{ label: "Inicio", href: "/" }, { label: "Eventos" }]}
+				title='Eventos'
+				description='Tabla y calendario operativo: dos formas de trabajar la misma información.'
+				actions={
+					<Link
+						href='/eventos/nuevo'
 						className='primary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
 					>
 						<IconLabel label='Nuevo evento' />
-					</button>
-				</div>
-			</header>
+					</Link>
+				}
+			/>
 
 			<div className='space-y-5 px-5 pb-28 md:px-8 md:pb-8'>
-				<section className='surface-card p-5 md:p-7'>
-					<div className='mb-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_240px]'>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-							<span>Buscar evento</span>
-							<input
-								placeholder='Nombre, cliente, lugar o fecha'
-								className='form-control'
+				<SectionCard>
+					<nav
+						aria-label='Modo de vista'
+						className='mb-5 flex w-fit rounded-full border border-[color:var(--border-color)] bg-[var(--surface-color)] p-1'
+					>
+						<Link
+							href={tableHref}
+							aria-current={!isCalendar ? "page" : undefined}
+							className={`flex min-h-10 items-center gap-2 rounded-full px-4 py-2 text-base font-black transition ${
+								!isCalendar
+									? "bg-[var(--accent-color)] text-[var(--on-accent)]"
+									: "text-[var(--text-secondary)] hover:bg-[#f0ebe4]"
+							}`}
+						>
+							<IconLabel icon='material-symbols:table-rows-rounded' label='Tabla' />
+						</Link>
+						<Link
+							href={calendarHref}
+							aria-current={isCalendar ? "page" : undefined}
+							className={`flex min-h-10 items-center gap-2 rounded-full px-4 py-2 text-base font-black transition ${
+								isCalendar
+									? "bg-[var(--accent-color)] text-[var(--on-accent)]"
+									: "text-[var(--text-secondary)] hover:bg-[#f0ebe4]"
+							}`}
+						>
+							<IconLabel
+								icon='material-symbols:calendar-month-rounded'
+								label='Calendario'
 							/>
-						</label>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-							<span>Estado</span>
-							<select className='form-control'>
-								<option>Todos</option>
-								<option>Cotizado</option>
-								<option>Reservado</option>
-								<option>Confirmado</option>
-								<option>Realizado</option>
-							</select>
-						</label>
-					</div>
+						</Link>
+					</nav>
 
-					<ManagementTable
-						columns={columns}
-						rows={events}
-						rowHref={event => `/eventos/${event.id}`}
-					/>
-				</section>
+					{isCalendar ? (
+						<EventsCalendar
+							events={calendarRows}
+							rango={calendarRange}
+							fecha={referenceDate}
+							today={today}
+							etapa={etapa}
+						/>
+					) : (
+						<EventsTable rows={rows} initialStage={etapa} />
+					)}
+				</SectionCard>
 			</div>
-		</CrmShell>
+		</>
 	);
 }

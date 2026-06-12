@@ -1,15 +1,18 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Breadcrumb } from "../../components/breadcrumb";
-import { CrmShell } from "../../components/crm-shell";
+import { PageHeader } from "../../components/page-header";
+import { PhoneInput } from "../../components/phone-input";
 import { PhotoThumbnailControl } from "../../components/photo-thumbnail-control";
 import { StatusBadge } from "../../components/status-badge";
+import { TaskPanel } from "../../components/task-panel";
 import {
 	formatCrc,
 	formatDate,
 	getClientById,
 	getClientEvents,
 	getClientFullName,
+	getClientInteractions,
+	getClientTasks,
 } from "../../lib/mock-data";
 
 export default async function ClientDetailPage({
@@ -25,28 +28,21 @@ export default async function ClientDetailPage({
 	}
 
 	const linkedEvents = getClientEvents(client.id);
+	const clientInteractions = getClientInteractions(client.id);
+	const clientTasks = getClientTasks(client.id);
 	const initials = `${client.firstName[0]}${client.lastName[0]}`;
 
 	return (
-		<CrmShell>
-			<header className='px-5 pb-6 pt-8 md:px-8 md:pt-10'>
-				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
-					<div>
-						<Breadcrumb
-							items={[
-								{ label: "Inicio", href: "/" },
-								{ label: "Clientes", href: "/clientes" },
-								{ label: getClientFullName(client) },
-							]}
-						/>
-						<div className='flex flex-wrap items-center gap-3'>
-							<h1 className='page-heading'>
-								{getClientFullName(client)}
-							</h1>
-							<StatusBadge value={client.pipelineStatus} />
-						</div>
-					</div>
-
+		<>
+			<PageHeader
+				breadcrumb={[
+					{ label: "Inicio", href: "/" },
+					{ label: "Clientes", href: "/clientes" },
+					{ label: getClientFullName(client) },
+				]}
+				title={getClientFullName(client)}
+				badges={<StatusBadge value={client.pipelineStatus} />}
+				actions={
 					<div className='grid grid-cols-2 gap-3 sm:flex'>
 						<button className='secondary-action min-h-12 rounded-full px-5 py-3 text-base font-black transition'>
 							Guardar cambios
@@ -55,8 +51,8 @@ export default async function ClientDetailPage({
 							Crear evento
 						</button>
 					</div>
-				</div>
-			</header>
+				}
+			/>
 
 			<div className='grid min-w-0 flex-1 gap-5 px-5 pb-28 md:px-8 md:pb-8 xl:grid-cols-[minmax(0,1fr)_360px]'>
 				<div className='min-w-0 space-y-5'>
@@ -88,13 +84,11 @@ export default async function ClientDetailPage({
 									className='form-control'
 								/>
 							</label>
-							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-								<span>Teléfono</span>
-								<input
-									defaultValue={client.phone}
-									className='form-control'
-								/>
-							</label>
+							<PhoneInput
+								name='phone'
+								label='Teléfono'
+								defaultValue={client.phone}
+							/>
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 								<span>Tipo</span>
 								<select
@@ -165,6 +159,49 @@ export default async function ClientDetailPage({
 							))}
 						</div>
 					</section>
+
+					<section className='surface-card min-w-0 p-5 md:p-7'>
+						<div className='mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
+							<div>
+								<h2 className='text-2xl font-black text-[var(--text-primary)]'>
+									Interacciones
+								</h2>
+								<p className='mt-1 text-lg text-[var(--text-secondary)]'>
+									Registro manual de WhatsApp y llamadas; actualiza el último
+									contacto.
+								</p>
+							</div>
+							<button className='secondary-action flex min-h-12 w-fit items-center rounded-full px-4 py-3 text-base font-black transition'>
+								Registrar contacto
+							</button>
+						</div>
+						{clientInteractions.length === 0 ? (
+							<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
+								Sin interacciones registradas todavía.
+							</p>
+						) : (
+							<ol className='list-none space-y-3 p-0'>
+								{clientInteractions.map(interaction => (
+									<li
+										key={interaction.id}
+										className='rounded-lg border border-[color:var(--border-color)] bg-[var(--surface-color)] p-4'
+									>
+										<div className='flex flex-wrap items-center gap-2'>
+											<StatusBadge value={interaction.channel} />
+											<StatusBadge value={interaction.direction} />
+											<span className='text-base font-bold text-[var(--text-muted)]'>
+												{formatDate(interaction.date)}
+											</span>
+										</div>
+										<p className='mt-2 text-lg font-semibold text-[var(--text-secondary)]'>
+											{interaction.summary}
+										</p>
+									</li>
+								))}
+							</ol>
+						)}
+					</section>
+
 				</div>
 
 				<aside className='min-w-0 space-y-5'>
@@ -212,8 +249,15 @@ export default async function ClientDetailPage({
 							</div>
 						</dl>
 					</section>
+
+					<TaskPanel
+						title='Tareas del cliente'
+						entityHref={`/clientes/${client.id}`}
+						entityLabel={getClientFullName(client)}
+						tasks={clientTasks}
+					/>
 				</aside>
 			</div>
-		</CrmShell>
+		</>
 	);
 }

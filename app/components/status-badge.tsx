@@ -32,6 +32,19 @@ const badgeStyles: Record<string, string> = {
 	ACEPTADA: "bg-[#d8f5f2] text-[var(--secondary-color)]",
 	VENCIDA: "bg-[#fff0cf] text-[#6f5600]",
 	RECHAZADA: "bg-[#ffe0e3] text-[var(--error-color)]",
+	// Tareas
+	PENDIENTE: "bg-[#fff0cf] text-[#6f5600]",
+	EN_PROGRESO: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
+	COMPLETADA: "bg-[#d8f5f2] text-[var(--secondary-color)]",
+	CANCELADA: "bg-[#eee8e1] text-[var(--text-secondary)]",
+	MANUAL: "bg-[#eee8e1] text-[var(--text-secondary)]",
+	AUTOMATICA: "bg-[#ffe2cf] text-[var(--primary-color)]",
+	SISTEMA: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
+	// Interacciones
+	WHATSAPP: "bg-[#d8f5f2] text-[var(--secondary-color)]",
+	LLAMADA: "bg-[#fff0cf] text-[#6f5600]",
+	ENTRANTE: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
+	SALIENTE: "bg-[#ffe2cf] text-[var(--primary-color)]",
 };
 
 export function StatusBadge({
@@ -43,7 +56,7 @@ export function StatusBadge({
 }) {
 	return (
 		<span
-			className={`inline-flex min-h-8 w-fit items-center rounded-full px-3 py-1 text-sm font-black ${
+			className={`inline-flex min-h-7 w-fit items-center rounded-full px-2.5 py-1 text-xs font-black ${
 				badgeStyles[value] ?? "bg-[var(--background-color)] text-[var(--text-primary)]"
 			}`}
 		>

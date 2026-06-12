@@ -31,6 +31,11 @@
 	--on-accent: #3d1b00;
 	--soft-shadow: 0 16px 40px rgba(77, 51, 31, 0.08);
 	--crisp-shadow: 0 6px 18px rgba(77, 51, 31, 0.08);
+
+	/* Bandas de temporadas festivas en el calendario (ver app/lib/domain/seasons.ts) */
+	--season-navidad: color-mix(in srgb, var(--error-color) 10%, transparent);
+	--season-dia-del-nino: color-mix(in srgb, var(--info-color) 14%, transparent);
+	--season-halloween: color-mix(in srgb, var(--accent-color) 14%, transparent);
 }
 
 .dark {
@@ -104,10 +109,10 @@ textarea {
 
 .page-heading {
 	color: var(--primary-color);
-	font-size: clamp(2.5rem, 4vw, 4.25rem);
+	font-size: clamp(2.45rem, 3vw, 3.875rem);
 	font-weight: 900;
 	letter-spacing: 0;
-	line-height: 0.95;
+	line-height: 1.05;
 }
 
 .page-kicker {
@@ -125,20 +130,101 @@ textarea {
 }
 
 .form-control {
-	min-height: 3.5rem;
+	min-height: 2.75rem;
 	width: 100%;
 	border: 1px solid var(--border-color);
 	background: #f3f0eb;
 	padding-inline: 1rem;
 	color: var(--text-primary);
-	font-size: 1.125rem;
+	font-size: 1rem;
 	font-weight: 650;
 	outline: none;
+}
+
+.form-control-with-leading-icon {
+	padding-left: 3rem;
 }
 
 .form-control:focus {
 	border-color: var(--accent-color);
 	box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-color) 22%, transparent);
+}
+
+/* Teléfono con país y bandera (react-phone-number-input) */
+.phone-input {
+	display: flex;
+	gap: 0.625rem;
+}
+
+.phone-input .PhoneInputCountry {
+	min-height: 2.75rem;
+	margin-right: 0;
+	padding-inline: 0.875rem;
+	border: 1px solid var(--border-color);
+	border-radius: 8px;
+	background: #f3f0eb;
+}
+
+.phone-input .PhoneInputCountryIcon {
+	width: 1.75rem;
+	height: 1.25rem;
+	box-shadow: none;
+	background: none;
+}
+
+.phone-input .PhoneInputCountrySelectArrow {
+	width: 0.5rem;
+	height: 0.5rem;
+	margin-left: 0.5rem;
+	color: var(--text-secondary);
+	opacity: 1;
+}
+
+.phone-input:focus-within .PhoneInputCountry {
+	border-color: var(--accent-color);
+}
+
+/* Escala tipográfica de aplicación: normal, legible y menos propensa a overflow. */
+.text-lg {
+	font-size: 0.9375rem;
+	line-height: 1.375rem;
+}
+
+.text-xl {
+	font-size: 1rem;
+	line-height: 1.5rem;
+}
+
+.text-2xl {
+	font-size: 1.125rem;
+	line-height: 1.625rem;
+}
+
+.text-3xl {
+	font-size: 1.375rem;
+	line-height: 1.875rem;
+}
+
+.text-4xl {
+	font-size: 1.75rem;
+	line-height: 2.125rem;
+}
+
+.text-6xl {
+	font-size: 2.25rem;
+	line-height: 1;
+}
+
+.min-h-12 {
+	min-height: 2.5rem;
+}
+
+.min-h-14 {
+	min-height: 2.75rem;
+}
+
+.h-14 {
+	height: 2.75rem;
 }
 
 .primary-action {
