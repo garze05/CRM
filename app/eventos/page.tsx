@@ -1,85 +1,29 @@
 import Link from "next/link";
-import { DeleteAction } from "../components/delete-action";
 import { IconLabel } from "../components/icon-label";
-import { ListFilters } from "../components/list-filters";
-import {
-	ManagementTable,
-	type ManagementColumn,
-} from "../components/management-table";
 import { PageHeader } from "../components/page-header";
 import { SectionCard } from "../components/section-card";
-import { StatusBadge } from "../components/status-badge";
-import {
-	events,
-	formatCrc,
-	formatDate,
-	getEventClient,
-	type EventRecord,
-} from "../lib/mock-data";
+import { EventsTable, type EventRow } from "./events-table";
+import { events, getEventClient } from "../lib/mock-data";
 
-const columns: ManagementColumn<EventRecord>[] = [
-	{
-		key: "event",
-		header: "Evento",
-		render: event => (
-			<div>
-				<p className='font-black text-[var(--text-primary)]'>{event.name}</p>
-				<p className='mt-1 text-base'>{event.venueName}</p>
-			</div>
-		),
-	},
-	{
-		key: "client",
-		header: "Cliente",
-		render: event => {
-			const client = getEventClient(event);
+export default async function EventsPage({
+	searchParams,
+}: {
+	searchParams: Promise<{ etapa?: string }>;
+}) {
+	const { etapa } = await searchParams;
 
-			return client ? `${client.firstName} ${client.lastName}` : "Sin cliente";
-		},
-	},
-	{
-		key: "date",
-		header: "Fecha",
-		render: event => (
-			<div>
-				<p>{formatDate(event.date)}</p>
-				<p className='mt-1 text-base'>{event.startTime}</p>
-			</div>
-		),
-	},
-	{
-		key: "type",
-		header: "Tipo",
-		render: event => <StatusBadge value={event.type} />,
-	},
-	{
-		key: "status",
-		header: "Estado",
-		render: event => <StatusBadge value={event.pipelineStatus} />,
-	},
-	{
-		key: "payment",
-		header: "Pago",
-		render: event => <StatusBadge value={event.paymentStatus} />,
-	},
-	{
-		key: "total",
-		header: "Total",
-		render: event => (
-			<span className='font-black text-[var(--text-primary)]'>
-				{formatCrc(event.estimatedTotal)}
-			</span>
-		),
-	},
-	{
-		key: "action",
-		header: "Acción",
-		width: "minmax(130px, 0.75fr)",
-		render: () => <DeleteAction />,
-	},
-];
+	const rows: EventRow[] = events.map(event => {
+		const client = getEventClient(event);
 
-export default function EventsPage() {
+		return {
+			...event,
+			clientName: client
+				? `${client.firstName} ${client.lastName}`
+				: "Sin cliente",
+			clientPhone: client?.phone ?? "",
+		};
+	});
+
 	return (
 		<>
 			<PageHeader
@@ -98,24 +42,7 @@ export default function EventsPage() {
 
 			<div className='space-y-5 px-5 pb-28 md:px-8 md:pb-8'>
 				<SectionCard>
-					<ListFilters
-						searchLabel='Buscar evento'
-						searchPlaceholder='Nombre, cliente, lugar o fecha'
-						selectLabel='Estado'
-						selectOptions={[
-							{ label: "Todos" },
-							{ label: "Cotizado" },
-							{ label: "Reservado" },
-							{ label: "Confirmado" },
-							{ label: "Realizado" },
-						]}
-					/>
-
-					<ManagementTable
-						columns={columns}
-						rows={events}
-						rowHref={event => `/eventos/${event.id}`}
-					/>
+					<EventsTable rows={rows} initialStage={etapa} />
 				</SectionCard>
 			</div>
 		</>

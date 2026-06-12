@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "../../components/breadcrumb";
+import { PhoneInput } from "../../components/phone-input";
 import { PhotoThumbnailControl } from "../../components/photo-thumbnail-control";
 import { StatusBadge } from "../../components/status-badge";
 import { getCollaboratorById } from "../../lib/mock-data";
@@ -61,10 +62,11 @@ export default async function CollaboratorDetailPage({
 							<span>Apellidos</span>
 							<input defaultValue={collaborator.lastName} className='form-control' />
 						</label>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-							<span>Teléfono</span>
-							<input defaultValue={collaborator.phone} className='form-control' />
-						</label>
+						<PhoneInput
+							name='phone'
+							label='Teléfono'
+							defaultValue={collaborator.phone}
+						/>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 							<span>Rol</span>
 							<select defaultValue={collaborator.role} className='form-control'>

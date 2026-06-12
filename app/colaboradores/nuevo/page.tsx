@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PageHeader } from "../../components/page-header";
+import { PhoneInput } from "../../components/phone-input";
 import { SectionCard } from "../../components/section-card";
 import { inventoryItems } from "../../lib/mock-data";
 
@@ -40,10 +41,11 @@ export default function NewCollaboratorPage() {
 							<span>Apellidos</span>
 							<input className='form-control' placeholder='Alvarado' />
 						</label>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-							<span>Teléfono</span>
-							<input className='form-control' placeholder='+506 7000 0000' />
-						</label>
+						<PhoneInput
+							name='phone'
+							label='Teléfono'
+							placeholder='7000 0000'
+						/>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 							<span>Rol</span>
 							<select defaultValue='BOTARGA' className='form-control'>

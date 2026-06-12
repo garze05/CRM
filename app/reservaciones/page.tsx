@@ -1,27 +1,18 @@
 import Link from "next/link";
 import { IconLabel } from "../components/icon-label";
-import {
-	ManagementTable,
-	type ManagementColumn,
-} from "../components/management-table";
 import { PageHeader } from "../components/page-header";
 import { SectionCard } from "../components/section-card";
-import { StatusBadge } from "../components/status-badge";
+import {
+	ReservationsTable,
+	type ReservationRow,
+} from "./reservations-table";
 import {
 	events,
 	formatCrc,
-	formatDate,
 	getEventClient,
+	getMockDocumentCode,
 	quotes,
-	type EventRecord,
 } from "../lib/mock-data";
-
-type ReservationRow = EventRecord & {
-	quoteNumber: string;
-	reservationNumber: string;
-	advancePayment: number;
-	balancePayment: number;
-};
 
 const reservedEvents = events.filter(event =>
 	["RESERVADO", "CONFIRMADO", "REALIZADO"].includes(event.pipelineStatus),
@@ -29,73 +20,20 @@ const reservedEvents = events.filter(event =>
 
 const rows: ReservationRow[] = reservedEvents.map((event, index) => {
 	const quote = quotes.find(item => item.eventId === event.id);
+	const client = getEventClient(event);
 	const half = Math.round(event.estimatedTotal / 2);
 
 	return {
 		...event,
-		quoteNumber: quote?.number ?? `COT-2026-${String(index + 50).padStart(4, "0")}`,
-		reservationNumber: `RES-2026-${String(index + 21).padStart(4, "0")}`,
+		clientName: client
+			? `${client.firstName} ${client.lastName}`
+			: "Sin cliente",
+		quoteNumber: quote?.number ?? getMockDocumentCode("C", event.date, 100 + index),
+		reservationNumber: getMockDocumentCode("R", event.date, 100 + index),
 		advancePayment: half,
 		balancePayment: event.estimatedTotal - half,
 	};
 });
-
-const columns: ManagementColumn<ReservationRow>[] = [
-	{
-		key: "reservation",
-		header: "Reservación",
-		render: row => (
-			<div>
-				<p className='font-black text-[var(--text-primary)]'>
-					{row.reservationNumber}
-				</p>
-				<p className='mt-1 text-base'>{row.quoteNumber}</p>
-			</div>
-		),
-	},
-	{
-		key: "event",
-		header: "Evento",
-		render: row => row.name,
-	},
-	{
-		key: "client",
-		header: "Cliente",
-		render: row => {
-			const client = getEventClient(row);
-
-			return client ? `${client.firstName} ${client.lastName}` : "Sin cliente";
-		},
-	},
-	{
-		key: "date",
-		header: "Fecha",
-		render: row => formatDate(row.date),
-	},
-	{
-		key: "payment",
-		header: "Pago",
-		render: row => <StatusBadge value={row.paymentStatus} />,
-	},
-	{
-		key: "advance",
-		header: "Anticipo",
-		render: row => (
-			<span className='font-black text-[var(--text-primary)]'>
-				{formatCrc(row.advancePayment)}
-			</span>
-		),
-	},
-	{
-		key: "balance",
-		header: "Saldo",
-		render: row => (
-			<span className='font-black text-[var(--text-primary)]'>
-				{formatCrc(row.balancePayment)}
-			</span>
-		),
-	},
-];
 
 export default function ReservationsPage() {
 	return (
@@ -154,7 +92,7 @@ export default function ReservationsPage() {
 						</div>
 					</div>
 
-					<ManagementTable columns={columns} rows={rows} />
+					<ReservationsTable rows={rows} />
 				</SectionCard>
 			</div>
 		</>

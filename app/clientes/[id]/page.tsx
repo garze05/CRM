@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "../../components/page-header";
+import { PhoneInput } from "../../components/phone-input";
 import { PhotoThumbnailControl } from "../../components/photo-thumbnail-control";
 import { StatusBadge } from "../../components/status-badge";
 import {
@@ -78,13 +79,11 @@ export default async function ClientDetailPage({
 									className='form-control'
 								/>
 							</label>
-							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-								<span>Teléfono</span>
-								<input
-									defaultValue={client.phone}
-									className='form-control'
-								/>
-							</label>
+							<PhoneInput
+								name='phone'
+								label='Teléfono'
+								defaultValue={client.phone}
+							/>
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 								<span>Tipo</span>
 								<select

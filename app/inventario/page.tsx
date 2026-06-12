@@ -1,91 +1,9 @@
 import Link from "next/link";
-import { DeleteAction } from "../components/delete-action";
-import { InventoryThumbnail } from "../components/entity-thumbnail";
 import { IconLabel } from "../components/icon-label";
-import { ListFilters } from "../components/list-filters";
-import {
-	ManagementTable,
-	type ManagementColumn,
-} from "../components/management-table";
 import { PageHeader } from "../components/page-header";
 import { SectionCard } from "../components/section-card";
-import { StatusBadge } from "../components/status-badge";
-import { inventoryItems, type InventoryItem } from "../lib/mock-data";
-
-function getInventoryAvailabilityBadgeValue(item: InventoryItem) {
-	if (item.availabilityStatus === "RESERVADO") {
-		return "RESERVADO_INVENTARIO";
-	}
-
-	return item.availabilityStatus;
-}
-
-const columns: ManagementColumn<InventoryItem>[] = [
-	{
-		key: "item",
-		header: "Ítem",
-		width: "minmax(250px, 1.7fr)",
-		render: item => (
-			<div className='flex items-center gap-3'>
-				<InventoryThumbnail category={item.category} />
-				<div>
-					<p className='font-black text-[var(--text-primary)]'>{item.name}</p>
-					<p className='mt-1 line-clamp-1 text-base'>{item.description}</p>
-				</div>
-			</div>
-		),
-	},
-	{
-		key: "category",
-		header: "Categoría",
-		width: "minmax(130px, 0.85fr)",
-		render: item => <StatusBadge value={item.category} />,
-	},
-	{
-		key: "active",
-		header: "Estado",
-		width: "minmax(110px, 0.75fr)",
-		render: item => <StatusBadge value={item.active ? "ACTIVO" : "PAUSADO"} />,
-	},
-	{
-		key: "availability",
-		header: "Disponibilidad",
-		width: "minmax(170px, 1fr)",
-		render: item => (
-			<StatusBadge
-				value={getInventoryAvailabilityBadgeValue(item)}
-				label={
-					item.availabilityStatus === "MANTENIMIENTO_PENDIENTE"
-						? "MANTENIMIENTO"
-						: item.availabilityStatus.replaceAll("_", " ")
-				}
-			/>
-		),
-	},
-	{
-		key: "maintenance",
-		header: "Mantenimiento",
-		width: "minmax(150px, 0.9fr)",
-		render: item =>
-			item.availabilityStatus === "MANTENIMIENTO_PENDIENTE" ? (
-				<span className='font-black text-[var(--accent-color)]'>Pendiente</span>
-			) : (
-				<span>Sin alerta</span>
-			),
-	},
-	{
-		key: "tags",
-		header: "Etiquetas",
-		width: "minmax(190px, 1.1fr)",
-		render: item => item.tags.join(", "),
-	},
-	{
-		key: "action",
-		header: "Acción",
-		width: "minmax(130px, 0.75fr)",
-		render: () => <DeleteAction />,
-	},
-];
+import { InventoryTable } from "./inventory-table";
+import { inventoryItems } from "../lib/mock-data";
 
 export default function InventoryPage() {
 	return (
@@ -106,29 +24,12 @@ export default function InventoryPage() {
 
 			<div className='space-y-5 px-5 pb-28 md:px-8 md:pb-8'>
 				<SectionCard>
-					<ListFilters
-						searchLabel='Buscar inventario'
-						searchPlaceholder='Nombre, categoría o tag'
-						selectLabel='Categoría'
-						selectOptions={[
-							{ label: "Todas" },
-							{ label: "Personaje" },
-							{ label: "Inflable" },
-							{ label: "Decoración" },
-							{ label: "Otro" },
-						]}
-					/>
-
 					<div className='mb-5 rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f0ebe4] p-4 text-lg text-[var(--text-secondary)]'>
 						Disponibilidad y mantenimiento quedan visibles como columnas para
 						conectarse luego con un módulo operativo dedicado.
 					</div>
 
-					<ManagementTable
-						columns={columns}
-						rows={inventoryItems}
-						rowHref={item => `/inventario/${item.id}`}
-					/>
+					<InventoryTable rows={inventoryItems} />
 				</SectionCard>
 			</div>
 		</>

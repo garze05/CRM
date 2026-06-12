@@ -146,6 +146,40 @@ textarea {
 	box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-color) 22%, transparent);
 }
 
+/* Teléfono con país y bandera (react-phone-number-input) */
+.phone-input {
+	display: flex;
+	gap: 0.625rem;
+}
+
+.phone-input .PhoneInputCountry {
+	min-height: 3.5rem;
+	margin-right: 0;
+	padding-inline: 0.875rem;
+	border: 1px solid var(--border-color);
+	border-radius: 8px;
+	background: #f3f0eb;
+}
+
+.phone-input .PhoneInputCountryIcon {
+	width: 1.75rem;
+	height: 1.25rem;
+	box-shadow: none;
+	background: none;
+}
+
+.phone-input .PhoneInputCountrySelectArrow {
+	width: 0.5rem;
+	height: 0.5rem;
+	margin-left: 0.5rem;
+	color: var(--text-secondary);
+	opacity: 1;
+}
+
+.phone-input:focus-within .PhoneInputCountry {
+	border-color: var(--accent-color);
+}
+
 .primary-action {
 	background: var(--primary-color);
 	color: var(--on-primary);

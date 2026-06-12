@@ -52,7 +52,7 @@ export default function Home() {
 						<MetricCard
 							label='Tasa de cierre'
 							value='38%'
-							helper='Leads a eventos realizados'
+							helper='Prospectos a eventos realizados'
 							accentColor='var(--secondary-color)'
 						/>
 						<MetricCard

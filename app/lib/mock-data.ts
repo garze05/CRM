@@ -314,13 +314,17 @@ export const pendingTasks = [
 	},
 ];
 
-export const suggestedQuote = {
-	number: "COT-2026-0043",
-	description: "Paquete Fiesta + botarga adicional + transporte estimado.",
-	subtotal: 165000,
-	transport: 20000,
-	total: 185000,
-};
+// Código de documento con el formato real del negocio (CorrespondencyBot):
+// {C|R}{DDMM de la fecha del evento}-{consecutivo anual desde 100}.
+// Versión mock de app/lib/domain/numbering.ts para datos de prueba.
+export function getMockDocumentCode(
+	prefix: "C" | "R",
+	eventDate: string,
+	sequential: number,
+) {
+	const [, month, day] = eventDate.split("-");
+	return `${prefix}${day}${month}-${sequential}`;
+}
 
 export const quotes: QuoteRecord[] = events
 	.filter(event =>
@@ -328,10 +332,7 @@ export const quotes: QuoteRecord[] = events
 	)
 	.map((event, index) => ({
 		id: `cotizacion-${event.id}`,
-		number:
-			index === 0
-				? suggestedQuote.number
-				: `COT-2026-${String(44 + index).padStart(4, "0")}`,
+		number: getMockDocumentCode("C", event.date, 100 + index),
 		eventId: event.id,
 		status:
 			event.pipelineStatus === "COTIZADO"
@@ -342,6 +343,14 @@ export const quotes: QuoteRecord[] = events
 		total: event.estimatedTotal,
 		validUntil: event.date,
 	}));
+
+export const suggestedQuote = {
+	number: quotes[0]?.number ?? getMockDocumentCode("C", "2026-06-22", 100),
+	description: "Paquete Fiesta + botarga adicional + transporte estimado.",
+	subtotal: 165000,
+	transport: 20000,
+	total: 185000,
+};
 
 export function getClientFullName(client: Client) {
 	return `${client.firstName} ${client.lastName}`;

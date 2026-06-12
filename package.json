@@ -11,9 +11,13 @@
   "dependencies": {
     "@iconify-json/material-symbols": "^1.2.76",
     "@iconify/react": "^6.0.2",
+    "@tanstack/react-table": "^8.21.3",
+    "libphonenumber-js": "^1.13.6",
     "next": "16.2.7",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "react-phone-number-input": "^3.4.17",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

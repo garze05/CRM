@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PageHeader } from "../../components/page-header";
+import { PhoneInput } from "../../components/phone-input";
 import { SectionCard } from "../../components/section-card";
 
 export default function NewClientPage() {
@@ -37,10 +38,12 @@ export default function NewClientPage() {
 							<span>Apellidos</span>
 							<input className='form-control' placeholder='Rodríguez' />
 						</label>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-							<span>Teléfono WhatsApp</span>
-							<input className='form-control' placeholder='+506 8888 0000' />
-						</label>
+						<PhoneInput
+							name='phone'
+							label='Teléfono WhatsApp'
+							placeholder='8888 0000'
+							required
+						/>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 							<span>Tipo de cliente</span>
 							<select defaultValue='FAMILIAR' className='form-control'>
