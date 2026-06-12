@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Breadcrumb } from "../../components/breadcrumb";
+import { PageHeader } from "../../components/page-header";
 import { StatusBadge } from "../../components/status-badge";
 import {
 	formatCrc,
@@ -24,26 +24,20 @@ export default async function EventDetailPage({
 
 	return (
 		<>
-			<header className='px-5 pb-6 pt-8 md:px-8 md:pt-10'>
-				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
-					<div>
-						<Breadcrumb
-							items={[
-								{ label: "Inicio", href: "/" },
-								{ label: "Eventos", href: "/eventos" },
-								{ label: event.name },
-							]}
-						/>
-						<div className='flex flex-wrap items-center gap-3'>
-							<h1 className='page-heading'>{event.name}</h1>
-							<StatusBadge value={event.pipelineStatus} />
-						</div>
-					</div>
+			<PageHeader
+				breadcrumb={[
+					{ label: "Inicio", href: "/" },
+					{ label: "Eventos", href: "/eventos" },
+					{ label: event.name },
+				]}
+				title={event.name}
+				badges={<StatusBadge value={event.pipelineStatus} />}
+				actions={
 					<button className='primary-action min-h-12 rounded-full px-5 py-3 text-base font-black transition'>
 						Guardar cambios
 					</button>
-				</div>
-			</header>
+				}
+			/>
 
 			<div className='grid min-w-0 flex-1 gap-5 px-5 pb-28 md:px-8 md:pb-8 xl:grid-cols-[minmax(0,1fr)_360px]'>
 				<section className='surface-card min-w-0 p-5 md:p-7'>

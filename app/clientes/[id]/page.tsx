@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Breadcrumb } from "../../components/breadcrumb";
+import { PageHeader } from "../../components/page-header";
 import { PhotoThumbnailControl } from "../../components/photo-thumbnail-control";
 import { StatusBadge } from "../../components/status-badge";
 import {
@@ -28,24 +28,15 @@ export default async function ClientDetailPage({
 
 	return (
 		<>
-			<header className='px-5 pb-6 pt-8 md:px-8 md:pt-10'>
-				<div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
-					<div>
-						<Breadcrumb
-							items={[
-								{ label: "Inicio", href: "/" },
-								{ label: "Clientes", href: "/clientes" },
-								{ label: getClientFullName(client) },
-							]}
-						/>
-						<div className='flex flex-wrap items-center gap-3'>
-							<h1 className='page-heading'>
-								{getClientFullName(client)}
-							</h1>
-							<StatusBadge value={client.pipelineStatus} />
-						</div>
-					</div>
-
+			<PageHeader
+				breadcrumb={[
+					{ label: "Inicio", href: "/" },
+					{ label: "Clientes", href: "/clientes" },
+					{ label: getClientFullName(client) },
+				]}
+				title={getClientFullName(client)}
+				badges={<StatusBadge value={client.pipelineStatus} />}
+				actions={
 					<div className='grid grid-cols-2 gap-3 sm:flex'>
 						<button className='secondary-action min-h-12 rounded-full px-5 py-3 text-base font-black transition'>
 							Guardar cambios
@@ -54,8 +45,8 @@ export default async function ClientDetailPage({
 							Crear evento
 						</button>
 					</div>
-				</div>
-			</header>
+				}
+			/>
 
 			<div className='grid min-w-0 flex-1 gap-5 px-5 pb-28 md:px-8 md:pb-8 xl:grid-cols-[minmax(0,1fr)_360px]'>
 				<div className='min-w-0 space-y-5'>
