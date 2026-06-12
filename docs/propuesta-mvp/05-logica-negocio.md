@@ -44,7 +44,7 @@ async function changeEventStage(eventId, to, actor) {
   calculado se congela en `Quote.lineItems` (Json)** — una cotización emitida nunca
   cambia aunque cambien los precios o las reglas.
 - **Numeración** (decisión de negocio 2026-06-11 — formato de CorrespondencyBot):
-  `{C|R}{DDMM}-{consecutivo}`, ej. `C1503-101`. DDMM = fecha del evento ("XXXX" si
+  `{C|R}{DDMM}-{YY}{consecutivo}`, ej. `C1503-26101`. DDMM = fecha del evento ("XXXX" si
   no hay fecha); consecutivo anual por tipo iniciando en **100**, reinicia cada año.
   Implementado en `app/lib/domain/numbering.ts`; persistencia vía `DocumentCounter`
   con `UPDATE ... SET last_value = last_value + 1 RETURNING` en transacción.

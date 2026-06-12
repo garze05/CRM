@@ -45,7 +45,7 @@
 | 5 | Temporadas festivas | **Navidad, Día del Niño (9 set CR), Halloween** por ahora | `app/lib/domain/seasons.ts` |
 | 6 | Mensajes de WhatsApp | Placeholder claro; redacción la pone el negocio | `app/lib/domain/whatsapp-templates.ts` (marcados `[PENDIENTE NEGOCIO]`) |
 | 7 | Acceso | Solo correos **@okidokicr.com** | `ALLOWED_EMAIL_DOMAIN` en `.env.example` |
-| 8 | Numeración | **Formato CorrespondencyBot** `{C\|R}{DDMM}-{seq}`, consecutivo anual desde 100, reinicia cada año | `app/lib/domain/numbering.ts` + `DocumentCounter` |
+| 8 | Numeración | **Formato CorrespondencyBot** `{C\|R}{DDMM}-{YY}{seq}`, consecutivo anual desde 100, reinicia cada año | `app/lib/domain/numbering.ts` + `DocumentCounter` |
 
 ## 8.5 Qué queda preparado para fases futuras (sin costo extra hoy)
 

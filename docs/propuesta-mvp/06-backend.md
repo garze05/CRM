@@ -55,7 +55,7 @@ Resumen: 24 modelos / 16 enums. Decisiones notables:
 - `Payment` separado de `Reservation` (historial de pagos real).
 - `Task.autoKey @unique` → idempotencia de recordatorios.
 - `Note`, `Interaction`, `AuditLog` como bitácoras transversales.
-- `DocumentCounter(type, year)` para `C{DDMM}-{seq}` / `R{DDMM}-{seq}` (consecutivo
+- `DocumentCounter(type, year)` para `C{DDMM}-{YY}{seq}` / `R{DDMM}-{YY}{seq}` (consecutivo
   anual desde 100, formato CorrespondencyBot — ver `app/lib/domain/numbering.ts`).
 - `Settings` fila única editable desde `/ajustes` (vigencia, % anticipo, tarifas de
   transporte, IVA) — los valores actuales del Python quedan como defaults.
@@ -102,7 +102,7 @@ Server Action generateQuotePdf(quoteId)
   2. integrations/google-maps.ts → transporte (misma fórmula: base 5000,
      400/km tras 15 km libres, origen de Settings)
   3. Construir JSON con el MISMO contrato de cotizacion_output.json:
-     { codigo: "C1503-101", tipo_documento, fecha_envio, descripcion,
+     { codigo: "C1503-26101", tipo_documento, fecha_envio, descripcion,
        cliente{...}, evento{...}, servicios[...], totales{...} }
   4. spawn: $CORRESPONDENCY_BOT_PYTHON generar_documento.py
        -i <tmp.json> -t Plantilla.docx --pdf   (cwd = CORRESPONDENCY_BOT_PATH)
@@ -111,9 +111,9 @@ Server Action generateQuotePdf(quoteId)
 ```
 
 - `generar_documento.py` ya toma `codigo` del JSON → el CRM genera el código con
-  el mismo formato del bot (`C{DDMM}-{seq}`, consecutivo anual desde 100) **sin
+  el mismo formato del bot (`C{DDMM}-{YY}{seq}`, consecutivo anual desde 100) **sin
   tocar una línea de Python** (verificado en el código del bot).
-- Reservaciones: mismo puente con `tipo_documento: "Reservación"` (prefijo RES-).
+- Reservaciones: mismo puente con `tipo_documento: "Reservación"` (prefijo `R`).
 - Requisito de despliegue: Python 3 + dependencias del bot + LibreOffice en el mismo
   host. `/ajustes` muestra un health-check (corre `--help` del script y verifica
   `soffice --version`).

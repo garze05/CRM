@@ -438,7 +438,7 @@ export type TaskRecord = {
 export const tasks: TaskRecord[] = [
 	{
 		id: "tarea-1",
-		title: "Dar seguimiento a la cotización C2206-100",
+		title: "Dar seguimiento a la cotización C2206-26100",
 		description: "Cotización enviada hace 24 horas sin respuesta del cliente.",
 		dueDate: "2026-06-11",
 		status: "PENDIENTE",
@@ -513,7 +513,7 @@ export const recentActivity: ActivityEntry[] = [
 	{
 		id: "actividad-1",
 		actor: "Huberth Rodríguez",
-		description: "envió la cotización C2206-100 a María Rodríguez",
+		description: "envió la cotización C2206-26100 a María Rodríguez",
 		timeAgo: "hace 2 horas",
 	},
 	{
@@ -556,7 +556,7 @@ export const interactions: InteractionRecord[] = [
 		channel: "WHATSAPP",
 		direction: "SALIENTE",
 		summary:
-			"Se envió la cotización C2206-100 con paquete de personaje principal.",
+			"Se envió la cotización C2206-26100 con paquete de personaje principal.",
 		date: "2026-06-08",
 	},
 	{

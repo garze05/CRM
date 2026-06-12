@@ -80,7 +80,7 @@ desde la fase 6.
   workflow de 4 pasos funcional, historial por evento.
 - **Riesgos:** entorno Python/LibreOffice → health-check en `/ajustes` desde el
   inicio de la fase; transporte degrada a precio base con advertencia visible.
-- **Aceptación:** una cotización real genera PDF con código `C{DDMM}-{seq}`, queda
+- **Aceptación:** una cotización real genera PDF con código `C{DDMM}-{YY}{seq}`, queda
   `SENT` única activa (enviar otra expira la anterior), totales idénticos a los del
   bot ante el mismo input (caso de prueba comparativo).
 
@@ -88,7 +88,7 @@ desde la fase 6.
 - **Objetivo:** aceptar cotización → reservación → pagos → confirmado.
 - **Módulos:** `server/reservations.ts` (`acceptQuote`, `registerPayment`),
   `PaymentTimeline`, detalle de reservación, PDF de reservación (mismo puente).
-- **Aceptación:** aceptar cotización crea RES- y mueve el evento a RESERVADO;
+- **Aceptación:** aceptar cotización crea código `R{DDMM}-{YY}{seq}` y mueve el evento a RESERVADO;
   registrar anticipo ≥50% mueve a CONFIRMADO; fechas límite calculadas (evento−14d).
 
 ### Fase 10 — Colaboradores y calificaciones

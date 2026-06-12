@@ -1,11 +1,12 @@
 // Códigos legibles de documentos — formato heredado de CorrespondencyBot
-// (decisión de negocio, 2026-06-11): {C|R}{DDMM}-{consecutivo}.
+// (decisión de negocio, 2026-06-11): {C|R}{DDMM}-{YY}{consecutivo}.
 //   - C / R según el tipo de documento (cotización / reservación).
 //   - DDMM proviene de la FECHA DEL EVENTO (no de la emisión); "XXXX" si aún
 //     no hay fecha definida.
+//   - YY son los últimos dos dígitos del año de la fecha del evento.
 //   - El consecutivo es anual por tipo y arranca en 100 (DocumentCounter
 //     persiste lastValue, default 99; el servicio incrementa en transacción).
-// Ejemplos: C1503-101 (cotización, evento del 15/03), R2412-115.
+// Ejemplos: C1503-26101 (cotización, evento del 15/03/2026), R2412-26115.
 
 export type DocumentType = "QUOTE" | "RESERVATION";
 

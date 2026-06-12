@@ -450,8 +450,8 @@ model CatalogItem {
 model Quote {
   id      String @id @default(uuid()) @db.Uuid
   eventId String @db.Uuid
-  /// Código legible con el formato de CorrespondencyBot: C{DDMM}-{consecutivo},
-  /// ej. C1503-101 (evento del 15/03, consecutivo anual desde 100).
+  /// Código legible con el formato de CorrespondencyBot: C{DDMM}-{YY}{consecutivo},
+  /// ej. C1503-26101 (evento del 15/03/2026, consecutivo anual desde 100).
   /// Ver app/lib/domain/numbering.ts y DocumentCounter.
   quoteNumber String @unique
 
@@ -500,8 +500,8 @@ model Reservation {
   id      String @id @default(uuid()) @db.Uuid
   eventId String @unique @db.Uuid
   quoteId String @unique @db.Uuid
-  /// Código legible con el formato de CorrespondencyBot: R{DDMM}-{consecutivo},
-  /// ej. R1503-101. Ver app/lib/domain/numbering.ts.
+  /// Código legible con el formato de CorrespondencyBot: R{DDMM}-{YY}{consecutivo},
+  /// ej. R1503-26101. Ver app/lib/domain/numbering.ts.
   reservationNumber String @unique
 
   /// Puede diferir del total cotizado si hubo ajuste acordado.
@@ -711,7 +711,7 @@ model AuditLog {
 // Soporte: numeración de documentos y configuración
 // ---------------------------------------------------------------------------
 
-/// Contador transaccional para códigos legibles (C1503-101, R1503-101).
+/// Contador transaccional para códigos legibles (C1503-26101, R1503-26101).
 /// El consecutivo inicia en 100 y reinicia cada año (decisión de negocio,
 /// heredada del sistema de CorrespondencyBot).
 model DocumentCounter {

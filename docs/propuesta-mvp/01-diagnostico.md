@@ -15,7 +15,7 @@ ya existen; lo que falta es la capa de datos y los flujos operativos.
 |------|------|--------|
 | `/` | Dashboard | Embudo, KPIs, tareas y calendario compacto — todo mock |
 | `/clientes`, `/eventos`, `/cotizaciones`, `/colaboradores`, `/inventario` | Listas | `ManagementTable` + `ListFilters` (filtros sin lógica) |
-| `/reservaciones` | Lista derivada | Sintetiza números RES-/montos al vuelo desde eventos |
+| `/reservaciones` | Lista derivada | Sintetiza códigos `R{DDMM}-{YY}{seq}`/montos al vuelo desde eventos |
 | `/*/[id]` | Detalle | Formularios sin submit, `notFound()` correcto |
 | `/*/nuevo` | Alta | Formularios sin submit ni validación |
 | `/cotizaciones/nueva` | Workflow | Indicador de 4 pasos, sin lógica de avance |
@@ -86,8 +86,8 @@ Puntos clave detectados:
   ₡400/km después de 15 km libres, base ₡5.000, fallback silencioso a precio base.
 - Reglas de descuento en hoja `REGLAS_DESCUENTO`: 15% por cantidad, 15% por ≥2h,
   tope acumulado 30%, recargo por tipo de cliente (escolar 5%, empresa 10%...).
-- Numeración del bot (`C1503-26107` = tipo + DDMM del evento + sufijo): el negocio
-  decidió conservar este formato con consecutivo anual desde 100 (`C1503-101`).
+- Numeración del bot (`C1503-26107` = tipo + DDMM del evento + año/sufijo): el negocio
+  decidió conservar este formato con consecutivo anual desde 100 (`C1503-26101`).
   `generar_documento.py` toma el `codigo` del JSON → el CRM lo genera **sin tocar
   el Python**.
 - IVA 13% opcional (`--invoice`), reparto 50/50 anticipo/saldo ya implementado.

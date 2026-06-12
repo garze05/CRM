@@ -162,7 +162,7 @@ PROSPECTO → CONTACTADO → COTIZADO → RESERVADO → CONFIRMADO → REALIZADO
 
 - `id` — UUID
 - `evento_id` — FK a Eventos, requerido
-- `numero_cotizacion` — string legible, generado automáticamente (ej: `COT-2025-0043`)
+- `numero_cotizacion` — string legible, generado automáticamente con formato `C{DDMM}-{YY}{consecutivo}` (ej: `C1503-26101`)
 - `subtotal` — decimal calculado
 - `costo_transporte` — decimal, calculado por Google Maps API
 - `descuento` — decimal, opcional
@@ -193,7 +193,7 @@ PROSPECTO → CONTACTADO → COTIZADO → RESERVADO → CONFIRMADO → REALIZADO
 - `id` — UUID
 - `evento_id` — FK a Eventos, requerido
 - `cotizacion_id` — FK a Cotizaciones, requerido
-- `numero_reservacion` — string legible (ej: `RES-2025-0021`)
+- `numero_reservacion` — string legible, generado automáticamente con formato `R{DDMM}-{YY}{consecutivo}` (ej: `R1503-26101`)
 - `total_acordado` — decimal (puede diferir del total cotizado si hubo ajuste)
 - `pago_anticipo` — decimal (50% del total, calculado automáticamente)
 - `pago_anticipo_fecha_limite` — date (2 semanas antes del evento)
