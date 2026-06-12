@@ -10,8 +10,8 @@
 export type DocumentType = "QUOTE" | "RESERVATION";
 
 const DOCUMENT_PREFIX: Record<DocumentType, string> = {
-  QUOTE: "C",
-  RESERVATION: "R",
+	QUOTE: "C",
+	RESERVATION: "R",
 };
 
 /**
@@ -19,17 +19,21 @@ const DOCUMENT_PREFIX: Record<DocumentType, string> = {
  * DocumentCounter del año en curso (>= 100).
  */
 export function formatDocumentCode(
-  type: DocumentType,
-  eventDate: Date | null,
-  sequential: number,
+	type: DocumentType,
+	eventDate: Date | null,
+	sequential: number,
 ): string {
-  const datePart = eventDate
-    ? `${String(eventDate.getUTCDate()).padStart(2, "0")}${String(
-        eventDate.getUTCMonth() + 1,
-      ).padStart(2, "0")}`
-    : "XXXX";
+	const datePart = eventDate
+		? `${String(eventDate.getUTCDate()).padStart(2, "0")}${String(
+				eventDate.getUTCMonth() + 1,
+			).padStart(2, "0")}`
+		: "XXXX";
 
-  return `${DOCUMENT_PREFIX[type]}${datePart}-${sequential}`;
+	const yearPart = eventDate
+		? String(eventDate.getUTCFullYear()).slice(-2)
+		: "";
+
+	return `${DOCUMENT_PREFIX[type]}${datePart}-${yearPart}${sequential}`;
 }
 
 /** Primer valor del consecutivo cada año. */

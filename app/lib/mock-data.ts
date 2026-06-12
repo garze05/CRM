@@ -321,15 +321,16 @@ export const pendingTasks = [
 ];
 
 // Código de documento con el formato real del negocio (CorrespondencyBot):
-// {C|R}{DDMM de la fecha del evento}-{consecutivo anual desde 100}.
+// {C|R}{DDMM de la fecha del evento}-{ultimos dos digitos del año}{consecutivo anual desde 100}.
 // Versión mock de app/lib/domain/numbering.ts para datos de prueba.
 export function getMockDocumentCode(
 	prefix: "C" | "R",
 	eventDate: string,
 	sequential: number,
 ) {
-	const [, month, day] = eventDate.split("-");
-	return `${prefix}${day}${month}-${sequential}`;
+	const [yearStr, month, day] = eventDate.split("-");
+	const yearDigits = yearStr.slice(-2);
+	return `${prefix}${day}${month}-${yearDigits}${sequential}`;
 }
 
 export const quotes: QuoteRecord[] = events
@@ -478,7 +479,8 @@ export const tasks: TaskRecord[] = [
 	{
 		id: "tarea-5",
 		title: "Verificar colaboradores asignados",
-		description: "Evento confirmado próximo; revisar que el equipo esté completo.",
+		description:
+			"Evento confirmado próximo; revisar que el equipo esté completo.",
 		dueDate: "2026-06-13",
 		status: "PENDIENTE",
 		origin: "SISTEMA",
@@ -553,7 +555,8 @@ export const interactions: InteractionRecord[] = [
 		clientId: "cliente-1",
 		channel: "WHATSAPP",
 		direction: "SALIENTE",
-		summary: "Se envió la cotización C2206-100 con paquete de personaje principal.",
+		summary:
+			"Se envió la cotización C2206-100 con paquete de personaje principal.",
 		date: "2026-06-08",
 	},
 	{
@@ -561,7 +564,8 @@ export const interactions: InteractionRecord[] = [
 		clientId: "cliente-1",
 		channel: "WHATSAPP",
 		direction: "ENTRANTE",
-		summary: "Preguntó por disponibilidad de Princesa Estrella para el 22 de junio.",
+		summary:
+			"Preguntó por disponibilidad de Princesa Estrella para el 22 de junio.",
 		date: "2026-06-07",
 	},
 	{
@@ -569,7 +573,8 @@ export const interactions: InteractionRecord[] = [
 		clientId: "cliente-1",
 		channel: "LLAMADA",
 		direction: "ENTRANTE",
-		summary: "Primer contacto: cumpleaños para Emma, 35 invitados, patio exterior.",
+		summary:
+			"Primer contacto: cumpleaños para Emma, 35 invitados, patio exterior.",
 		date: "2026-06-07",
 	},
 ];
