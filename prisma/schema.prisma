@@ -1,0 +1,743 @@
+// OkiDoki CRM — Esquema de base de datos (PostgreSQL + Prisma)
+// Convenciones: código en inglés, UI en español, UUID v4, soft delete con deletedAt,
+// fechas en UTC (se muestran en America/Costa_Rica), moneda CRC.
+//
+// NOTA sobre índices únicos parciales: Prisma no soporta índices únicos condicionales
+// (ej. "único mientras deletedAt IS NULL"). Esos índices se crean con SQL crudo en una
+// migración manual — ver prisma/sql/partial-unique-indexes.sql y docs/propuesta-mvp/06-backend.md.
+
+// Prisma 7: la URL de conexión vive en prisma.config.ts (no en este archivo)
+// y PrismaClient se instancia con el driver adapter @prisma/adapter-pg.
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum ClientType {
+  FAMILY
+  EDUCATIONAL
+  CORPORATE
+}
+
+/// Etapa del embudo de un EVENTO (la oportunidad comercial).
+/// RECURRENTE no es etapa de evento: es condición del CLIENTE (Client.isRecurring),
+/// derivada de tener más de un evento COMPLETED.
+enum FunnelStage {
+  PROSPECT
+  CONTACTED
+  QUOTED
+  RESERVED
+  CONFIRMED
+  COMPLETED
+  CANCELED
+}
+
+enum EventType {
+  CHILDREN
+  CORPORATE
+  INSTITUTIONAL
+}
+
+enum VenueType {
+  INDOOR
+  OUTDOOR
+}
+
+enum PriceType {
+  FIXED
+  PER_HOUR
+  PER_UNIT
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  EXPIRED
+  REJECTED
+}
+
+enum PaymentStatus {
+  PENDING_DEPOSIT
+  DEPOSIT_RECEIVED
+  BALANCE_PENDING
+  FULLY_PAID
+}
+
+enum PaymentKind {
+  DEPOSIT
+  BALANCE
+  OTHER
+}
+
+enum CollaboratorRole {
+  MASCOT_COSTUME
+  ENTERTAINER
+  LOGISTICS
+  OTHER
+}
+
+enum CatalogCategory {
+  CHARACTER
+  INFLATABLE
+  DECORATION
+  SERVICE
+  OTHER
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELED
+}
+
+enum TaskOrigin {
+  MANUAL
+  AUTOMATIC
+  SYSTEM
+}
+
+enum InteractionChannel {
+  WHATSAPP
+  PHONE_CALL
+  IN_PERSON
+  OTHER
+}
+
+enum InteractionDirection {
+  INBOUND
+  OUTBOUND
+}
+
+/// Estado de sincronización con Google Calendar (integración futura; el modelo queda listo).
+enum CalendarSyncStatus {
+  NOT_SYNCED
+  PENDING
+  SYNCED
+  FAILED
+}
+
+// ---------------------------------------------------------------------------
+// Autenticación (Auth.js / NextAuth con Google OAuth)
+// Modelos estándar del adaptador @auth/prisma-adapter.
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+
+  accounts        Account[]
+  sessions        Session[]
+  tasksAssigned   Task[]      @relation("TaskAssignee")
+  tasksCreated    Task[]      @relation("TaskCreator")
+  notes           Note[]
+  interactions    Interaction[]
+  auditLogs       AuditLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(uuid()) @db.Uuid
+  userId            String  @db.Uuid
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(uuid()) @db.Uuid
+  sessionToken String   @unique
+  userId       String   @db.Uuid
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ---------------------------------------------------------------------------
+// Clientes
+// ---------------------------------------------------------------------------
+
+model Client {
+  id        String     @id @default(uuid()) @db.Uuid
+  firstName String
+  lastName  String
+  /// Teléfono normalizado E.164 (ej. +50688887777). Identificador natural vía WhatsApp.
+  /// Unicidad real: índice único parcial WHERE deleted_at IS NULL (SQL crudo).
+  phone          String
+  /// Código ISO-3166 alpha-2 del país del teléfono (ej. "CR").
+  phoneCountry   String  @default("CR")
+  /// Versión formateada para mostrar (ej. "8888 7777").
+  phoneFormatted String
+  type           ClientType
+  notes          String?
+  /// Cliente con más de 1 evento COMPLETED. Cache mantenido por el servicio de dominio
+  /// al marcar eventos como realizados (ver lib/domain — recomputeClientRecurrence).
+  isRecurring Boolean @default(false)
+
+  firstContactAt DateTime @default(now())
+  /// Se actualiza automáticamente al registrar cada Interaction.
+  lastContactAt  DateTime @default(now())
+
+  events       Event[]
+  interactions Interaction[]
+  tasks        Task[]
+  notesLog     Note[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([phone])
+  @@index([type])
+  @@index([isRecurring])
+  @@index([deletedAt])
+  @@map("clients")
+}
+
+/// Registro manual de interacciones (WhatsApp/llamadas siguen fuera del sistema en el MVP).
+/// Insertar una interacción actualiza Client.lastContactAt.
+model Interaction {
+  id        String               @id @default(uuid()) @db.Uuid
+  clientId  String               @db.Uuid
+  eventId   String?              @db.Uuid
+  channel   InteractionChannel
+  direction InteractionDirection @default(OUTBOUND)
+  summary   String
+  occurredAt DateTime            @default(now())
+  createdById String?            @db.Uuid
+
+  client    Client @relation(fields: [clientId], references: [id])
+  event     Event? @relation(fields: [eventId], references: [id])
+  createdBy User?  @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([clientId, occurredAt])
+  @@map("interactions")
+}
+
+// ---------------------------------------------------------------------------
+// Eventos
+// ---------------------------------------------------------------------------
+
+model Event {
+  id          String      @id @default(uuid()) @db.Uuid
+  clientId    String      @db.Uuid
+  /// Nombre operativo del evento (ej. "Cumpleaños de Sofía").
+  name        String
+  funnelStage FunnelStage @default(PROSPECT)
+  eventType   EventType
+
+  /// Requerida a partir de RESERVED (validación de dominio, no de BD).
+  eventDate     DateTime? @db.Date
+  /// Hora local de inicio "HH:mm" (se combina con eventDate en la zona America/Costa_Rica).
+  startTime     String?
+  durationHours Decimal?  @db.Decimal(4, 2)
+
+  venueName    String?
+  venueAddress String?
+  venueType    VenueType?
+  guestCount   Int?
+  /// Edad del festejado (eventos infantiles; orienta sugerencia de personaje).
+  honoreeAge   Int?
+  honoreeName  String?
+
+  packageId String? @db.Uuid
+
+  internalNotes String?
+  /// Calificación manual del evento 1–5 (opcional).
+  rating Int?
+
+  // --- Preparación para Google Calendar (post-MVP) ---
+  externalCalendarId      String?
+  externalCalendarEventId String?
+  syncStatus              CalendarSyncStatus @default(NOT_SYNCED)
+  lastSyncedAt            DateTime?
+
+  client       Client            @relation(fields: [clientId], references: [id])
+  package      Package?          @relation(fields: [packageId], references: [id])
+  services     EventService[]
+  characters   EventCatalogItem[]
+  assignments  EventAssignment[]
+  quotes       Quote[]
+  reservation  Reservation?
+  tasks        Task[]
+  notesLog     Note[]
+  interactions Interaction[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([clientId])
+  @@index([funnelStage])
+  @@index([eventDate])
+  @@index([eventDate, funnelStage])
+  @@index([deletedAt])
+  @@map("events")
+}
+
+/// Servicios adicionales seleccionados para un evento (à la carte sobre el paquete).
+model EventService {
+  id        String  @id @default(uuid()) @db.Uuid
+  eventId   String  @db.Uuid
+  serviceId String  @db.Uuid
+  quantity  Int     @default(1)
+  /// Horas contratadas cuando el servicio es PER_HOUR.
+  hours     Decimal? @db.Decimal(4, 2)
+
+  event   Event   @relation(fields: [eventId], references: [id])
+  service Service @relation(fields: [serviceId], references: [id])
+
+  @@unique([eventId, serviceId])
+  @@map("event_services")
+}
+
+/// Personajes / ítems de catálogo asignados a un evento (ej. botarga de Sonic).
+model EventCatalogItem {
+  id            String @id @default(uuid()) @db.Uuid
+  eventId       String @db.Uuid
+  catalogItemId String @db.Uuid
+  quantity      Int    @default(1)
+
+  event       Event       @relation(fields: [eventId], references: [id])
+  catalogItem CatalogItem @relation(fields: [catalogItemId], references: [id])
+
+  @@unique([eventId, catalogItemId])
+  @@map("event_catalog_items")
+}
+
+// ---------------------------------------------------------------------------
+// Paquetes y servicios
+// ---------------------------------------------------------------------------
+
+model Package {
+  id            String  @id @default(uuid()) @db.Uuid
+  name          String
+  description   String?
+  durationHours Decimal @db.Decimal(4, 2)
+
+  priceFamily      Decimal @db.Decimal(12, 2)
+  priceEducational Decimal @db.Decimal(12, 2)
+  priceCorporate   Decimal @db.Decimal(12, 2)
+
+  active Boolean @default(true)
+
+  /// Composición del paquete (creador de paquetes a partir del catálogo).
+  items  PackageItem[]
+  events Event[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([active])
+  @@map("packages")
+}
+
+/// Línea de composición de un paquete: referencia a un servicio O a un ítem de catálogo.
+/// Exactamente uno de (serviceId, catalogItemId) debe estar presente (CHECK en SQL crudo).
+model PackageItem {
+  id            String  @id @default(uuid()) @db.Uuid
+  packageId     String  @db.Uuid
+  serviceId     String? @db.Uuid
+  catalogItemId String? @db.Uuid
+  quantity      Int     @default(1)
+  /// Horas incluidas cuando aplica (servicios PER_HOUR).
+  hours         Decimal? @db.Decimal(4, 2)
+
+  package     Package      @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  service     Service?     @relation(fields: [serviceId], references: [id])
+  catalogItem CatalogItem? @relation(fields: [catalogItemId], references: [id])
+
+  @@index([packageId])
+  @@map("package_items")
+}
+
+/// Servicios adicionales à la carte (ej. "Hora adicional", "Pintacaritas").
+model Service {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String
+  category  String?
+  unitPrice Decimal   @db.Decimal(12, 2)
+  priceType PriceType @default(FIXED)
+  /// Recargo porcentual por tipo de cliente (ej. {"EDUCATIONAL": 0.05, "CORPORATE": 0.10}).
+  /// Replica las reglas de REGLAS_DESCUENTO del Sheets; null = sin recargo.
+  clientTypeSurcharge Json?
+  active    Boolean   @default(true)
+
+  eventServices EventService[]
+  packageItems  PackageItem[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([active])
+  @@map("services")
+}
+
+// ---------------------------------------------------------------------------
+// Catálogo (personajes, inflables, decoración) — alimenta vista pública y PDF
+// ---------------------------------------------------------------------------
+
+model CatalogItem {
+  id          String          @id @default(uuid()) @db.Uuid
+  name        String
+  category    CatalogCategory
+  description String?
+  imageUrl    String?
+  galleryUrls String[]        @default([])
+  tags        String[]        @default([])
+  active      Boolean         @default(true)
+
+  /// Precio por hora de referencia cuando el ítem se cotiza directo (ej. botarga staff).
+  hourlyPrice Decimal? @db.Decimal(12, 2)
+
+  eventLinks    EventCatalogItem[]
+  packageItems  PackageItem[]
+  collaborators CollaboratorCharacter[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([category, active])
+  @@index([tags], type: Gin)
+  @@map("catalog_items")
+}
+
+// ---------------------------------------------------------------------------
+// Cotizaciones
+// ---------------------------------------------------------------------------
+
+model Quote {
+  id      String @id @default(uuid()) @db.Uuid
+  eventId String @db.Uuid
+  /// Número legible COT-2026-0043 generado por DocumentCounter.
+  quoteNumber String @unique
+
+  subtotal      Decimal @db.Decimal(12, 2)
+  transportCost Decimal @db.Decimal(12, 2) @default(0)
+  discount      Decimal @db.Decimal(12, 2) @default(0)
+  /// IVA cuando se requiere factura (13%); 0 en caso contrario.
+  taxAmount     Decimal @db.Decimal(12, 2) @default(0)
+  total         Decimal @db.Decimal(12, 2)
+  currency      String  @default("CRC")
+  /// Tipo de cambio CRC→USD al emitir (referencia visual, no transaccional).
+  usdExchangeRate Decimal? @db.Decimal(10, 4)
+
+  issuedAt   DateTime    @default(now())
+  /// Por defecto 7 días desde emisión (config en Settings).
+  validUntil DateTime    @db.Date
+  status     QuoteStatus @default(DRAFT)
+
+  /// Detalle de líneas tal como se envió al generador de documentos (contrato JSON
+  /// de CorrespondencyBot). Fuente para re-render y trazabilidad histórica.
+  lineItems Json
+
+  pdfUrl String?
+  /// Notas visibles para el cliente en el documento.
+  notes  String?
+
+  event       Event        @relation(fields: [eventId], references: [id])
+  reservation Reservation?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Unicidad "solo 1 cotización SENT activa por evento": índice único parcial
+  // WHERE status = 'SENT' AND deleted_at IS NULL (SQL crudo) + validación de dominio.
+  @@index([eventId])
+  @@index([status, validUntil])
+  @@map("quotes")
+}
+
+// ---------------------------------------------------------------------------
+// Reservaciones y pagos
+// ---------------------------------------------------------------------------
+
+model Reservation {
+  id      String @id @default(uuid()) @db.Uuid
+  eventId String @unique @db.Uuid
+  quoteId String @unique @db.Uuid
+  /// Número legible RES-2026-0021 generado por DocumentCounter.
+  reservationNumber String @unique
+
+  /// Puede diferir del total cotizado si hubo ajuste acordado.
+  agreedTotal Decimal @db.Decimal(12, 2)
+
+  depositAmount  Decimal  @db.Decimal(12, 2)
+  /// 2 semanas antes del evento (calculada al crear; editable).
+  depositDueDate DateTime @db.Date
+  balanceAmount  Decimal  @db.Decimal(12, 2)
+  /// Antes de iniciar el evento.
+  balanceDueDate DateTime @db.Date
+
+  paymentStatus PaymentStatus @default(PENDING_DEPOSIT)
+
+  pdfUrl String?
+  notes  String?
+
+  event    Event     @relation(fields: [eventId], references: [id])
+  quote    Quote     @relation(fields: [quoteId], references: [id])
+  payments Payment[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([paymentStatus, depositDueDate])
+  @@map("reservations")
+}
+
+/// Pagos registrados contra una reservación (trazabilidad de anticipo/saldo).
+model Payment {
+  id            String      @id @default(uuid()) @db.Uuid
+  reservationId String      @db.Uuid
+  kind          PaymentKind
+  amount        Decimal     @db.Decimal(12, 2)
+  paidAt        DateTime    @default(now())
+  method        String?
+  reference     String?
+  notes         String?
+
+  reservation Reservation @relation(fields: [reservationId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([reservationId])
+  @@map("payments")
+}
+
+// ---------------------------------------------------------------------------
+// Colaboradores y asignaciones
+// ---------------------------------------------------------------------------
+
+model Collaborator {
+  id        String           @id @default(uuid()) @db.Uuid
+  firstName String
+  lastName  String
+  phone          String?
+  phoneCountry   String  @default("CR")
+  phoneFormatted String?
+  role      CollaboratorRole
+  active    Boolean          @default(true)
+  notes     String?
+
+  /// Promedio cacheado de EventAssignment.rating; null = "Sin calificación".
+  /// Recalculado por el servicio de dominio al guardar asignaciones calificadas.
+  ratingAverage Decimal? @db.Decimal(3, 2)
+
+  characters  CollaboratorCharacter[]
+  assignments EventAssignment[]
+  tasks       Task[]
+  notesLog    Note[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([role, active])
+  @@map("collaborators")
+}
+
+/// Personajes que un colaborador puede interpretar.
+model CollaboratorCharacter {
+  id             String @id @default(uuid()) @db.Uuid
+  collaboratorId String @db.Uuid
+  catalogItemId  String @db.Uuid
+
+  collaborator Collaborator @relation(fields: [collaboratorId], references: [id], onDelete: Cascade)
+  catalogItem  CatalogItem  @relation(fields: [catalogItemId], references: [id])
+
+  @@unique([collaboratorId, catalogItemId])
+  @@map("collaborator_characters")
+}
+
+/// Asignación Colaborador ↔ Evento. Aquí viven la nota y la calificación POR EVENTO.
+model EventAssignment {
+  id             String @id @default(uuid()) @db.Uuid
+  eventId        String @db.Uuid
+  collaboratorId String @db.Uuid
+  /// Rol desempeñado en este evento (puede diferir del rol base del colaborador).
+  roleInEvent    CollaboratorRole?
+  notes          String?
+  /// Calificación 1–5 del desempeño en este evento (opcional).
+  rating         Int?
+
+  event        Event        @relation(fields: [eventId], references: [id])
+  collaborator Collaborator @relation(fields: [collaboratorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([eventId, collaboratorId])
+  @@index([collaboratorId])
+  @@map("event_assignments")
+}
+
+// ---------------------------------------------------------------------------
+// Tareas, notas y auditoría
+// ---------------------------------------------------------------------------
+
+model Task {
+  id          String     @id @default(uuid()) @db.Uuid
+  title       String
+  description String?
+  dueAt       DateTime?
+  status      TaskStatus @default(PENDING)
+  origin      TaskOrigin @default(MANUAL)
+
+  /// Clave de deduplicación para tareas automáticas
+  /// (ej. "QUOTE_FOLLOWUP_24H:quote:<id>"). Única cuando no es null.
+  autoKey String? @unique
+
+  // Asociación polimórfica simple: cero o más FKs opcionales.
+  clientId       String? @db.Uuid
+  eventId        String? @db.Uuid
+  collaboratorId String? @db.Uuid
+
+  assigneeId  String? @db.Uuid
+  createdById String? @db.Uuid
+  completedAt DateTime?
+
+  client       Client?       @relation(fields: [clientId], references: [id])
+  event        Event?        @relation(fields: [eventId], references: [id])
+  collaborator Collaborator? @relation(fields: [collaboratorId], references: [id])
+  assignee     User?         @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  createdBy    User?         @relation("TaskCreator", fields: [createdById], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([status, dueAt])
+  @@index([eventId])
+  @@index([clientId])
+  @@map("tasks")
+}
+
+/// Notas de bitácora (timeline) asociadas a cliente, evento o colaborador.
+model Note {
+  id   String @id @default(uuid()) @db.Uuid
+  body String
+
+  clientId       String? @db.Uuid
+  eventId        String? @db.Uuid
+  collaboratorId String? @db.Uuid
+
+  authorId String? @db.Uuid
+
+  client       Client?       @relation(fields: [clientId], references: [id])
+  event        Event?        @relation(fields: [eventId], references: [id])
+  collaborator Collaborator? @relation(fields: [collaboratorId], references: [id])
+  author       User?         @relation(fields: [authorId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([eventId, createdAt])
+  @@index([clientId, createdAt])
+  @@map("notes")
+}
+
+/// Bitácora de auditoría: "quién hizo qué y cuándo".
+/// Escrita por los servicios de dominio dentro de la misma transacción que el cambio.
+model AuditLog {
+  id      String  @id @default(uuid()) @db.Uuid
+  /// Acción con formato "entidad.verbo" (ej. "event.stage_changed", "quote.accepted").
+  action  String
+  /// Tipo de entidad afectada (ej. "Client", "Event", "Quote").
+  entityType String
+  entityId   String @db.Uuid
+  /// Diff de campos relevantes: { campo: { from, to } }.
+  changes Json?
+  /// Contexto opcional (ej. etapa origen/destino, monto del pago).
+  context Json?
+
+  actorId String? @db.Uuid
+  actor   User?   @relation(fields: [actorId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([entityType, entityId, createdAt])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ---------------------------------------------------------------------------
+// Soporte: numeración de documentos y configuración
+// ---------------------------------------------------------------------------
+
+/// Contador transaccional para números legibles (COT-2026-0043, RES-2026-0021).
+model DocumentCounter {
+  id        String @id @default(uuid()) @db.Uuid
+  /// "QUOTE" | "RESERVATION"
+  type      String
+  year      Int
+  lastValue Int    @default(0)
+
+  @@unique([type, year])
+  @@map("document_counters")
+}
+
+/// Configuración del negocio editable desde /ajustes (fila única).
+model Settings {
+  id                    String  @id @default(uuid()) @db.Uuid
+  currency              String  @default("CRC")
+  timezone              String  @default("America/Costa_Rica")
+  quoteValidityDays     Int     @default(7)
+  depositPercent        Decimal @db.Decimal(5, 2) @default(50)
+  depositLeadTimeDays   Int     @default(14)
+  transportBasePrice    Decimal @db.Decimal(12, 2) @default(5000)
+  transportRatePerKm    Decimal @db.Decimal(12, 2) @default(400)
+  transportFreeKm       Int     @default(15)
+  transportOriginAddress String @default("Heredia Canton Central Ulloa Costa Rica")
+  taxRate               Decimal @db.Decimal(5, 4) @default(0.13)
+
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}
