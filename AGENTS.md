@@ -12,7 +12,7 @@ Cubre el ciclo completo: captación de prospectos → seguimiento → cotizació
 - Tipos de cliente: Familiar, Institución Educativa, Corporativo — cada uno con lógica de precios distinta.
 - Variables de cotización: paquete base + servicios adicionales + transporte (calculado via Google Maps API) + tipo de cliente.
 - Usuarios del sistema: 2–3 personas (equipo familiar/pequeño). No se requieren roles complejos en el MVP.
-- Stack definido: Next.js 14, PostgreSQL + Prisma, NextAuth con Google OAuth.
+- Stack definido: Next.js 16, PostgreSQL + Prisma, NextAuth con Google OAuth.
 
 ---
 

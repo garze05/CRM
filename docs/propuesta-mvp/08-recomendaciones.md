@@ -34,23 +34,18 @@
 | Sin tests E2E exhaustivos | Suite de dominio + UAT cubren el riesgo real | Cuando haya más de un dev |
 | Calendario sin drag-and-drop | No está en el MVP | Si el equipo lo pide → evaluar FullCalendar Premium |
 
-## 8.4 Decisiones que requieren validación del negocio
+## 8.4 Decisiones de negocio — RESUELTAS (2026-06-11)
 
-1. **Stack real vs. documentado**: el repo usa Next 16/React 19/Tailwind 4; AGENTS.md
-   dice Next 14. Propuesta: quedarse en Next 16 y actualizar AGENTS.md. *(Bloqueante
-   para la fase 1.)*
-2. **Catálogo público con o sin precios** (propuesta: sin precios, CTA a WhatsApp).
-3. **Reglas de descuento**: ¿se conservan exactamente las del Sheets (15%/15%/tope
-   30%/recargos por tipo) como defaults del CRM? ¿Quién puede editarlas (Ajustes)?
-4. **Política de cancelación**: ¿un evento CANCELADO con anticipo pagado genera
-   devolución/nota? (MVP: solo se registra en notas; confirmar.)
-5. **Temporadas festivas**: lista inicial de rangos (Navidad, día del niño,
-   graduaciones…) y colores.
-6. **Mensajes sugeridos de WhatsApp**: redacción/tono de las plantillas de
-   seguimiento (las escribe el negocio, no el dev).
-7. **Correos de `ALLOWED_EMAILS`** y dominio de despliegue.
-8. **Numeración**: confirmar `COT-AAAA-NNNN`/`RES-AAAA-NNNN` y si el consecutivo
-   reinicia por año (propuesta: sí).
+| # | Decisión | Respuesta del negocio | Dónde quedó aplicada |
+|---|----------|----------------------|----------------------|
+| 1 | Stack real vs. documentado | **Next 16** — AGENTS.md actualizado por el negocio | AGENTS.md |
+| 2 | Catálogo público | **Sin precios, CTA a WhatsApp** | Doc 02 §2.10 |
+| 3 | Reglas de descuento | Defaults del Sheets, **editables en Ajustes** | Campos en `Settings` (schema.prisma) |
+| 4 | Cancelación con anticipo | **No hay devolución después de confirmar**; se registra en notas | Doc 05 §5.3 |
+| 5 | Temporadas festivas | **Navidad, Día del Niño (9 set CR), Halloween** por ahora | `app/lib/domain/seasons.ts` |
+| 6 | Mensajes de WhatsApp | Placeholder claro; redacción la pone el negocio | `app/lib/domain/whatsapp-templates.ts` (marcados `[PENDIENTE NEGOCIO]`) |
+| 7 | Acceso | Solo correos **@okidokicr.com** | `ALLOWED_EMAIL_DOMAIN` en `.env.example` |
+| 8 | Numeración | **Formato CorrespondencyBot** `{C\|R}{DDMM}-{seq}`, consecutivo anual desde 100, reinicia cada año | `app/lib/domain/numbering.ts` + `DocumentCounter` |
 
 ## 8.5 Qué queda preparado para fases futuras (sin costo extra hoy)
 

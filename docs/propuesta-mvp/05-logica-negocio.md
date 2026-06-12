@@ -39,11 +39,15 @@ async function changeEventStage(eventId, to, actor) {
   (precio/hora) + servicios à la carte (FIJO / POR_HORA×horas / POR_UNIDAD×cantidad)
   + transporte (Google Maps) − descuento manual + IVA opcional (13%).
 - Las reglas de descuento del Sheets (15% 2.º ítem, 15% ≥2h, tope 30%, recargo por
-  tipo de cliente) se portan a `Service.clientTypeSurcharge` + constantes en
-  `Settings`/dominio; **el detalle calculado se congela en `Quote.lineItems` (Json)**
-  — una cotización emitida nunca cambia aunque cambien los precios.
-- **Numeración**: `COT-{año}-{NNNN}` vía `DocumentCounter` con
-  `UPDATE ... SET last_value = last_value + 1 RETURNING` en transacción.
+  tipo de cliente: educativo 5%, corporativo 10%) viven en `Settings` como campos
+  **editables desde /ajustes** (decisión de negocio 2026-06-11); **el detalle
+  calculado se congela en `Quote.lineItems` (Json)** — una cotización emitida nunca
+  cambia aunque cambien los precios o las reglas.
+- **Numeración** (decisión de negocio 2026-06-11 — formato de CorrespondencyBot):
+  `{C|R}{DDMM}-{consecutivo}`, ej. `C1503-101`. DDMM = fecha del evento ("XXXX" si
+  no hay fecha); consecutivo anual por tipo iniciando en **100**, reinicia cada año.
+  Implementado en `app/lib/domain/numbering.ts`; persistencia vía `DocumentCounter`
+  con `UPDATE ... SET last_value = last_value + 1 RETURNING` en transacción.
 - **Unicidad activa**: solo 1 `SENT` por evento — índice parcial + regla de dominio:
   al enviar una nueva, la `SENT` anterior pasa a `EXPIRED` (historial).
 - **Vigencia**: `validUntil = issuedAt + Settings.quoteValidityDays` (7 default).
@@ -70,6 +74,9 @@ async function registerPayment(reservationId, { amount, kind, ... }, actor) {
 
 - Saldo registrado → el evento **puede** marcarse `COMPLETED` (acción manual del
   equipo tras ejecutar el evento, no automática).
+- **Cancelación** (decisión de negocio 2026-06-11): cancelar un evento con anticipo
+  pagado **no genera devolución**. El sistema solo registra la cancelación en
+  notas/auditoría; los pagos quedan en el historial tal como ocurrieron.
 
 ## 5.4 Recordatorios y tareas automáticas
 

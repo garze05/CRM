@@ -31,6 +31,11 @@
 	--on-accent: #3d1b00;
 	--soft-shadow: 0 16px 40px rgba(77, 51, 31, 0.08);
 	--crisp-shadow: 0 6px 18px rgba(77, 51, 31, 0.08);
+
+	/* Bandas de temporadas festivas en el calendario (ver app/lib/domain/seasons.ts) */
+	--season-navidad: color-mix(in srgb, var(--error-color) 10%, transparent);
+	--season-dia-del-nino: color-mix(in srgb, var(--info-color) 14%, transparent);
+	--season-halloween: color-mix(in srgb, var(--accent-color) 14%, transparent);
 }
 
 .dark {

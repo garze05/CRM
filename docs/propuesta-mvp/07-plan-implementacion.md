@@ -14,7 +14,8 @@ desde la fase 6.
   `app/lib/db.ts`, `app/lib/auth.ts`, `app/api/auth/[...nextauth]/route.ts`,
   middleware, grupo `(app)/` con sesión, login con Google + allowlist.
 - **Riesgos:** fricción Auth.js v5 con Next 16 → fijar versiones exactas.
-- **Aceptación:** solo correos de `ALLOWED_EMAILS` entran; el usuario real reemplaza
+- **Aceptación:** solo correos del dominio `ALLOWED_EMAIL_DOMAIN` (okidokicr.com)
+  entran; el usuario real reemplaza
   al mock del sidebar; `/catalogo` (placeholder) abre sin login.
 
 ### Fase 2 — Modelos Prisma y seed
@@ -79,7 +80,7 @@ desde la fase 6.
   workflow de 4 pasos funcional, historial por evento.
 - **Riesgos:** entorno Python/LibreOffice → health-check en `/ajustes` desde el
   inicio de la fase; transporte degrada a precio base con advertencia visible.
-- **Aceptación:** una cotización real genera PDF con `COT-2026-NNNN`, queda
+- **Aceptación:** una cotización real genera PDF con código `C{DDMM}-{seq}`, queda
   `SENT` única activa (enviar otra expira la anterior), totales idénticos a los del
   bot ante el mismo input (caso de prueba comparativo).
 

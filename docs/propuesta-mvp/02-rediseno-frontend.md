@@ -160,7 +160,8 @@ Se conserva el workflow de 4 pasos existente, ahora funcional:
 4. **Revisión**: totales, vigencia (default 7 días), notas visibles, toggle factura
    (IVA 13%), referencia USD. Acciones: "Guardar borrador" · "Generar PDF y marcar
    enviada".
-- Al generar: el CRM asigna `COT-2026-NNNN`, llama al puente con CorrespondencyBot,
+- Al generar: el CRM asigna el código `C{DDMM}-{seq}` (formato CorrespondencyBot,
+  consecutivo anual desde 100), llama al puente con CorrespondencyBot,
   guarda `pdfUrl` y muestra el PDF con botón "Copiar mensaje de WhatsApp sugerido".
 
 ### Detalle (`/cotizaciones/[id]`)

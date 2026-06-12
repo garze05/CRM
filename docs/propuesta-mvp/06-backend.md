@@ -55,7 +55,8 @@ Resumen: 24 modelos / 16 enums. Decisiones notables:
 - `Payment` separado de `Reservation` (historial de pagos real).
 - `Task.autoKey @unique` → idempotencia de recordatorios.
 - `Note`, `Interaction`, `AuditLog` como bitácoras transversales.
-- `DocumentCounter(type, year)` para `COT-2026-NNNN` / `RES-2026-NNNN`.
+- `DocumentCounter(type, year)` para `C{DDMM}-{seq}` / `R{DDMM}-{seq}` (consecutivo
+  anual desde 100, formato CorrespondencyBot — ver `app/lib/domain/numbering.ts`).
 - `Settings` fila única editable desde `/ajustes` (vigencia, % anticipo, tarifas de
   transporte, IVA) — los valores actuales del Python quedan como defaults.
 - Índices únicos parciales y CHECKs en
@@ -101,7 +102,7 @@ Server Action generateQuotePdf(quoteId)
   2. integrations/google-maps.ts → transporte (misma fórmula: base 5000,
      400/km tras 15 km libres, origen de Settings)
   3. Construir JSON con el MISMO contrato de cotizacion_output.json:
-     { codigo: "COT-2026-0043", tipo_documento, fecha_envio, descripcion,
+     { codigo: "C1503-101", tipo_documento, fecha_envio, descripcion,
        cliente{...}, evento{...}, servicios[...], totales{...} }
   4. spawn: $CORRESPONDENCY_BOT_PYTHON generar_documento.py
        -i <tmp.json> -t Plantilla.docx --pdf   (cwd = CORRESPONDENCY_BOT_PATH)
@@ -109,8 +110,9 @@ Server Action generateQuotePdf(quoteId)
   6. audit("quote.pdf_generated")
 ```
 
-- `generar_documento.py` ya toma `codigo` del JSON → la numeración `COT-…` del CRM
-  funciona **sin tocar una línea de Python** (verificado en el código del bot).
+- `generar_documento.py` ya toma `codigo` del JSON → el CRM genera el código con
+  el mismo formato del bot (`C{DDMM}-{seq}`, consecutivo anual desde 100) **sin
+  tocar una línea de Python** (verificado en el código del bot).
 - Reservaciones: mismo puente con `tipo_documento: "Reservación"` (prefijo RES-).
 - Requisito de despliegue: Python 3 + dependencias del bot + LibreOffice en el mismo
   host. `/ajustes` muestra un health-check (corre `--help` del script y verifica
@@ -131,8 +133,8 @@ Server Action generateQuotePdf(quoteId)
 1. **Catálogo y precios (Sheets → BD)**: exportar `CATÁLOGO_GENERAL`, `BOTARGAS` y
    `REGLAS_DESCUENTO` a CSV → `prisma/seed-data/`. `seed.ts` crea `CatalogItem`
    (botargas con tipo/franquicia como tags), `Service` (conceptos generales) y
-   defaults de `Settings`. Los recargos por tipo de cliente van a
-   `Service.clientTypeSurcharge`.
+   defaults de `Settings`. Los recargos por tipo de cliente y reglas de descuento
+   van a los campos de `Settings` (editables desde /ajustes).
 2. **Históricos (Excel → BD)**: tras limpieza manual (normalizar nombres, deduplicar
    por teléfono, validar formato), exportar a `clientes.csv` y `eventos.csv`.
    `seed.ts --historical`: crea clientes (teléfono E.164), eventos `COMPLETED` sin
@@ -150,6 +152,7 @@ Server Action generateQuotePdf(quoteId)
 
 ## 6.9 Autenticación
 
-- Auth.js v5 + Google + Prisma adapter. `signIn` callback: permitir solo correos de
-  `ALLOWED_EMAILS`. Middleware protege `(app)/`; `/catalogo` y `/api/auth` libres.
+- Auth.js v5 + Google + Prisma adapter. `signIn` callback: permitir solo correos
+  del dominio `ALLOWED_EMAIL_DOMAIN` (okidokicr.com — decisión de negocio).
+  Middleware protege `(app)/`; `/catalogo` y `/api/auth` libres.
 - Sin roles: cualquier usuario autenticado tiene acceso total (mandato del MVP).

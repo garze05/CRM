@@ -86,9 +86,10 @@ Puntos clave detectados:
   ₡400/km después de 15 km libres, base ₡5.000, fallback silencioso a precio base.
 - Reglas de descuento en hoja `REGLAS_DESCUENTO`: 15% por cantidad, 15% por ≥2h,
   tope acumulado 30%, recargo por tipo de cliente (escolar 5%, empresa 10%...).
-- Numeración propia del bot (`C1503-26107`) ≠ formato del MVP (`COT-2026-0043`),
-  pero `generar_documento.py` toma el `codigo` del JSON → el CRM puede imponer su
-  numeración **sin tocar el Python**.
+- Numeración del bot (`C1503-26107` = tipo + DDMM del evento + sufijo): el negocio
+  decidió conservar este formato con consecutivo anual desde 100 (`C1503-101`).
+  `generar_documento.py` toma el `codigo` del JSON → el CRM lo genera **sin tocar
+  el Python**.
 - IVA 13% opcional (`--invoice`), reparto 50/50 anticipo/saldo ya implementado.
 - PDF requiere LibreOffice instalado en el servidor.
 
