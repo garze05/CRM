@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "../../components/page-header";
 import { StarRating } from "../../components/star-rating";
 import { StatusBadge } from "../../components/status-badge";
-import { TaskList } from "../../components/task-list";
+import { TaskPanel } from "../../components/task-panel";
 import {
 	collaborators,
 	formatCrc,
@@ -242,14 +242,6 @@ export default async function EventDetailPage({
 						)}
 					</section>
 
-					{eventTasks.length > 0 ? (
-						<section className='surface-card min-w-0 p-5 md:p-7'>
-							<h2 className='mb-4 text-2xl font-black text-[var(--text-primary)]'>
-								Tareas del evento
-							</h2>
-							<TaskList tasks={eventTasks} />
-						</section>
-					) : null}
 				</div>
 
 				<aside className='min-w-0 space-y-5'>
@@ -288,6 +280,13 @@ export default async function EventDetailPage({
 							</div>
 						</dl>
 					</section>
+
+					<TaskPanel
+						title='Tareas del evento'
+						entityHref={`/eventos/${event.id}`}
+						entityLabel={event.name}
+						tasks={eventTasks}
+					/>
 
 					<section className='surface-card p-5'>
 						<h2 className='text-xl font-black text-[var(--text-primary)]'>

@@ -4,15 +4,16 @@ import { DecorativePageIcon } from "./decorative-page-icon";
 
 const moduleIcons: Record<string, string> = {
 	Ajustes: "material-symbols:settings-rounded",
+	Catálogo: "material-symbols:photo-library-rounded",
 	Clientes: "material-symbols:groups-rounded",
 	Colaboradores: "material-symbols:family-star",
 	Cotizaciones: "material-symbols:request-quote-rounded",
 	Eventos: "material-symbols:event-rounded",
 	Inicio: "material-symbols:dashboard-rounded",
-	Inventario: "material-symbols:inventory-2-rounded",
 	"Paquetes y servicios": "material-symbols:package-rounded",
 	Papelería: "material-symbols:restore-from-trash-rounded",
 	Reservaciones: "material-symbols:payments-rounded",
+	Tareas: "material-symbols:checklist-rounded",
 };
 
 function getDecorativeIcon(items: BreadcrumbItem[], title: string) {
@@ -20,7 +21,10 @@ function getDecorativeIcon(items: BreadcrumbItem[], title: string) {
 		items.find(item => item.label !== "Inicio" && moduleIcons[item.label]) ??
 		items.find(item => moduleIcons[item.label]);
 
-	return moduleIcons[moduleItem?.label ?? title] ?? "material-symbols:dashboard-rounded";
+	return (
+		moduleIcons[moduleItem?.label ?? title] ??
+		"material-symbols:dashboard-rounded"
+	);
 }
 
 export function PageHeader({

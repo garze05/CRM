@@ -4,7 +4,7 @@ import { PageHeader } from "../../components/page-header";
 import { PhoneInput } from "../../components/phone-input";
 import { PhotoThumbnailControl } from "../../components/photo-thumbnail-control";
 import { StatusBadge } from "../../components/status-badge";
-import { TaskList } from "../../components/task-list";
+import { TaskPanel } from "../../components/task-panel";
 import {
 	formatCrc,
 	formatDate,
@@ -202,14 +202,6 @@ export default async function ClientDetailPage({
 						)}
 					</section>
 
-					{clientTasks.length > 0 ? (
-						<section className='surface-card min-w-0 p-5 md:p-7'>
-							<h2 className='mb-4 text-2xl font-black text-[var(--text-primary)]'>
-								Tareas del cliente
-							</h2>
-							<TaskList tasks={clientTasks} />
-						</section>
-					) : null}
 				</div>
 
 				<aside className='min-w-0 space-y-5'>
@@ -257,6 +249,13 @@ export default async function ClientDetailPage({
 							</div>
 						</dl>
 					</section>
+
+					<TaskPanel
+						title='Tareas del cliente'
+						entityHref={`/clientes/${client.id}`}
+						entityLabel={getClientFullName(client)}
+						tasks={clientTasks}
+					/>
 				</aside>
 			</div>
 		</>

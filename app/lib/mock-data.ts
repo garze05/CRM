@@ -586,6 +586,10 @@ export function getEventTasks(eventId: string) {
 	return tasks.filter(task => task.entityHref === `/eventos/${eventId}`);
 }
 
+export function getQuoteTasks(quoteId: string) {
+	return tasks.filter(task => task.entityHref === `/cotizaciones/${quoteId}`);
+}
+
 // ---------------------------------------------------------------------------
 // Asignaciones Colaborador ↔ Evento (nota y calificación POR evento)
 // ---------------------------------------------------------------------------

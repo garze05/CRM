@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { IconLabel } from "../components/icon-label";
 import { MetricCard } from "../components/metric-card";
 import { PageHeader } from "../components/page-header";
 import { SectionCard } from "../components/section-card";
@@ -23,6 +25,14 @@ export default async function TasksPage({
 				breadcrumb={[{ label: "Inicio", href: "/" }, { label: "Tareas" }]}
 				title='Tareas'
 				description='Seguimientos, recordatorios automáticos y pendientes del equipo.'
+				actions={
+					<Link
+						href='/tareas/nueva'
+						className='primary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
+					>
+						<IconLabel icon='material-symbols:add-task-rounded' label='Nueva tarea' />
+					</Link>
+				}
 			/>
 
 			<div className='space-y-5 px-5 pb-28 md:px-8 md:pb-8'>

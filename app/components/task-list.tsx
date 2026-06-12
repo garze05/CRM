@@ -7,7 +7,7 @@ export function TaskList({ tasks }: { tasks: TaskRecord[] }) {
 	if (tasks.length === 0) {
 		return (
 			<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
-				Todo al día. Sin tareas pendientes ✅
+				Todo al día. Sin tareas pendientes.
 			</p>
 		);
 	}

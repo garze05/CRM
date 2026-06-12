@@ -2,12 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "../../components/page-header";
 import { StatusBadge } from "../../components/status-badge";
+import { TaskPanel } from "../../components/task-panel";
 import {
 	formatCrc,
 	formatDate,
 	getEventClient,
 	getQuoteById,
 	getQuoteEvent,
+	getQuoteTasks,
 	suggestedQuote,
 } from "../../lib/mock-data";
 
@@ -25,6 +27,7 @@ export default async function QuoteDetailPage({
 
 	const event = getQuoteEvent(quote);
 	const client = event ? getEventClient(event) : undefined;
+	const quoteTasks = getQuoteTasks(quote.id);
 
 	return (
 		<>
@@ -137,6 +140,13 @@ export default async function QuoteDetailPage({
 							</Link>
 						) : null}
 					</section>
+
+					<TaskPanel
+						title='Tareas de la cotización'
+						entityHref={`/cotizaciones/${quote.id}`}
+						entityLabel={quote.number}
+						tasks={quoteTasks}
+					/>
 				</aside>
 			</div>
 		</>
