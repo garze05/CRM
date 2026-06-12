@@ -50,6 +50,8 @@ export type EventRecord = {
 	guestCount: number;
 	paymentStatus: PaymentStatus;
 	estimatedTotal: number;
+	/** Personajes/servicios principales del catálogo (nombres para mostrar). */
+	characters: string[];
 };
 
 export type Collaborator = {
@@ -154,6 +156,7 @@ export const events: EventRecord[] = [
 		guestCount: 35,
 		paymentStatus: "PENDIENTE_ANTICIPO",
 		estimatedTotal: 185000,
+		characters: ["Princesa Estrella"],
 	},
 	{
 		id: "evento-2",
@@ -170,6 +173,7 @@ export const events: EventRecord[] = [
 		guestCount: 120,
 		paymentStatus: "PENDIENTE_ANTICIPO",
 		estimatedTotal: 620000,
+		characters: ["Superhéroe Azul", "Inflable Jungla"],
 	},
 	{
 		id: "evento-3",
@@ -186,6 +190,7 @@ export const events: EventRecord[] = [
 		guestCount: 180,
 		paymentStatus: "ANTICIPO_RECIBIDO",
 		estimatedTotal: 480000,
+		characters: ["Princesa Estrella", "Inflable Jungla"],
 	},
 	{
 		id: "evento-4",
@@ -202,6 +207,7 @@ export const events: EventRecord[] = [
 		guestCount: 28,
 		paymentStatus: "PAGADO_COMPLETO",
 		estimatedTotal: 145000,
+		characters: ["Superhéroe Azul"],
 	},
 ];
 
@@ -403,4 +409,237 @@ export function formatDate(date: string) {
 		year: "numeric",
 		timeZone: "America/Costa_Rica",
 	}).format(new Date(`${date}T12:00:00Z`));
+}
+
+// ---------------------------------------------------------------------------
+// Tareas (manuales, automáticas y de sistema)
+// ---------------------------------------------------------------------------
+
+export type TaskStatus =
+	| "PENDIENTE"
+	| "EN_PROGRESO"
+	| "COMPLETADA"
+	| "CANCELADA";
+export type TaskOrigin = "MANUAL" | "AUTOMATICA" | "SISTEMA";
+
+export type TaskRecord = {
+	id: string;
+	title: string;
+	description?: string;
+	/** YYYY-MM-DD o null si no tiene vencimiento. */
+	dueDate: string | null;
+	status: TaskStatus;
+	origin: TaskOrigin;
+	entityLabel: string;
+	entityHref: string;
+};
+
+export const tasks: TaskRecord[] = [
+	{
+		id: "tarea-1",
+		title: "Dar seguimiento a la cotización C2206-100",
+		description: "Cotización enviada hace 24 horas sin respuesta del cliente.",
+		dueDate: "2026-06-11",
+		status: "PENDIENTE",
+		origin: "AUTOMATICA",
+		entityLabel: "María Rodríguez",
+		entityHref: "/clientes/cliente-1",
+	},
+	{
+		id: "tarea-2",
+		title: "Recordar anticipo a Carlos Jiménez",
+		description: "El anticipo de la Fiesta Empresa Sol vence en 3 días.",
+		dueDate: "2026-06-14",
+		status: "PENDIENTE",
+		origin: "AUTOMATICA",
+		entityLabel: "Fiesta Empresa Sol",
+		entityHref: "/eventos/evento-2",
+	},
+	{
+		id: "tarea-3",
+		title: "Reactivar a Sofía Castro",
+		description:
+			"Más de 3 meses sin contacto después de su último evento realizado.",
+		dueDate: null,
+		status: "PENDIENTE",
+		origin: "AUTOMATICA",
+		entityLabel: "Sofía Castro",
+		entityHref: "/clientes/cliente-4",
+	},
+	{
+		id: "tarea-4",
+		title: "Confirmar dirección exacta del evento escolar",
+		dueDate: "2026-06-12",
+		status: "EN_PROGRESO",
+		origin: "MANUAL",
+		entityLabel: "Día familiar escolar",
+		entityHref: "/eventos/evento-3",
+	},
+	{
+		id: "tarea-5",
+		title: "Verificar colaboradores asignados",
+		description: "Evento confirmado próximo; revisar que el equipo esté completo.",
+		dueDate: "2026-06-13",
+		status: "PENDIENTE",
+		origin: "SISTEMA",
+		entityLabel: "Día familiar escolar",
+		entityHref: "/eventos/evento-3",
+	},
+	{
+		id: "tarea-6",
+		title: "Enviar fotos del cumpleaños de Mateo",
+		dueDate: "2026-02-17",
+		status: "COMPLETADA",
+		origin: "MANUAL",
+		entityLabel: "Cumpleaños de Mateo",
+		entityHref: "/eventos/evento-4",
+	},
+];
+
+// ---------------------------------------------------------------------------
+// Actividad reciente (vista previa de la bitácora de auditoría)
+// ---------------------------------------------------------------------------
+
+export type ActivityEntry = {
+	id: string;
+	actor: string;
+	description: string;
+	timeAgo: string;
+};
+
+export const recentActivity: ActivityEntry[] = [
+	{
+		id: "actividad-1",
+		actor: "Huberth Rodríguez",
+		description: "envió la cotización C2206-100 a María Rodríguez",
+		timeAgo: "hace 2 horas",
+	},
+	{
+		id: "actividad-2",
+		actor: "Huberth Rodríguez",
+		description: "registró el anticipo del Día familiar escolar",
+		timeAgo: "hace 5 horas",
+	},
+	{
+		id: "actividad-3",
+		actor: "Huberth Rodríguez",
+		description: "asignó a Luis Alvarado al Día familiar escolar",
+		timeAgo: "ayer",
+	},
+	{
+		id: "actividad-4",
+		actor: "Huberth Rodríguez",
+		description: "creó el evento Fiesta Empresa Sol",
+		timeAgo: "hace 2 días",
+	},
+];
+
+// ---------------------------------------------------------------------------
+// Interacciones registradas a mano (WhatsApp / llamadas)
+// ---------------------------------------------------------------------------
+
+export type InteractionRecord = {
+	id: string;
+	clientId: string;
+	channel: "WHATSAPP" | "LLAMADA";
+	direction: "ENTRANTE" | "SALIENTE";
+	summary: string;
+	date: string;
+};
+
+export const interactions: InteractionRecord[] = [
+	{
+		id: "interaccion-1",
+		clientId: "cliente-1",
+		channel: "WHATSAPP",
+		direction: "SALIENTE",
+		summary: "Se envió la cotización C2206-100 con paquete de personaje principal.",
+		date: "2026-06-08",
+	},
+	{
+		id: "interaccion-2",
+		clientId: "cliente-1",
+		channel: "WHATSAPP",
+		direction: "ENTRANTE",
+		summary: "Preguntó por disponibilidad de Princesa Estrella para el 22 de junio.",
+		date: "2026-06-07",
+	},
+	{
+		id: "interaccion-3",
+		clientId: "cliente-1",
+		channel: "LLAMADA",
+		direction: "ENTRANTE",
+		summary: "Primer contacto: cumpleaños para Emma, 35 invitados, patio exterior.",
+		date: "2026-06-07",
+	},
+];
+
+export function getClientInteractions(clientId: string) {
+	return interactions.filter(interaction => interaction.clientId === clientId);
+}
+
+export function getClientTasks(clientId: string) {
+	return tasks.filter(task => task.entityHref === `/clientes/${clientId}`);
+}
+
+export function getEventTasks(eventId: string) {
+	return tasks.filter(task => task.entityHref === `/eventos/${eventId}`);
+}
+
+// ---------------------------------------------------------------------------
+// Asignaciones Colaborador ↔ Evento (nota y calificación POR evento)
+// ---------------------------------------------------------------------------
+
+export type AssignmentRecord = {
+	id: string;
+	eventId: string;
+	collaboratorId: string;
+	roleInEvent: string;
+	note: string | null;
+	rating: number | null;
+};
+
+export const eventAssignments: AssignmentRecord[] = [
+	{
+		id: "asignacion-1",
+		eventId: "evento-3",
+		collaboratorId: "colaborador-1",
+		roleInEvent: "Botarga principal",
+		note: "Confirmar vestuario del personaje el jueves anterior.",
+		rating: null,
+	},
+	{
+		id: "asignacion-2",
+		eventId: "evento-3",
+		collaboratorId: "colaborador-2",
+		roleInEvent: "Animación",
+		note: null,
+		rating: null,
+	},
+	{
+		id: "asignacion-3",
+		eventId: "evento-4",
+		collaboratorId: "colaborador-1",
+		roleInEvent: "Botarga principal",
+		note: "Excelente manejo del grupo; el salón era pequeño para inflable.",
+		rating: 5,
+	},
+	{
+		id: "asignacion-4",
+		eventId: "evento-4",
+		collaboratorId: "colaborador-2",
+		roleInEvent: "Animación musical",
+		note: "Muy buena energía. Llegó 10 minutos tarde por transporte.",
+		rating: 4,
+	},
+];
+
+export function getEventAssignments(eventId: string) {
+	return eventAssignments.filter(assignment => assignment.eventId === eventId);
+}
+
+export function getCollaboratorAssignments(collaboratorId: string) {
+	return eventAssignments.filter(
+		assignment => assignment.collaboratorId === collaboratorId,
+	);
 }

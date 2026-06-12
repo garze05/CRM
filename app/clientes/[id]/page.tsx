@@ -4,12 +4,15 @@ import { PageHeader } from "../../components/page-header";
 import { PhoneInput } from "../../components/phone-input";
 import { PhotoThumbnailControl } from "../../components/photo-thumbnail-control";
 import { StatusBadge } from "../../components/status-badge";
+import { TaskList } from "../../components/task-list";
 import {
 	formatCrc,
 	formatDate,
 	getClientById,
 	getClientEvents,
 	getClientFullName,
+	getClientInteractions,
+	getClientTasks,
 } from "../../lib/mock-data";
 
 export default async function ClientDetailPage({
@@ -25,6 +28,8 @@ export default async function ClientDetailPage({
 	}
 
 	const linkedEvents = getClientEvents(client.id);
+	const clientInteractions = getClientInteractions(client.id);
+	const clientTasks = getClientTasks(client.id);
 	const initials = `${client.firstName[0]}${client.lastName[0]}`;
 
 	return (
@@ -154,6 +159,57 @@ export default async function ClientDetailPage({
 							))}
 						</div>
 					</section>
+
+					<section className='surface-card min-w-0 p-5 md:p-7'>
+						<div className='mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
+							<div>
+								<h2 className='text-2xl font-black text-[var(--text-primary)]'>
+									Interacciones
+								</h2>
+								<p className='mt-1 text-lg text-[var(--text-secondary)]'>
+									Registro manual de WhatsApp y llamadas; actualiza el último
+									contacto.
+								</p>
+							</div>
+							<button className='secondary-action flex min-h-12 w-fit items-center rounded-full px-4 py-3 text-base font-black transition'>
+								Registrar contacto
+							</button>
+						</div>
+						{clientInteractions.length === 0 ? (
+							<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
+								Sin interacciones registradas todavía.
+							</p>
+						) : (
+							<ol className='list-none space-y-3 p-0'>
+								{clientInteractions.map(interaction => (
+									<li
+										key={interaction.id}
+										className='rounded-lg border border-[color:var(--border-color)] bg-[var(--surface-color)] p-4'
+									>
+										<div className='flex flex-wrap items-center gap-2'>
+											<StatusBadge value={interaction.channel} />
+											<StatusBadge value={interaction.direction} />
+											<span className='text-base font-bold text-[var(--text-muted)]'>
+												{formatDate(interaction.date)}
+											</span>
+										</div>
+										<p className='mt-2 text-lg font-semibold text-[var(--text-secondary)]'>
+											{interaction.summary}
+										</p>
+									</li>
+								))}
+							</ol>
+						)}
+					</section>
+
+					{clientTasks.length > 0 ? (
+						<section className='surface-card min-w-0 p-5 md:p-7'>
+							<h2 className='mb-4 text-2xl font-black text-[var(--text-primary)]'>
+								Tareas del cliente
+							</h2>
+							<TaskList tasks={clientTasks} />
+						</section>
+					) : null}
 				</div>
 
 				<aside className='min-w-0 space-y-5'>

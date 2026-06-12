@@ -9,9 +9,9 @@ export default function InventoryPage() {
 	return (
 		<>
 			<PageHeader
-				breadcrumb={[{ label: "Inicio", href: "/" }, { label: "Inventario" }]}
-				title='Inventario'
-				description='Catálogo visual de personajes, inflables, decoración y servicios disponibles para cotizaciones.'
+				breadcrumb={[{ label: "Inicio", href: "/" }, { label: "Catálogo" }]}
+				title='Catálogo'
+				description='Personajes, inflables y decoración: alimenta las cotizaciones, el creador de paquetes y la vista pública.'
 				actions={
 					<Link
 						href='/inventario/nuevo'
@@ -24,9 +24,21 @@ export default function InventoryPage() {
 
 			<div className='space-y-5 px-5 pb-28 md:px-8 md:pb-8'>
 				<SectionCard>
-					<div className='mb-5 rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f0ebe4] p-4 text-lg text-[var(--text-secondary)]'>
-						Disponibilidad y mantenimiento quedan visibles como columnas para
-						conectarse luego con un módulo operativo dedicado.
+					<div className='mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f0ebe4] p-4 text-lg text-[var(--text-secondary)]'>
+						<span>
+							Este catálogo se comparte con clientes mediante la vista pública
+							(sin precios).
+						</span>
+						<Link
+							href='/catalogo'
+							target='_blank'
+							className='secondary-action flex min-h-11 w-fit items-center gap-2 rounded-full px-4 py-2 text-base font-black transition'
+						>
+							<IconLabel
+								icon='material-symbols:open-in-new-rounded'
+								label='Abrir vista pública'
+							/>
+						</Link>
 					</div>
 
 					<InventoryTable rows={inventoryItems} />

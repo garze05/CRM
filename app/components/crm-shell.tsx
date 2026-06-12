@@ -40,18 +40,6 @@ const navigationGroups = [
 				activeMatch: "/eventos",
 			},
 			{
-				label: "Colaboradores",
-				href: "/colaboradores",
-				icon: "material-symbols:family-star",
-				activeMatch: "/colaboradores",
-			},
-			{
-				label: "Inventario",
-				href: "/inventario",
-				icon: "material-symbols:inventory-2-rounded",
-				activeMatch: "/inventario",
-			},
-			{
 				label: "Cotizaciones",
 				href: "/cotizaciones",
 				icon: "material-symbols:request-quote-rounded",
@@ -63,20 +51,34 @@ const navigationGroups = [
 				icon: "material-symbols:payments-rounded",
 				activeMatch: "/reservaciones",
 			},
+			{
+				label: "Colaboradores",
+				href: "/colaboradores",
+				icon: "material-symbols:family-star",
+				activeMatch: "/colaboradores",
+			},
+			{
+				label: "Tareas",
+				href: "/tareas",
+				icon: "material-symbols:checklist-rounded",
+				activeMatch: "/tareas",
+			},
 		],
 	},
 	{
-		label: "Métricas",
+		label: "Oferta",
 		items: [
 			{
-				label: "General",
-				href: "/",
-				icon: "material-symbols:dashboard-rounded",
+				label: "Paquetes y servicios",
+				href: "/paquetes",
+				icon: "material-symbols:package-2-rounded",
+				activeMatch: "/paquetes",
 			},
 			{
-				label: "Ventas",
-				href: "/",
-				icon: "material-symbols:monitoring-rounded",
+				label: "Catálogo",
+				href: "/inventario",
+				icon: "material-symbols:photo-library-rounded",
+				activeMatch: "/inventario",
 			},
 		],
 	},
@@ -131,6 +133,7 @@ function NavigationLink({
 		<Link
 			href={item.href}
 			onClick={onClick}
+			aria-current={isActive ? "page" : undefined}
 			className={`flex min-h-12 items-center gap-3 rounded-lg px-4 py-3 font-extrabold transition ${
 				isActive
 					? "bg-[var(--accent-color)] text-[var(--on-accent)] shadow-sm"
@@ -267,16 +270,12 @@ function GlobalSearch() {
 	);
 }
 
+// Inicio · Eventos · Tareas · Clientes: lo que se consulta en campo.
 const mobileNavigationItems = [
 	homeItem,
-	navigationGroups[0].items[0],
 	navigationGroups[0].items[1],
-	{
-		label: "Cotizaciones",
-		href: "/cotizaciones",
-		icon: "material-symbols:request-quote-rounded",
-		activeMatch: "/cotizaciones",
-	},
+	navigationGroups[0].items[5],
+	navigationGroups[0].items[0],
 ];
 
 function MobileNavigation() {
@@ -291,6 +290,7 @@ function MobileNavigation() {
 					<Link
 						key={item.label}
 						href={item.href}
+						aria-current={isActive ? "page" : undefined}
 						className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg px-1 text-xs font-black transition ${
 							isActive
 								? "bg-[var(--accent-color)] text-[var(--on-accent)]"
@@ -311,8 +311,22 @@ function MobileNavigation() {
 }
 
 export function CrmShell({ children }: { children: ReactNode }) {
+	const pathname = usePathname();
+
+	// La vista pública del catálogo vive fuera del shell autenticado
+	// (en la fase 1 esto se formaliza con el grupo de rutas (app) + middleware).
+	if (pathname.startsWith("/catalogo")) {
+		return <main id='contenido-principal'>{children}</main>;
+	}
+
 	return (
 		<main className='min-h-screen bg-[var(--background-color)] text-[var(--text-primary)]'>
+			<a
+				href='#contenido-principal'
+				className='sr-only z-50 rounded-lg bg-[var(--primary-color)] px-4 py-3 text-base font-black text-white focus:not-sr-only focus:absolute focus:left-4 focus:top-4'
+			>
+				Saltar al contenido principal
+			</a>
 			<div className='flex min-h-screen'>
 				<aside className='sticky top-0 hidden h-screen w-72 shrink-0 flex-col overflow-y-auto border-r border-[color:var(--border-color)] bg-[var(--surface-color)] px-5 py-6 text-[var(--text-primary)] lg:flex'>
 					<Link href='/' className='mb-5 block'>
@@ -328,7 +342,7 @@ export function CrmShell({ children }: { children: ReactNode }) {
 					<SidebarContent />
 				</aside>
 
-				<section className='flex min-w-0 flex-1 flex-col'>
+				<section id='contenido-principal' className='flex min-w-0 flex-1 flex-col'>
 					<GlobalSearch />
 
 					{children}

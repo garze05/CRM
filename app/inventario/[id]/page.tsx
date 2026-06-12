@@ -29,7 +29,7 @@ export default async function InventoryDetailPage({
 						<Breadcrumb
 							items={[
 								{ label: "Inicio", href: "/" },
-								{ label: "Inventario", href: "/inventario" },
+								{ label: "Catálogo", href: "/inventario" },
 								{ label: item.name },
 							]}
 						/>

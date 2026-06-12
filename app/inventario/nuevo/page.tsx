@@ -8,7 +8,7 @@ export default function NewInventoryItemPage() {
 			<PageHeader
 				breadcrumb={[
 					{ label: "Inicio", href: "/" },
-					{ label: "Inventario", href: "/inventario" },
+					{ label: "Catálogo", href: "/inventario" },
 					{ label: "Nuevo ítem" },
 				]}
 				title='Nuevo ítem'

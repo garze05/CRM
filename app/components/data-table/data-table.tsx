@@ -235,11 +235,13 @@ export function DataTable<Row extends { id: string }>({
 
 			{/* Con un menú abierto se libera el overflow para no recortar el popover. */}
 			<div
+				role='table'
 				className={`max-w-full rounded-lg border border-[color:var(--border-color)] bg-[var(--card-color)] shadow-[var(--crisp-shadow)] ${
 					openMenuKey ? "overflow-visible" : "overflow-x-auto"
 				}`}
 			>
 				<div
+					role='row'
 					className='grid min-w-[860px] bg-[#f0ebe4] px-5 py-2 text-base font-black text-[var(--text-secondary)]'
 					style={{ gridTemplateColumns }}
 				>
@@ -283,12 +285,14 @@ export function DataTable<Row extends { id: string }>({
 						const row = tableRow.original;
 						const content = (
 							<div
+								role='row'
 								className='grid min-w-[860px] items-center px-5 py-5 text-lg text-[var(--text-secondary)]'
 								style={{ gridTemplateColumns }}
 							>
 								{columns.map(column => (
 									<div
 										key={column.key}
+										role='cell'
 										className={`relative z-10 ${
 											column.key === "action"
 												? "pointer-events-auto"
@@ -394,11 +398,26 @@ function HeaderCell<Row extends { id: string }>({
 	}, [column, allRows]);
 
 	if (!isInteractive) {
-		return <span className={`py-2 ${column.className ?? ""}`}>{column.header}</span>;
+		return (
+			<span role='columnheader' className={`py-2 ${column.className ?? ""}`}>
+				{column.header}
+			</span>
+		);
 	}
 
 	return (
-		<div ref={menuRef} className={`relative ${column.className ?? ""}`}>
+		<div
+			ref={menuRef}
+			role='columnheader'
+			aria-sort={
+				sortDirection === "asc"
+					? "ascending"
+					: sortDirection === "desc"
+						? "descending"
+						: "none"
+			}
+			className={`relative ${column.className ?? ""}`}
+		>
 			<button
 				type='button'
 				onClick={onToggleMenu}
