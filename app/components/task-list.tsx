@@ -20,17 +20,17 @@ export function TaskList({ tasks }: { tasks: TaskRecord[] }) {
 					className='rounded-lg border border-[color:var(--border-color)] bg-[var(--surface-color)] p-3'
 				>
 					<div className='flex items-start justify-between gap-2'>
-						<p className='text-lg font-black text-[var(--text-primary)]'>
+						<p className='text-[0.95rem] font-black leading-snug text-[var(--text-primary)]'>
 							{task.title}
 						</p>
 						<StatusBadge value={task.origin} />
 					</div>
 					{task.description ? (
-						<p className='mt-1 text-base font-semibold text-[var(--text-secondary)]'>
+						<p className='mt-1 text-sm font-semibold leading-snug text-[var(--text-secondary)]'>
 							{task.description}
 						</p>
 					) : null}
-					<div className='mt-2 flex flex-wrap items-center gap-3 text-base font-bold'>
+					<div className='mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-bold'>
 						<Link
 							href={task.entityHref}
 							className='text-[var(--secondary-color)] underline-offset-2 hover:underline'

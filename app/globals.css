@@ -109,10 +109,10 @@ textarea {
 
 .page-heading {
 	color: var(--primary-color);
-	font-size: clamp(2.5rem, 4vw, 4.25rem);
+	font-size: clamp(2.45rem, 3vw, 3.875rem);
 	font-weight: 900;
 	letter-spacing: 0;
-	line-height: 0.95;
+	line-height: 1.05;
 }
 
 .page-kicker {
@@ -130,19 +130,19 @@ textarea {
 }
 
 .form-control {
-	min-height: 3.5rem;
+	min-height: 2.75rem;
 	width: 100%;
 	border: 1px solid var(--border-color);
 	background: #f3f0eb;
 	padding-inline: 1rem;
 	color: var(--text-primary);
-	font-size: 1.125rem;
+	font-size: 1rem;
 	font-weight: 650;
 	outline: none;
 }
 
 .form-control-with-leading-icon {
-	padding-left: 3.75rem;
+	padding-left: 3rem;
 }
 
 .form-control:focus {
@@ -157,7 +157,7 @@ textarea {
 }
 
 .phone-input .PhoneInputCountry {
-	min-height: 3.5rem;
+	min-height: 2.75rem;
 	margin-right: 0;
 	padding-inline: 0.875rem;
 	border: 1px solid var(--border-color);
@@ -182,6 +182,49 @@ textarea {
 
 .phone-input:focus-within .PhoneInputCountry {
 	border-color: var(--accent-color);
+}
+
+/* Escala tipográfica de aplicación: normal, legible y menos propensa a overflow. */
+.text-lg {
+	font-size: 0.9375rem;
+	line-height: 1.375rem;
+}
+
+.text-xl {
+	font-size: 1rem;
+	line-height: 1.5rem;
+}
+
+.text-2xl {
+	font-size: 1.125rem;
+	line-height: 1.625rem;
+}
+
+.text-3xl {
+	font-size: 1.375rem;
+	line-height: 1.875rem;
+}
+
+.text-4xl {
+	font-size: 1.75rem;
+	line-height: 2.125rem;
+}
+
+.text-6xl {
+	font-size: 2.25rem;
+	line-height: 1;
+}
+
+.min-h-12 {
+	min-height: 2.5rem;
+}
+
+.min-h-14 {
+	min-height: 2.75rem;
+}
+
+.h-14 {
+	height: 2.75rem;
 }
 
 .primary-action {

@@ -43,7 +43,7 @@ export function PageHeader({
 	const decorativeIcon = getDecorativeIcon(breadcrumb, title);
 
 	return (
-		<header className='relative isolate overflow-hidden px-5 pb-6 pt-8 md:px-8 md:pt-10'>
+		<header className='relative isolate overflow-hidden px-5 pb-5 pt-7 md:px-6 md:pt-8'>
 			<DecorativePageIcon icon={decorativeIcon} />
 			<div className='relative z-10 flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
 				<div className='min-w-0'>

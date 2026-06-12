@@ -37,17 +37,17 @@ export function FunnelBoard({
 				<li key={stage.label}>
 					<Link
 						href={`/eventos?etapa=${stage.label}`}
-						className='block rounded-lg border border-[color:var(--border-color)] bg-[var(--surface-color)] p-4 text-center transition hover:border-[color:var(--accent-color)] hover:shadow-[var(--crisp-shadow)]'
+						className='block rounded-lg border border-[color:var(--border-color)] bg-[var(--surface-color)] p-3 text-center transition hover:border-[color:var(--accent-color)] hover:shadow-[var(--crisp-shadow)]'
 					>
 						<span
-							className='mx-auto mb-3 block h-2 w-16 rounded-full'
+							className='mx-auto mb-2 block h-1.5 w-14 rounded-full'
 							style={{ backgroundColor: STAGE_COLORS[stage.label] }}
 							aria-hidden='true'
 						/>
 						<span className='block text-4xl font-black leading-none text-[var(--primary-color)]'>
 							{stage.total}
 						</span>
-						<span className='mt-2 block text-base font-black text-[var(--text-secondary)]'>
+						<span className='mt-1.5 block text-sm font-black text-[var(--text-secondary)]'>
 							{STAGE_LABELS[stage.label] ?? stage.label}
 						</span>
 					</Link>

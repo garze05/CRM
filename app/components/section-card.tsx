@@ -12,9 +12,9 @@ export function SectionCard({
 	title?: string;
 }) {
 	return (
-		<section className='surface-card min-w-0 p-5 md:p-7'>
+		<section className='surface-card min-w-0 p-4 md:p-5'>
 			{title ? (
-				<div className='mb-6 flex flex-col gap-3 md:flex-row md:items-start md:justify-between'>
+				<div className='mb-5 flex flex-col gap-3 md:flex-row md:items-start md:justify-between'>
 					<div>
 						<h2 className='text-2xl font-black text-[var(--text-primary)]'>
 							{title}

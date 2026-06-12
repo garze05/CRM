@@ -56,7 +56,7 @@ export function StatusBadge({
 }) {
 	return (
 		<span
-			className={`inline-flex min-h-8 w-fit items-center rounded-full px-3 py-1 text-sm font-black ${
+			className={`inline-flex min-h-7 w-fit items-center rounded-full px-2.5 py-1 text-xs font-black ${
 				badgeStyles[value] ?? "bg-[var(--background-color)] text-[var(--text-primary)]"
 			}`}
 		>

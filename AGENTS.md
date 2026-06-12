@@ -336,7 +336,7 @@ Lo siguiente está identificado pero se construye en fases posteriores:
 
 Estos principios aplican a toda la interfaz y deben respetarse en cada componente construido:
 
-- **Tipografía grande:** el tamaño de fuente base de la interfaz debe ser generoso (mínimo 16px body, títulos y etiquetas de campo proporcionalmente mayores). El sistema lo usa gente que opera rápido; la legibilidad es prioridad sobre la densidad de información.
+- **Tipografía normal y accesible:** el tamaño base de la interfaz debe mantenerse en 16px para legibilidad, pero sin escalar títulos, etiquetas, tablas o formularios de forma exagerada. La UI debe evitar que la información se salga de contenedores; si un usuario necesita verla más grande, puede usar los controles de zoom del navegador. Priorizar jerarquía clara, contraste suficiente, objetivos táctiles accesibles y texto que respire sin romper layouts.
 - **Iconos con etiqueta obligatoria:** ningún ícono debe aparecer solo. Todo ícono debe ir acompañado de un texto descriptivo visible a su lado. No se permiten íconos sin label, ni tooltips como sustituto de la etiqueta (los tooltips son complemento, no reemplazo).
 - **Diseño de referencia:** el wireframe en papel existente es el punto de partida; cualquier decisión de layout debe partir de él antes de proponer cambios.
 

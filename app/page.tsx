@@ -48,13 +48,13 @@ export default function Home() {
 					<div className='flex flex-wrap gap-3'>
 						<Link
 							href='/clientes/nuevo'
-							className='primary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
+							className='primary-action flex min-h-10 w-fit items-center gap-2 rounded-lg px-4 py-2 text-sm font-black transition'
 						>
 							<IconLabel label='Nuevo prospecto' />
 						</Link>
 						<Link
 							href='/eventos?vista=calendario'
-							className='secondary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
+							className='secondary-action flex min-h-10 w-fit items-center gap-2 rounded-lg px-4 py-2 text-sm font-black transition'
 						>
 							<IconLabel
 								icon='material-symbols:calendar-month-rounded'
@@ -65,7 +65,7 @@ export default function Home() {
 				}
 			/>
 
-			<div className='grid min-w-0 flex-1 gap-5 px-5 pb-28 md:px-8 md:pb-8 xl:grid-cols-[minmax(0,1fr)_380px]'>
+			<div className='grid min-w-0 flex-1 gap-4 px-5 pb-28 md:px-6 md:pb-6 xl:grid-cols-[minmax(0,1fr)_320px]'>
 				<div className='min-w-0 space-y-5'>
 					<SectionCard
 						title='Embudo de ventas'
@@ -80,7 +80,7 @@ export default function Home() {
 						action={
 							<Link
 								href='/eventos?vista=calendario'
-								className='secondary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-4 py-3 text-base font-black transition'
+								className='secondary-action flex min-h-10 w-fit items-center gap-2 rounded-lg px-4 py-2 text-sm font-black transition'
 							>
 								<IconLabel
 									icon='material-symbols:calendar-month-rounded'
@@ -97,7 +97,7 @@ export default function Home() {
 									<Link
 										key={event.id}
 										href={`/eventos/${event.id}`}
-										className='rounded-lg border border-[color:var(--border-color)] bg-[#f0ebe4] p-4 transition hover:bg-[#f7f2ec]'
+										className='rounded-lg border border-[color:var(--border-color)] bg-[#f0ebe4] p-3 transition hover:bg-[#f7f2ec]'
 									>
 										<div className='flex items-start justify-between gap-3'>
 											<div>
@@ -160,7 +160,7 @@ export default function Home() {
 						action={
 							<Link
 								href='/tareas'
-								className='secondary-action flex min-h-12 w-fit items-center rounded-full px-4 py-3 text-base font-black transition'
+								className='secondary-action flex min-h-10 w-fit items-center rounded-lg px-4 py-2 text-sm font-black transition'
 							>
 								Ver todas
 							</Link>

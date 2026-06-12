@@ -12,9 +12,9 @@ export function MetricCard({
 	helper?: string;
 }) {
 	return (
-		<div className='rounded-lg border border-[color:var(--border-color)] bg-[var(--surface-color)] p-5'>
+		<div className='rounded-lg border border-[color:var(--border-color)] bg-[var(--surface-color)] p-4'>
 			<div
-				className='mb-4 h-2 w-20 rounded-full'
+				className='mb-3 h-1.5 w-16 rounded-full'
 				style={{ backgroundColor: accentColor }}
 			/>
 			<p className='text-base font-black uppercase text-[var(--text-muted)]'>
