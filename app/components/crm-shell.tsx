@@ -71,7 +71,7 @@ const navigationGroups = [
 			{
 				label: "Paquetes y servicios",
 				href: "/paquetes",
-				icon: "material-symbols:package-2-rounded",
+				icon: "material-symbols:package-rounded",
 				activeMatch: "/paquetes",
 			},
 			{

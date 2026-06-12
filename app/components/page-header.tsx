@@ -10,6 +10,7 @@ const moduleIcons: Record<string, string> = {
 	Eventos: "material-symbols:event-rounded",
 	Inicio: "material-symbols:dashboard-rounded",
 	Inventario: "material-symbols:inventory-2-rounded",
+	"Paquetes y servicios": "material-symbols:package-rounded",
 	Papelería: "material-symbols:restore-from-trash-rounded",
 	Reservaciones: "material-symbols:payments-rounded",
 };

@@ -206,7 +206,7 @@ export function DataTable<Row extends { id: string }>({
 								value={globalFilter}
 								onChange={event => setGlobalFilter(event.target.value)}
 								placeholder={searchPlaceholder}
-								className='form-control pl-12'
+								className='form-control form-control-with-leading-icon'
 							/>
 						</span>
 					</label>

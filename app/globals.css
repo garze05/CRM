@@ -141,6 +141,10 @@ textarea {
 	outline: none;
 }
 
+.form-control-with-leading-icon {
+	padding-left: 3.75rem;
+}
+
 .form-control:focus {
 	border-color: var(--accent-color);
 	box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-color) 22%, transparent);
