@@ -7,6 +7,9 @@ declare module "next-auth" {
 		user: {
 			id: string;
 		} & DefaultSession["user"];
+		/** id_token de Google — solo uso server-side (reenvío a Quotation API). */
+		idToken?: string;
+		idTokenExpires?: number;
 	}
 }
 

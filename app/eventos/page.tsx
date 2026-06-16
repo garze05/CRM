@@ -7,29 +7,8 @@ import {
 	type CalendarRange,
 } from "./calendar/events-calendar";
 import type { CalendarEvent } from "./calendar/event-card";
-import { EventsTable, type EventRow } from "./events-table";
-import {
-	collaborators,
-	events,
-	getEventAssignments,
-	getEventClient,
-} from "../lib/mock-data";
-
-function buildAlerts(event: EventRow, collaboratorNames: string[]): string[] {
-	const alerts: string[] = [];
-
-	if (
-		["RESERVADO", "CONFIRMADO"].includes(event.pipelineStatus) &&
-		event.paymentStatus === "PENDIENTE_ANTICIPO"
-	) {
-		alerts.push("Anticipo pendiente");
-	}
-	if (event.pipelineStatus === "CONFIRMADO" && collaboratorNames.length === 0) {
-		alerts.push("Sin colaboradores asignados");
-	}
-
-	return alerts;
-}
+import { EventsTable } from "./events-table";
+import { listEvents } from "../lib/server/events";
 
 export default async function EventsPage({
 	searchParams,
@@ -54,33 +33,8 @@ export default async function EventsPage({
 		? (fecha as string)
 		: today;
 
-	const rows: CalendarEvent[] = events.map(event => {
-		const client = getEventClient(event);
-		const collaboratorNames = getEventAssignments(event.id)
-			.map(assignment => {
-				const collaborator = collaborators.find(
-					person => person.id === assignment.collaboratorId,
-				);
-				return collaborator
-					? `${collaborator.firstName} ${collaborator.lastName}`
-					: null;
-			})
-			.filter((name): name is string => name !== null);
-
-		const base: EventRow = {
-			...event,
-			clientName: client
-				? `${client.firstName} ${client.lastName}`
-				: "Sin cliente",
-			clientPhone: client?.phone ?? "",
-		};
-
-		return {
-			...base,
-			collaboratorNames,
-			alerts: buildAlerts(base, collaboratorNames),
-		};
-	});
+	// El servicio ya resuelve cliente, colaboradores, total/pago derivados y alertas.
+	const rows: CalendarEvent[] = await listEvents();
 
 	const calendarRows = etapa
 		? rows.filter(event => event.pipelineStatus === etapa)

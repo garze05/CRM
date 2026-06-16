@@ -42,3 +42,10 @@ export const QUOTE_STATUS_LABELS: Record<string, string> = {
 	EXPIRED: "Vencida",
 	REJECTED: "Rechazada",
 };
+
+export const COLLABORATOR_ROLE_LABELS: Record<string, string> = {
+	MASCOT_COSTUME: "Botarga",
+	ENTERTAINER: "Animador",
+	LOGISTICS: "Logística",
+	OTHER: "Otro",
+};

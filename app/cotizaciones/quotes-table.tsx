@@ -3,25 +3,32 @@
 import { DeleteAction } from "../components/delete-action";
 import {
 	DataTable,
-	formatEnumLabel,
 	type DataTableColumn,
 } from "../components/data-table/data-table";
 import { StatusBadge } from "../components/status-badge";
-import { formatCrc, formatDate, type QuoteRecord } from "../lib/mock-data";
+import { formatCrc, formatDateKey } from "../lib/format";
+import { QUOTE_STATUS_LABELS } from "../lib/domain/labels";
 
-export type QuoteRow = QuoteRecord & {
+export type QuoteRow = {
+	id: string;
+	quoteNumber: string;
 	eventName: string;
 	clientName: string;
+	status: string;
+	total: number;
+	validUntil: Date;
 };
 
 const columns: DataTableColumn<QuoteRow>[] = [
 	{
 		key: "number",
 		header: "Cotización",
-		sortValue: quote => quote.number,
+		sortValue: quote => quote.quoteNumber,
 		render: quote => (
 			<div>
-				<p className='font-black text-[var(--text-primary)]'>{quote.number}</p>
+				<p className='font-black text-[var(--text-primary)]'>
+					{quote.quoteNumber}
+				</p>
 				<p className='mt-1 text-base'>{quote.eventName}</p>
 			</div>
 		),
@@ -36,8 +43,13 @@ const columns: DataTableColumn<QuoteRow>[] = [
 		key: "status",
 		header: "Estado",
 		filterValue: quote => quote.status,
-		filterLabel: formatEnumLabel,
-		render: quote => <StatusBadge value={quote.status} />,
+		filterLabel: value => QUOTE_STATUS_LABELS[value] ?? value,
+		render: quote => (
+			<StatusBadge
+				value={quote.status}
+				label={QUOTE_STATUS_LABELS[quote.status]}
+			/>
+		),
 	},
 	{
 		key: "total",
@@ -52,8 +64,8 @@ const columns: DataTableColumn<QuoteRow>[] = [
 	{
 		key: "validUntil",
 		header: "Vigencia",
-		sortValue: quote => quote.validUntil,
-		render: quote => formatDate(quote.validUntil),
+		sortValue: quote => quote.validUntil.getTime(),
+		render: quote => formatDateKey(quote.validUntil),
 	},
 	{
 		key: "action",
@@ -73,7 +85,7 @@ export function QuotesTable({ rows }: { rows: QuoteRow[] }) {
 			searchLabel='Buscar cotización'
 			searchPlaceholder='Código, cliente o evento'
 			searchText={quote =>
-				`${quote.number} ${quote.clientName} ${quote.eventName}`
+				`${quote.quoteNumber} ${quote.clientName} ${quote.eventName}`
 			}
 			emptyTitle='Sin cotizaciones todavía'
 			emptyDescription='Generá la primera cotización desde un evento contactado.'

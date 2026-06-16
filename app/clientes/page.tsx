@@ -13,7 +13,7 @@ export default async function ClientsPage() {
 			<PageHeader
 				breadcrumb={[{ label: "Inicio", href: "/" }, { label: "Clientes" }]}
 				title='Clientes'
-				description='Repositorio central de contactos para WhatsApp, seguimiento y cotizaciones.'
+				description='Repositorio central de contactos. La relación vive aquí; el embudo se controla por evento.'
 				actions={
 					<Link
 						href='/clientes/nuevo'

@@ -30,6 +30,8 @@ function phone(input: string) {
 
 async function main() {
 	// Orden inverso de dependencias para limpiar.
+	await prisma.reservation.deleteMany();
+	await prisma.quote.deleteMany();
 	await prisma.interaction.deleteMany();
 	await prisma.event.deleteMany();
 	await prisma.client.deleteMany();
@@ -120,7 +122,7 @@ async function main() {
 		},
 	});
 
-	await prisma.event.create({
+	const diaFamiliar = await prisma.event.create({
 		data: {
 			clientId: andrea.id,
 			name: "Día familiar escolar",
@@ -187,7 +189,69 @@ async function main() {
 		],
 	});
 
-	console.log("Seed completado: 4 clientes, 4 eventos, 3 interacciones.");
+	// Cotizaciones de ejemplo con el formato real de codigo C{DDMM}-{YY}{seq}
+	// (como lo arma la Quotation API). Permiten ver totales en eventos y la
+	// pantalla de cotizaciones sin depender del motor externo.
+	const emmaLineItems = [
+		{ concepto: "Personaje: Princesa Estrella", cantidad: 1, horas: 3, precio_unitario: 90000, subtotal: 90000 },
+		{ concepto: "Pintacaritas", cantidad: 1, horas: 2, precio_unitario: 35000, subtotal: 35000 },
+		{ concepto: "Transporte", cantidad: 1, horas: 1, precio_unitario: 20000, subtotal: 20000 },
+	];
+	await prisma.quote.create({
+		data: {
+			eventId: emma.id,
+			quoteNumber: "C2206-26100",
+			subtotal: 125000,
+			transportCost: 20000,
+			discount: 0,
+			taxAmount: 0,
+			total: 145000,
+			currency: "CRC",
+			validUntil: new Date("2026-06-15"),
+			status: "SENT",
+			lineItems: emmaLineItems,
+			notes: "Paquete con personaje principal y pintacaritas.",
+		},
+	});
+
+	const diaQuote = await prisma.quote.create({
+		data: {
+			eventId: diaFamiliar.id,
+			quoteNumber: "C1807-26101",
+			subtotal: 420000,
+			transportCost: 35000,
+			discount: 0,
+			taxAmount: 59150,
+			total: 514150,
+			currency: "CRC",
+			validUntil: new Date("2026-07-11"),
+			status: "ACCEPTED",
+			lineItems: [
+				{ concepto: "Show institucional (2 personajes)", cantidad: 2, horas: 4, precio_unitario: 210000, subtotal: 420000 },
+				{ concepto: "Transporte", cantidad: 1, horas: 1, precio_unitario: 35000, subtotal: 35000 },
+			],
+			notes: "Evento institucional con factura.",
+		},
+	});
+
+	await prisma.reservation.create({
+		data: {
+			eventId: diaFamiliar.id,
+			quoteId: diaQuote.id,
+			reservationNumber: "R1807-26101",
+			agreedTotal: 514150,
+			depositAmount: 257075,
+			depositDueDate: new Date("2026-07-04"),
+			balanceAmount: 257075,
+			balanceDueDate: new Date("2026-07-18"),
+			paymentStatus: "DEPOSIT_RECEIVED",
+			notes: "Anticipo recibido por transferencia.",
+		},
+	});
+
+	console.log(
+		"Seed completado: 4 clientes, 4 eventos, 3 interacciones, 2 cotizaciones, 1 reservación.",
+	);
 }
 
 function mapPhone(p: ReturnType<typeof phone>) {

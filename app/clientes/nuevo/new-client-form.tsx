@@ -62,7 +62,7 @@ export function NewClientForm() {
 						<FieldError message={errors?.phone} />
 					</div>
 					<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-						<span>Tipo de cliente</span>
+						<span>Tipo comercial</span>
 						<select
 							name='type'
 							defaultValue={values?.type ?? "FAMILY"}
@@ -72,6 +72,9 @@ export function NewClientForm() {
 							<option value='EDUCATIONAL'>Educativo</option>
 							<option value='CORPORATE'>Corporativo</option>
 						</select>
+						<span className='block text-base font-semibold text-[var(--text-secondary)]'>
+							Define la lógica de precios por defecto para sus cotizaciones.
+						</span>
 						<FieldError message={errors?.type} />
 					</label>
 					<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
@@ -89,11 +92,11 @@ export function NewClientForm() {
 			<aside className='space-y-5'>
 				<section className='surface-card p-5'>
 					<h2 className='text-2xl font-black text-[var(--text-primary)]'>
-						Primer seguimiento
+						Contacto guardado
 					</h2>
 					<p className='mt-2 text-lg font-semibold text-[var(--text-secondary)]'>
-						Al guardar, el cliente inicia como PROSPECTO y queda listo para crear
-						evento o cotización.
+						El cliente queda como contacto del negocio. El embudo comienza al
+						crear su primer evento u oportunidad.
 					</p>
 					{state.error ? (
 						<p className='mt-4 rounded-lg bg-[#ffe0e3] px-4 py-3 text-sm font-black text-[var(--error-color)]'>

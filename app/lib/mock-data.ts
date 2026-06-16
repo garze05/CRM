@@ -6,7 +6,6 @@ export type PipelineStatus =
 	| "RESERVADO"
 	| "CONFIRMADO"
 	| "REALIZADO"
-	| "RECURRENTE"
 	| "CANCELADO";
 
 export type EventType = "INFANTIL" | "CORPORATIVO" | "INSTITUCIONAL";
@@ -31,7 +30,8 @@ export type Client = {
 	notes: string;
 	firstContactDate: string;
 	lastContactDate: string;
-	pipelineStatus: PipelineStatus;
+	activeOpportunityStatus: Exclude<PipelineStatus, "REALIZADO" | "CANCELADO"> | null;
+	isRecurring: boolean;
 	eventsCompleted: number;
 };
 
@@ -98,7 +98,8 @@ export const clients: Client[] = [
 			"Prefiere contacto por WhatsApp. Le interesan paquetes con personaje principal e inflable pequeño.",
 		firstContactDate: "2026-06-07",
 		lastContactDate: "2026-06-08",
-		pipelineStatus: "COTIZADO",
+		activeOpportunityStatus: "COTIZADO",
+		isRecurring: true,
 		eventsCompleted: 2,
 	},
 	{
@@ -110,7 +111,8 @@ export const clients: Client[] = [
 		notes: "Coordina actividades institucionales para preescolar y primaria.",
 		firstContactDate: "2026-05-28",
 		lastContactDate: "2026-06-06",
-		pipelineStatus: "CONTACTADO",
+		activeOpportunityStatus: "CONTACTADO",
+		isRecurring: false,
 		eventsCompleted: 1,
 	},
 	{
@@ -123,7 +125,8 @@ export const clients: Client[] = [
 			"Busca opciones para día familiar empresarial con logística completa.",
 		firstContactDate: "2026-05-20",
 		lastContactDate: "2026-06-04",
-		pipelineStatus: "RESERVADO",
+		activeOpportunityStatus: "RESERVADO",
+		isRecurring: false,
 		eventsCompleted: 0,
 	},
 	{
@@ -135,7 +138,8 @@ export const clients: Client[] = [
 		notes: "Cliente recurrente. Le gustan paquetes con animación musical.",
 		firstContactDate: "2025-11-15",
 		lastContactDate: "2026-03-01",
-		pipelineStatus: "RECURRENTE",
+		activeOpportunityStatus: null,
+		isRecurring: true,
 		eventsCompleted: 3,
 	},
 ];

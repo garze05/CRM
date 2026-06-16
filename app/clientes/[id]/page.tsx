@@ -53,9 +53,11 @@ export default async function ClientDetailPage({
 	const completedEvents = client.events.filter(
 		event => event.funnelStage === "COMPLETED",
 	).length;
-	const currentStage =
-		client.events.find(event => event.funnelStage !== "CANCELED")?.funnelStage ??
-		"PROSPECT";
+	const activeEvent = client.events.find(event =>
+		["PROSPECT", "CONTACTED", "QUOTED", "RESERVED", "CONFIRMED"].includes(
+			event.funnelStage,
+		),
+	);
 
 	return (
 		<>
@@ -68,10 +70,12 @@ export default async function ClientDetailPage({
 				title={fullName}
 				badges={
 					<div className='flex flex-wrap items-center gap-1.5'>
-						<StatusBadge
-							value={currentStage}
-							label={FUNNEL_STAGE_LABELS[currentStage]}
-						/>
+						{activeEvent ? (
+							<StatusBadge
+								value={activeEvent.funnelStage}
+								label={`Oportunidad: ${FUNNEL_STAGE_LABELS[activeEvent.funnelStage]}`}
+							/>
+						) : null}
 						{client.isRecurring ? (
 							<StatusBadge value='RECURRING' label='Recurrente' />
 						) : null}
@@ -82,9 +86,12 @@ export default async function ClientDetailPage({
 						<button className='secondary-action min-h-12 rounded-full px-5 py-3 text-base font-black transition'>
 							Guardar cambios
 						</button>
-						<button className='primary-action min-h-12 rounded-full px-5 py-3 text-base font-black transition'>
+						<Link
+							href={`/eventos/nuevo?cliente=${client.id}`}
+							className='primary-action flex min-h-12 items-center justify-center rounded-full px-5 py-3 text-base font-black transition'
+						>
 							Crear evento
-						</button>
+						</Link>
 					</div>
 				}
 			/>
@@ -98,7 +105,8 @@ export default async function ClientDetailPage({
 									Datos del cliente
 								</h2>
 								<p className='mt-1 text-lg text-[var(--text-secondary)]'>
-									Contacto principal para WhatsApp y cotizaciones.
+									Contacto principal. Su tipo comercial define precios por
+									defecto; el embudo se controla en cada evento.
 								</p>
 							</div>
 							<StatusBadge value={client.type} label={typeLabel} />
@@ -125,12 +133,15 @@ export default async function ClientDetailPage({
 								defaultValue={client.phone}
 							/>
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-								<span>Tipo</span>
+								<span>Tipo comercial</span>
 								<select defaultValue={client.type} className='form-control'>
 									<option value='FAMILY'>Familiar</option>
 									<option value='EDUCATIONAL'>Educativo</option>
 									<option value='CORPORATE'>Corporativo</option>
 								</select>
+								<span className='block text-base font-semibold text-[var(--text-secondary)]'>
+									Se usa para cotizar; no cambia el tipo de cada evento.
+								</span>
 							</label>
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
 								<span>Notas</span>
@@ -292,6 +303,16 @@ export default async function ClientDetailPage({
 								</dt>
 								<dd className='font-black text-[var(--text-primary)]'>
 									{completedEvents}
+								</dd>
+							</div>
+							<div className='flex justify-between gap-4 border-t border-[color:var(--border-color)] pt-4'>
+								<dt className='font-bold text-[var(--text-secondary)]'>
+									Oportunidad activa
+								</dt>
+								<dd className='text-right font-black text-[var(--text-primary)]'>
+									{activeEvent
+										? FUNNEL_STAGE_LABELS[activeEvent.funnelStage]
+										: "Sin oportunidad activa"}
 								</dd>
 							</div>
 						</dl>

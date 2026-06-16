@@ -149,8 +149,27 @@ vencer es trabajo siguiente.
 La API responde con códigos significativos: `400` (datos inválidos), `401`
 (token ausente/ inválido), `403` (cuenta no aceptada), `502` (falla Sheets /
 OpenRouter / Maps), `503` (faltan credenciales/variables). El cliente HTTP del
-CRM traduce estos a un error de dominio visible en la UI ("La generación de
-cotizaciones no está disponible…") sin filtrar detalles internos.
+CRM ([quotation-api.ts](../app/lib/integrations/quotation-api.ts)) traduce estos
+a un `QuotationApiError` con mensaje en español, visible en el formulario sin
+filtrar detalles internos. Falla de red / servicio caído → mensaje "No se pudo
+contactar el servicio de cotización".
+
+### 3.7 Consecutivo en generación fallida
+
+El consecutivo (`DocumentCounter`) se reserva **antes** de llamar a la API,
+porque el `id_evento` que compone el `codigo` lo necesita. Si la API falla, el
+número queda consumido (hueco en la secuencia). Es aceptable para el MVP: no
+rompe la unicidad ni la numeración. Mantener una transacción de BD abierta
+durante la llamada de red sería peor (locks).
+
+### 3.8 Flujo de "Nueva cotización" — SIMPLIFICACIÓN
+
+El wizard original de 4 pasos con catálogo visual se reemplazó por un formulario
+funcional: seleccionar evento + líneas de servicio/personaje (nombre libre que
+la API resuelve contra el catálogo de Sheets) + opciones (transporte, IVA). El
+selector visual de catálogo (que requiere `GET /catalog/*` con credenciales de
+Sheets) queda como mejora futura. La generación crea la cotización como
+`BORRADOR`; enviarla (`SENT`) y aceptarla son acciones separadas (pendientes).
 
 ---
 
@@ -161,5 +180,5 @@ cotizaciones no está disponible…") sin filtrar detalles internos.
 | 1    | Prisma client + `db.ts`                          | ✅     |
 | 2    | Auth.js + Google + protección de rutas           | ✅     |
 | 3    | Servicio de clientes + pantallas a DB            | ✅     |
-| 4    | Servicio de eventos + pantallas a DB             | ⏳     |
-| 5    | Cliente Quotation API + flujo de cotizaciones    | ⏳     |
+| 4    | Servicio de eventos + pantallas a DB             | ✅     |
+| 5    | Cliente Quotation API + flujo de cotizaciones    | ✅     |

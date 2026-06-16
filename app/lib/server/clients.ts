@@ -12,8 +12,8 @@ export type ClientListRow = {
 	lastName: string;
 	phoneFormatted: string;
 	type: string;
-	/** Etapa del evento más reciente no cancelado; "PROSPECT" si no tiene eventos. */
-	stage: FunnelStage;
+	/** Etapa del evento activo más reciente; null si no hay oportunidad abierta. */
+	activeOpportunityStage: FunnelStage | null;
 	isRecurring: boolean;
 	lastContactAt: Date;
 	eventsCount: number;
@@ -22,11 +22,9 @@ export type ClientListRow = {
 /**
  * Lista de clientes activos (no soft-deleted) con datos derivados para la tabla.
  *
- * Nota de modelo (reconciliación con el esquema): el Cliente NO tiene un campo
- * de etapa de embudo — el embudo vive por Evento (FunnelStage). La columna
- * "Estado" muestra la etapa del evento más reciente no cancelado del cliente,
- * o "Prospecto" si aún no tiene eventos. La condición de recurrencia
- * (isRecurring) se expone aparte. Ver docs/integracion-db-auth-quotation.md.
+ * Nota de modelo: el Cliente NO tiene un campo de etapa de embudo; el embudo
+ * vive por Evento (FunnelStage). La tabla muestra la oportunidad abierta más
+ * reciente y expone la recurrencia como condición del cliente.
  */
 export async function listClients(): Promise<ClientListRow[]> {
 	const clients = await prisma.client.findMany({
@@ -34,7 +32,12 @@ export async function listClients(): Promise<ClientListRow[]> {
 		orderBy: { lastContactAt: "desc" },
 		include: {
 			events: {
-				where: { deletedAt: null, funnelStage: { not: "CANCELED" } },
+				where: {
+					deletedAt: null,
+					funnelStage: {
+						in: ["PROSPECT", "CONTACTED", "QUOTED", "RESERVED", "CONFIRMED"],
+					},
+				},
 				orderBy: [{ eventDate: "desc" }, { createdAt: "desc" }],
 				select: { funnelStage: true },
 			},
@@ -50,7 +53,8 @@ export async function listClients(): Promise<ClientListRow[]> {
 		lastName: client.lastName,
 		phoneFormatted: client.phoneFormatted,
 		type: client.type,
-		stage: (client.events[0]?.funnelStage ?? "PROSPECT") as FunnelStage,
+		activeOpportunityStage: (client.events[0]?.funnelStage ??
+			null) as FunnelStage | null,
 		isRecurring: client.isRecurring,
 		lastContactAt: client.lastContactAt,
 		eventsCount: client._count.events,

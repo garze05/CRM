@@ -116,6 +116,10 @@ export const authConfig = {
 			if (session.user && typeof token.picture === "string") {
 				session.user.image = token.picture;
 			}
+			// id_token de Google para reenviar a la Quotation API. SOLO uso
+			// server-side (no pasar la sesión completa a componentes cliente).
+			session.idToken = token.idToken as string | undefined;
+			session.idTokenExpires = token.idTokenExpires as number | undefined;
 			return session;
 		},
 	},

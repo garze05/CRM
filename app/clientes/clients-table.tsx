@@ -53,7 +53,7 @@ const columns: DataTableColumn<ClientRow>[] = [
 	},
 	{
 		key: "type",
-		header: "Tipo",
+		header: "Tipo comercial",
 		filterValue: client => client.type,
 		filterLabel: typeLabel,
 		render: client => (
@@ -61,19 +61,30 @@ const columns: DataTableColumn<ClientRow>[] = [
 		),
 	},
 	{
-		key: "stage",
-		header: "Estado",
-		filterValue: client => (client.isRecurring ? "RECURRING" : client.stage),
+		key: "activeOpportunity",
+		header: "Oportunidad activa",
+		filterValue: client =>
+			client.activeOpportunityStage ??
+			(client.isRecurring ? "RECURRING" : "NO_ACTIVE_OPPORTUNITY"),
 		filterLabel: value =>
 			value === "RECURRING"
 				? "Recurrente"
-				: FUNNEL_STAGE_LABELS[value as keyof typeof FUNNEL_STAGE_LABELS] ?? value,
+				: value === "NO_ACTIVE_OPPORTUNITY"
+					? "Sin oportunidad activa"
+					: FUNNEL_STAGE_LABELS[value as keyof typeof FUNNEL_STAGE_LABELS] ??
+						value,
 		render: client => (
 			<div className='flex flex-wrap items-center gap-1.5'>
-				<StatusBadge
-					value={client.stage}
-					label={FUNNEL_STAGE_LABELS[client.stage]}
-				/>
+				{client.activeOpportunityStage ? (
+					<StatusBadge
+						value={client.activeOpportunityStage}
+						label={FUNNEL_STAGE_LABELS[client.activeOpportunityStage]}
+					/>
+				) : (
+					<span className='text-base font-bold text-[var(--text-muted)]'>
+						Sin oportunidad activa
+					</span>
+				)}
 				{client.isRecurring ? (
 					<StatusBadge value='RECURRING' label='Recurrente' />
 				) : null}
@@ -112,12 +123,20 @@ export function ClientsTable({ rows }: { rows: ClientRow[] }) {
 			rows={rows}
 			rowHref={client => `/clientes/${client.id}`}
 			searchLabel='Buscar cliente'
-			searchPlaceholder='Nombre, teléfono o tipo de cliente'
+			searchPlaceholder='Nombre, teléfono, tipo comercial u oportunidad'
 			searchText={client =>
-				`${fullName(client)} ${client.phoneFormatted} ${typeLabel(client.type)}`
+				[
+					fullName(client),
+					client.phoneFormatted,
+					typeLabel(client.type),
+					client.activeOpportunityStage
+						? FUNNEL_STAGE_LABELS[client.activeOpportunityStage]
+						: "Sin oportunidad activa",
+					client.isRecurring ? "Recurrente" : "",
+				].join(" ")
 			}
 			emptyTitle='Sin clientes todavía'
-			emptyDescription='Creá el primer cliente para iniciar el embudo de ventas.'
+			emptyDescription='Creá el primer contacto; el embudo comienza cuando registrés su evento.'
 		/>
 	);
 }

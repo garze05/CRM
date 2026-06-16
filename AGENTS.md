@@ -29,11 +29,12 @@ Lo siguiente ya existe y debe integrarse, no rehacerse:
 
 ## Embudo de ventas — Estados del pipeline
 
-Todo prospecto o cliente activo tiene un estado que determina en qué etapa del embudo se encuentra.
-El sistema debe hacer visible este pipeline en todo momento.
+Todo evento activo funciona como una oportunidad comercial y tiene un estado que determina en qué etapa del embudo se encuentra.
+El cliente conserva la relación, el tipo comercial y el historial; no tiene un estado de embudo independiente.
+El sistema debe hacer visible este pipeline en todo momento desde eventos, dashboard y fichas de cliente como dato derivado.
 
 ```
-PROSPECTO → CONTACTADO → COTIZADO → RESERVADO → CONFIRMADO → REALIZADO → RECURRENTE
+PROSPECTO → CONTACTADO → COTIZADO → RESERVADO → CONFIRMADO → REALIZADO
                                                               ↓
                                                           CANCELADO (desde cualquier estado)
 ```
@@ -46,8 +47,9 @@ PROSPECTO → CONTACTADO → COTIZADO → RESERVADO → CONFIRMADO → REALIZADO
 | `RESERVADO`  | Cliente aceptó; reservación generada; pendiente pago inicial  |
 | `CONFIRMADO` | Pago del 50% recibido (2 semanas antes del evento)            |
 | `REALIZADO`  | Evento ejecutado; pendiente cobro del saldo restante          |
-| `RECURRENTE` | Cliente que ha tenido más de 1 evento realizado               |
 | `CANCELADO`  | Proceso cerrado sin realización                               |
+
+`RECURRENTE` no es etapa de evento. Es una condición del cliente, derivada de tener más de 1 evento realizado.
 
 ---
 
@@ -73,14 +75,17 @@ PROSPECTO → CONTACTADO → COTIZADO → RESERVADO → CONFIRMADO → REALIZADO
 **Reglas de negocio:**
 
 - Un cliente puede tener múltiples eventos a lo largo del tiempo.
-- El tipo de cliente afecta directamente cómo se calcula la cotización.
+- El tipo de cliente pertenece al cliente y afecta directamente cómo se calcula la cotización por defecto.
+- Si un cliente existente vuelve a contactar por un evento nuevo, se crea un nuevo evento con su propio estado inicial (`PROSPECTO`, `CONTACTADO` o `COTIZADO`) sin modificar el estado histórico de eventos anteriores.
+- La ficha de cliente puede mostrar "oportunidad activa" como dato derivado del evento abierto más reciente; no debe persistir un estado de embudo duplicado en cliente.
+- Un cliente se marca como recurrente cuando tiene más de 1 evento realizado; debe mostrarse como condición de relación, no como etapa del embudo.
 - Si el teléfono ya existe en la BD al registrar un nuevo lead, el sistema debe alertar que es un cliente existente y asociarlo en lugar de duplicarlo.
 
 **Sistema de seguimiento (recordatorios):**
 
-- Si un cliente está en estado `COTIZADO` y no ha respondido en 24h → recordatorio al usuario del CRM.
-- Si un cliente está en estado `COTIZADO` y no ha respondido en 72h → segundo recordatorio con sugerencia de mensaje de seguimiento.
-- Si un cliente estuvo en `REALIZADO` hace más de 3 meses sin nuevo contacto → recordatorio de reactivación.
+- Si un evento está en estado `COTIZADO` y el cliente no ha respondido en 24h → recordatorio al usuario del CRM.
+- Si un evento está en estado `COTIZADO` y el cliente no ha respondido en 72h → segundo recordatorio con sugerencia de mensaje de seguimiento.
+- Si el último evento realizado de un cliente fue hace más de 3 meses sin nuevo contacto → recordatorio de reactivación.
 - Los recordatorios se muestran en el dashboard principal como tareas pendientes.
 
 ---
@@ -113,6 +118,8 @@ PROSPECTO → CONTACTADO → COTIZADO → RESERVADO → CONFIRMADO → REALIZADO
 **Reglas de negocio:**
 
 - Un evento siempre pertenece a exactamente 1 cliente.
+- El estado del embudo pertenece al evento, no al cliente.
+- Al crear un evento para un cliente existente, el estado inicial se define para esa nueva oportunidad y no se hereda automáticamente de eventos realizados o cancelados.
 - No puede existir un evento en estado `RESERVADO` o superior sin fecha definida.
 - El sistema debe advertir conflictos de calendario (mismo personaje/colaborador en misma fecha y horario).
 - Eventos en estado `CONFIRMADO` bloquean esa fecha en el calendario para los recursos asignados.
@@ -312,7 +319,7 @@ PROSPECTO → CONTACTADO → COTIZADO → RESERVADO → CONFIRMADO → REALIZADO
 Los Excel existentes con clientes y eventos anteriores deben pasar por:
 
 1. **Limpieza manual** (fuera del sistema): normalizar nombres, eliminar duplicados, validar teléfonos.
-2. **Script de seed** (parte del setup del proyecto): carga masiva a las tablas de Clientes y Eventos con estado `REALIZADO` o `RECURRENTE` según corresponda.
+2. **Script de seed** (parte del setup del proyecto): carga masiva a las tablas de Clientes y Eventos históricos con estado `REALIZADO`; los clientes con más de 1 evento realizado quedan marcados como recurrentes.
 3. Los eventos históricos no requieren cotización ni reservación asociada; solo el registro del evento y cliente.
 
 ---

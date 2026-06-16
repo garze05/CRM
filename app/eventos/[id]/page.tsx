@@ -4,16 +4,15 @@ import { PageHeader } from "../../components/page-header";
 import { StarRating } from "../../components/star-rating";
 import { StatusBadge } from "../../components/status-badge";
 import { TaskPanel } from "../../components/task-panel";
+import { getEventDetail } from "../../lib/server/events";
+import { formatCrc, formatDateKey } from "../../lib/format";
 import {
-	collaborators,
-	formatCrc,
-	formatDate,
-	getEventAssignments,
-	getEventById,
-	getEventClient,
-	getEventTasks,
-	quotes,
-} from "../../lib/mock-data";
+	COLLABORATOR_ROLE_LABELS,
+	EVENT_TYPE_LABELS,
+	FUNNEL_STAGE_LABELS,
+	PAYMENT_STATUS_LABELS,
+	QUOTE_STATUS_LABELS,
+} from "../../lib/domain/labels";
 
 export default async function EventDetailPage({
 	params,
@@ -21,22 +20,23 @@ export default async function EventDetailPage({
 	params: Promise<{ id: string }>;
 }) {
 	const { id } = await params;
-	const event = getEventById(id);
+	const event = await getEventDetail(id);
 
 	if (!event) {
 		notFound();
 	}
 
-	const client = getEventClient(event);
-	const isCompleted = event.pipelineStatus === "REALIZADO";
-	const assignments = getEventAssignments(event.id).map(assignment => ({
-		assignment,
-		collaborator: collaborators.find(
-			person => person.id === assignment.collaboratorId,
-		),
-	}));
-	const eventQuotes = quotes.filter(quote => quote.eventId === event.id);
-	const eventTasks = getEventTasks(event.id);
+	const client = event.client;
+	const isCompleted = event.funnelStage === "COMPLETED";
+	const paymentStatus = event.reservation?.paymentStatus ?? null;
+	const total =
+		event.reservation?.agreedTotal != null
+			? Number(event.reservation.agreedTotal)
+			: event.quotes[0]?.total != null
+				? Number(event.quotes[0].total)
+				: null;
+	const characters = event.characters.map(c => c.catalogItem.name);
+	const dateKey = event.eventDate ? event.eventDate.toISOString().slice(0, 10) : "";
 
 	return (
 		<>
@@ -49,8 +49,16 @@ export default async function EventDetailPage({
 				title={event.name}
 				badges={
 					<div className='flex flex-wrap gap-2'>
-						<StatusBadge value={event.pipelineStatus} />
-						<StatusBadge value={event.paymentStatus} />
+						<StatusBadge
+							value={event.funnelStage}
+							label={FUNNEL_STAGE_LABELS[event.funnelStage]}
+						/>
+						{paymentStatus ? (
+							<StatusBadge
+								value={paymentStatus}
+								label={PAYMENT_STATUS_LABELS[paymentStatus]}
+							/>
+						) : null}
 					</div>
 				}
 				actions={
@@ -86,54 +94,70 @@ export default async function EventDetailPage({
 								/>
 							</label>
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-								<span>Tipo</span>
-								<select defaultValue={event.type} className='form-control'>
-									<option value='INFANTIL'>Infantil</option>
-									<option value='CORPORATIVO'>Corporativo</option>
-									<option value='INSTITUCIONAL'>Institucional</option>
+								<span>Tipo de evento</span>
+								<select defaultValue={event.eventType} className='form-control'>
+									<option value='CHILDREN'>Infantil</option>
+									<option value='CORPORATE'>Corporativo</option>
+									<option value='INSTITUTIONAL'>Institucional</option>
 								</select>
+								<span className='block text-base font-semibold text-[var(--text-secondary)]'>
+									El tipo comercial para precios se toma del cliente.
+								</span>
 							</label>
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 								<span>Estado del embudo</span>
-								<select defaultValue={event.pipelineStatus} className='form-control'>
-									<option value='COTIZADO'>Cotizado</option>
-									<option value='RESERVADO'>Reservado</option>
-									<option value='CONFIRMADO'>Confirmado</option>
-									<option value='REALIZADO'>Realizado</option>
-									<option value='CANCELADO'>Cancelado</option>
+								<select defaultValue={event.funnelStage} className='form-control'>
+									<option value='PROSPECT'>Prospecto</option>
+									<option value='CONTACTED'>Contactado</option>
+									<option value='QUOTED'>Cotizado</option>
+									<option value='RESERVED'>Reservado</option>
+									<option value='CONFIRMED'>Confirmado</option>
+									<option value='COMPLETED'>Realizado</option>
+									<option value='CANCELED'>Cancelado</option>
 								</select>
 							</label>
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 								<span>Fecha</span>
-								<input type='date' defaultValue={event.date} className='form-control' />
+								<input
+									type='date'
+									defaultValue={dateKey}
+									className='form-control'
+								/>
 							</label>
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 								<span>Hora inicio</span>
 								<input
 									type='time'
-									defaultValue={event.startTime}
+									defaultValue={event.startTime ?? ""}
 									className='form-control'
 								/>
 							</label>
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 								<span>Lugar</span>
-								<input defaultValue={event.venueName} className='form-control' />
+								<input
+									defaultValue={event.venueName ?? ""}
+									className='form-control'
+								/>
 							</label>
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 								<span>Invitados</span>
 								<input
 									type='number'
-									defaultValue={event.guestCount}
+									defaultValue={event.guestCount ?? undefined}
 									className='form-control'
 								/>
 							</label>
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
 								<span>Dirección</span>
-								<input defaultValue={event.venueAddress} className='form-control' />
+								<input
+									defaultValue={event.venueAddress ?? ""}
+									className='form-control'
+								/>
 							</label>
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
 								<span>Notas internas</span>
 								<textarea
+									defaultValue={event.internalNotes ?? ""}
 									className='form-control min-h-28 resize-none py-3 leading-7'
 									placeholder='Detalles del lugar, trato del cliente, logística y aprendizajes para futuros eventos.'
 								/>
@@ -150,31 +174,26 @@ export default async function EventDetailPage({
 								Asignar colaborador
 							</button>
 						</div>
-						{assignments.length === 0 ? (
+						{event.assignments.length === 0 ? (
 							<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
 								Sin colaboradores asignados todavía. El sistema validará
 								conflictos de fecha y hora al asignar.
 							</p>
 						) : (
 							<ul className='list-none space-y-3 p-0'>
-								{assignments.map(({ assignment, collaborator }) => (
+								{event.assignments.map(assignment => (
 									<li
 										key={assignment.id}
 										className='rounded-lg border border-[color:var(--border-color)] bg-[var(--surface-color)] p-4'
 									>
 										<div className='flex flex-wrap items-center justify-between gap-2'>
-											{collaborator ? (
-												<Link
-													href={`/colaboradores/${collaborator.id}`}
-													className='text-lg font-black text-[var(--text-primary)] underline-offset-2 hover:underline'
-												>
-													{collaborator.firstName} {collaborator.lastName}
-												</Link>
-											) : (
-												<span className='text-lg font-black text-[var(--text-muted)]'>
-													Colaborador eliminado
-												</span>
-											)}
+											<Link
+												href={`/colaboradores/${assignment.collaborator.id}`}
+												className='text-lg font-black text-[var(--text-primary)] underline-offset-2 hover:underline'
+											>
+												{assignment.collaborator.firstName}{" "}
+												{assignment.collaborator.lastName}
+											</Link>
 											<StarRating
 												value={assignment.rating}
 												readOnly={!isCompleted}
@@ -182,12 +201,15 @@ export default async function EventDetailPage({
 												size='sm'
 											/>
 										</div>
-										<p className='mt-1 text-base font-semibold text-[var(--text-secondary)]'>
-											{assignment.roleInEvent}
-										</p>
-										{assignment.note ? (
+										{assignment.roleInEvent ? (
+											<p className='mt-1 text-base font-semibold text-[var(--text-secondary)]'>
+												{COLLABORATOR_ROLE_LABELS[assignment.roleInEvent] ??
+													assignment.roleInEvent}
+											</p>
+										) : null}
+										{assignment.notes ? (
 											<p className='mt-2 text-base font-semibold text-[var(--text-secondary)]'>
-												Nota: {assignment.note}
+												Nota: {assignment.notes}
 											</p>
 										) : null}
 									</li>
@@ -208,14 +230,14 @@ export default async function EventDetailPage({
 								Nueva cotización
 							</Link>
 						</div>
-						{eventQuotes.length === 0 ? (
+						{event.quotes.length === 0 ? (
 							<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
 								Sin cotizaciones todavía. Solo puede haber una cotización
 								enviada activa; las demás quedan en historial.
 							</p>
 						) : (
 							<ul className='list-none space-y-3 p-0'>
-								{eventQuotes.map(quote => (
+								{event.quotes.map(quote => (
 									<li key={quote.id}>
 										<Link
 											href={`/cotizaciones/${quote.id}`}
@@ -223,16 +245,19 @@ export default async function EventDetailPage({
 										>
 											<div>
 												<p className='text-lg font-black text-[var(--text-primary)]'>
-													{quote.number}
+													{quote.quoteNumber}
 												</p>
 												<p className='mt-1 text-base font-semibold text-[var(--text-secondary)]'>
-													Vigente hasta {formatDate(quote.validUntil)}
+													Vigente hasta {formatDateKey(quote.validUntil)}
 												</p>
 											</div>
 											<div className='flex items-center gap-3'>
-												<StatusBadge value={quote.status} />
+												<StatusBadge
+													value={quote.status}
+													label={QUOTE_STATUS_LABELS[quote.status]}
+												/>
 												<span className='text-lg font-black text-[var(--text-primary)]'>
-													{formatCrc(quote.total)}
+													{formatCrc(Number(quote.total))}
 												</span>
 											</div>
 										</Link>
@@ -241,7 +266,6 @@ export default async function EventDetailPage({
 							</ul>
 						)}
 					</section>
-
 				</div>
 
 				<aside className='min-w-0 space-y-5'>
@@ -253,7 +277,8 @@ export default async function EventDetailPage({
 							<div className='border-t border-[color:var(--border-color)] pt-4'>
 								<dt className='font-bold text-[var(--text-secondary)]'>Fecha</dt>
 								<dd className='mt-1 font-black text-[var(--text-primary)]'>
-									{formatDate(event.date)} · {event.startTime}
+									{formatDateKey(dateKey || null)}
+									{event.startTime ? ` · ${event.startTime}` : ""}
 								</dd>
 							</div>
 							<div className='border-t border-[color:var(--border-color)] pt-4'>
@@ -261,21 +286,28 @@ export default async function EventDetailPage({
 									Personajes y servicios
 								</dt>
 								<dd className='mt-1 font-black text-[var(--text-primary)]'>
-									{event.characters.length > 0
-										? event.characters.join(", ")
-										: "Por definir"}
+									{characters.length > 0 ? characters.join(", ") : "Por definir"}
 								</dd>
 							</div>
 							<div className='border-t border-[color:var(--border-color)] pt-4'>
 								<dt className='font-bold text-[var(--text-secondary)]'>Pago</dt>
 								<dd className='mt-2'>
-									<StatusBadge value={event.paymentStatus} />
+									{paymentStatus ? (
+										<StatusBadge
+											value={paymentStatus}
+											label={PAYMENT_STATUS_LABELS[paymentStatus]}
+										/>
+									) : (
+										<span className='text-base font-semibold text-[var(--text-muted)]'>
+											Sin reservación
+										</span>
+									)}
 								</dd>
 							</div>
 							<div className='border-t border-[color:var(--border-color)] pt-4'>
 								<dt className='font-bold text-[var(--text-secondary)]'>Total</dt>
 								<dd className='mt-1 font-black text-[var(--text-primary)]'>
-									{formatCrc(event.estimatedTotal)}
+									{total !== null ? formatCrc(total) : "Por cotizar"}
 								</dd>
 							</div>
 						</dl>
@@ -285,7 +317,7 @@ export default async function EventDetailPage({
 						title='Tareas del evento'
 						entityHref={`/eventos/${event.id}`}
 						entityLabel={event.name}
-						tasks={eventTasks}
+						tasks={[]}
 					/>
 
 					<section className='surface-card p-5'>
@@ -295,7 +327,7 @@ export default async function EventDetailPage({
 						{isCompleted ? (
 							<div className='mt-3'>
 								<StarRating
-									value={null}
+									value={event.rating}
 									label='Calificación del evento'
 									name='eventRating'
 								/>
