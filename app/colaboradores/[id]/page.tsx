@@ -5,12 +5,14 @@ import { PhoneInput } from "../../components/phone-input";
 import { PhotoThumbnailControl } from "../../components/photo-thumbnail-control";
 import { StarRating } from "../../components/star-rating";
 import { StatusBadge } from "../../components/status-badge";
-import {
-	formatDate,
-	getCollaboratorAssignments,
-	getCollaboratorById,
-	getEventById,
-} from "../../lib/mock-data";
+import { getCollaboratorDetail } from "../../lib/server/collaborators";
+import { COLLABORATOR_ROLE_LABELS } from "../../lib/domain/labels";
+import { formatDateKey } from "../../lib/format";
+
+function roleLabel(role: string | null) {
+	if (!role) return "Sin rol";
+	return COLLABORATOR_ROLE_LABELS[role] ?? role;
+}
 
 export default async function CollaboratorDetailPage({
 	params,
@@ -18,7 +20,7 @@ export default async function CollaboratorDetailPage({
 	params: Promise<{ id: string }>;
 }) {
 	const { id } = await params;
-	const collaborator = getCollaboratorById(id);
+	const collaborator = await getCollaboratorDetail(id);
 
 	if (!collaborator) {
 		notFound();
@@ -26,22 +28,24 @@ export default async function CollaboratorDetailPage({
 
 	const fullName = `${collaborator.firstName} ${collaborator.lastName}`;
 	const initials = `${collaborator.firstName[0]}${collaborator.lastName[0]}`;
-
-	const assignments = getCollaboratorAssignments(collaborator.id)
-		.map(assignment => ({
-			assignment,
-			event: getEventById(assignment.eventId),
-		}))
-		.filter(({ event }) => event !== undefined);
+	const ratingAverage =
+		collaborator.ratingAverage != null
+			? Number(collaborator.ratingAverage)
+			: null;
 
 	const today = new Date().toISOString().slice(0, 10);
-	const upcoming = assignments.filter(({ event }) => event!.date >= today);
-	const past = assignments
-		.filter(({ event }) => event!.date < today)
-		.sort((a, b) => b.event!.date.localeCompare(a.event!.date));
-	const recentComments = assignments.filter(
-		({ assignment }) => assignment.note !== null,
-	);
+	const dated = collaborator.assignments.map(assignment => ({
+		assignment,
+		event: assignment.event,
+		dateKey: assignment.event.eventDate
+			? assignment.event.eventDate.toISOString().slice(0, 10)
+			: "",
+	}));
+	const upcoming = dated.filter(d => d.dateKey >= today);
+	const past = dated
+		.filter(d => d.dateKey < today && d.dateKey !== "")
+		.sort((a, b) => b.dateKey.localeCompare(a.dateKey));
+	const recentComments = dated.filter(d => d.assignment.notes);
 
 	return (
 		<>
@@ -52,7 +56,12 @@ export default async function CollaboratorDetailPage({
 					{ label: fullName },
 				]}
 				title={fullName}
-				badges={<StatusBadge value={collaborator.availability} />}
+				badges={
+					<StatusBadge
+						value={collaborator.active ? "ACTIVO" : "INACTIVO"}
+						label={collaborator.active ? "Activo" : "Inactivo"}
+					/>
+				}
 				actions={
 					<button className='primary-action min-h-12 rounded-full px-5 py-3 text-base font-black transition'>
 						Guardar cambios
@@ -89,26 +98,28 @@ export default async function CollaboratorDetailPage({
 							<PhoneInput
 								name='phone'
 								label='Teléfono'
-								defaultValue={collaborator.phone}
+								defaultValue={collaborator.phone ?? undefined}
 							/>
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-								<span>Rol</span>
+								<span>Rol base</span>
 								<select defaultValue={collaborator.role} className='form-control'>
-									<option value='BOTARGA'>Botarga</option>
-									<option value='ANIMADOR'>Animador</option>
-									<option value='LOGISTICA'>Logística</option>
-									<option value='OTRO'>Otro</option>
+									<option value='MASCOT_COSTUME'>Botarga</option>
+									<option value='ENTERTAINER'>Animador</option>
+									<option value='LOGISTICS'>Logística</option>
+									<option value='OTHER'>Otro</option>
 								</select>
+								<span className='block text-base font-semibold text-[var(--text-secondary)]'>
+									Rol por defecto; cada evento puede asignarle un rol distinto.
+								</span>
 							</label>
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-								<span>Disponibilidad</span>
+								<span>Estado</span>
 								<select
-									defaultValue={collaborator.availability}
+									defaultValue={collaborator.active ? "ACTIVE" : "INACTIVE"}
 									className='form-control'
 								>
-									<option value='DISPONIBLE'>Disponible</option>
-									<option value='ASIGNADO'>Asignado</option>
-									<option value='INACTIVO'>Inactivo</option>
+									<option value='ACTIVE'>Activo</option>
+									<option value='INACTIVE'>Inactivo</option>
 								</select>
 							</label>
 						</form>
@@ -127,22 +138,19 @@ export default async function CollaboratorDetailPage({
 								{upcoming.map(({ assignment, event }) => (
 									<li key={assignment.id}>
 										<Link
-											href={`/eventos/${event!.id}`}
+											href={`/eventos/${event.id}`}
 											className='block rounded-lg border border-[color:var(--border-color)] bg-[var(--surface-color)] p-4 transition hover:border-[color:var(--accent-color)]'
 										>
-											<div className='flex flex-wrap items-center justify-between gap-2'>
-												<p className='text-lg font-black text-[var(--text-primary)]'>
-													{event!.name}
-												</p>
-												<StatusBadge value={event!.pipelineStatus} />
-											</div>
-											<p className='mt-1 text-base font-semibold text-[var(--text-secondary)]'>
-												{formatDate(event!.date)} · {event!.startTime} ·{" "}
-												{assignment.roleInEvent}
+											<p className='text-lg font-black text-[var(--text-primary)]'>
+												{event.name}
 											</p>
-											{assignment.note ? (
+											<p className='mt-1 text-base font-semibold text-[var(--text-secondary)]'>
+												{formatDateKey(event.eventDate)} ·{" "}
+												{roleLabel(assignment.roleInEvent)}
+											</p>
+											{assignment.notes ? (
 												<p className='mt-2 text-base font-semibold text-[var(--text-secondary)]'>
-													Nota: {assignment.note}
+													Nota: {assignment.notes}
 												</p>
 											) : null}
 										</Link>
@@ -157,8 +165,8 @@ export default async function CollaboratorDetailPage({
 							Eventos pasados y calificaciones
 						</h2>
 						<p className='mt-1 text-lg text-[var(--text-secondary)]'>
-							La calificación se registra por evento; el promedio se calcula
-							solo con eventos calificados.
+							La calificación se registra por evento; el promedio se calcula solo
+							con eventos calificados.
 						</p>
 						{past.length === 0 ? (
 							<p className='mt-4 rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
@@ -173,23 +181,20 @@ export default async function CollaboratorDetailPage({
 									>
 										<div className='flex flex-wrap items-center justify-between gap-2'>
 											<Link
-												href={`/eventos/${event!.id}`}
+												href={`/eventos/${event.id}`}
 												className='text-lg font-black text-[var(--text-primary)] underline-offset-2 hover:underline'
 											>
-												{event!.name}
+												{event.name}
 											</Link>
-											<StarRating
-												value={assignment.rating}
-												readOnly
-												size='sm'
-											/>
+											<StarRating value={assignment.rating} readOnly size='sm' />
 										</div>
 										<p className='mt-1 text-base font-semibold text-[var(--text-secondary)]'>
-											{formatDate(event!.date)} · {assignment.roleInEvent}
+											{formatDateKey(event.eventDate)} ·{" "}
+											{roleLabel(assignment.roleInEvent)}
 										</p>
-										{assignment.note ? (
+										{assignment.notes ? (
 											<p className='mt-2 text-base font-semibold text-[var(--text-secondary)]'>
-												“{assignment.note}”
+												“{assignment.notes}”
 											</p>
 										) : null}
 									</li>
@@ -212,17 +217,23 @@ export default async function CollaboratorDetailPage({
 							{fullName}
 						</h2>
 						<p className='text-lg font-semibold text-[var(--text-secondary)]'>
-							<StatusBadge value={collaborator.role} />
+							<StatusBadge
+								value={collaborator.role}
+								label={roleLabel(collaborator.role)}
+							/>
 						</p>
 						<div className='mt-4 border-t border-[color:var(--border-color)] pt-4'>
 							<p className='text-sm font-black uppercase text-[var(--text-muted)]'>
 								Calificación promedio
 							</p>
 							<div className='mt-1'>
-								<StarRating
-									value={collaborator.ratingAverage}
-									readOnly
-								/>
+								{ratingAverage !== null ? (
+									<StarRating value={ratingAverage} readOnly />
+								) : (
+									<span className='text-base font-semibold text-[var(--text-muted)]'>
+										Sin calificación
+									</span>
+								)}
 							</div>
 						</div>
 					</section>
@@ -239,10 +250,10 @@ export default async function CollaboratorDetailPage({
 										className='border-l-4 border-[color:var(--border-color)] pl-3'
 									>
 										<p className='text-base font-semibold text-[var(--text-secondary)]'>
-											“{assignment.note}”
+											“{assignment.notes}”
 										</p>
 										<p className='mt-1 text-sm font-bold uppercase text-[var(--text-muted)]'>
-											{event!.name}
+											{event.name}
 										</p>
 									</li>
 								))}

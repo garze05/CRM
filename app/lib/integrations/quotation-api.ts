@@ -159,6 +159,41 @@ export function renderDocument(
 	return request<DocumentRenderResponse>("/documents/render", idToken, payload);
 }
 
+/**
+ * Renderiza el documento y devuelve los bytes del PDF (vista previa bajo
+ * demanda). Mapea errores a QuotationApiError igual que `request`.
+ */
+export async function previewDocument(
+	cotizacion: QuotationResponse,
+	idToken: string | undefined,
+): Promise<ArrayBuffer> {
+	let response: Response;
+	try {
+		response = await fetch(`${BASE_URL}/documents/preview`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+			},
+			body: JSON.stringify({ cotizacion }),
+			cache: "no-store",
+		});
+	} catch {
+		throw new QuotationApiError(friendlyMessage(0), 0, true);
+	}
+
+	if (!response.ok) {
+		const unavailable = response.status === 502 || response.status === 503;
+		throw new QuotationApiError(
+			friendlyMessage(response.status),
+			response.status,
+			unavailable,
+		);
+	}
+
+	return response.arrayBuffer();
+}
+
 /** Chequeo de disponibilidad (GET /health). No lanza: devuelve null si falla. */
 export async function checkHealth(): Promise<{
 	status: string;

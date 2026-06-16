@@ -6,6 +6,7 @@ import { PhotoThumbnailControl } from "../../components/photo-thumbnail-control"
 import { StatusBadge } from "../../components/status-badge";
 import { TaskPanel } from "../../components/task-panel";
 import { getClientDetail } from "../../lib/server/clients";
+import { listTasksForEntity } from "../../lib/server/tasks";
 import {
 	CLIENT_TYPE_LABELS,
 	EVENT_TYPE_LABELS,
@@ -47,6 +48,7 @@ export default async function ClientDetailPage({
 		notFound();
 	}
 
+	const clientTasks = await listTasksForEntity({ clientId: client.id });
 	const fullName = `${client.firstName} ${client.lastName}`;
 	const initials = `${client.firstName[0]}${client.lastName[0]}`;
 	const typeLabel = CLIENT_TYPE_LABELS[client.type] ?? client.type;
@@ -320,9 +322,10 @@ export default async function ClientDetailPage({
 
 					<TaskPanel
 						title='Tareas del cliente'
-						entityHref={`/clientes/${client.id}`}
-						entityLabel={fullName}
-						tasks={[]}
+						entityType='client'
+						entityId={client.id}
+						revalidatePath={`/clientes/${client.id}`}
+						tasks={clientTasks}
 					/>
 				</aside>
 			</div>

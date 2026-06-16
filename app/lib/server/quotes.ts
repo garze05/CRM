@@ -69,6 +69,18 @@ export type QuoteDetail = NonNullable<
 	Awaited<ReturnType<typeof getQuoteDetail>>
 >;
 
+/** Payload de documento (QuotationResponse) para re-render del PDF; null si no existe. */
+export async function getQuoteDocumentPayload(
+	id: string,
+): Promise<QuotationResponse | null> {
+	const quote = await prisma.quote.findFirst({
+		where: { id, deletedAt: null },
+		select: { documentPayload: true },
+	});
+	if (!quote?.documentPayload) return null;
+	return quote.documentPayload as unknown as QuotationResponse;
+}
+
 // --- Generación contra la Quotation API ---
 
 export type GenerateQuoteInput = {
@@ -188,6 +200,8 @@ export async function generateQuoteForEvent(
 				validUntil,
 				status: "DRAFT",
 				lineItems: response.servicios as unknown as object,
+				// Payload completo para re-render del documento (PDF preview).
+				documentPayload: response as unknown as object,
 				notes: response.descripcion || null,
 			},
 			select: { id: true, quoteNumber: true },

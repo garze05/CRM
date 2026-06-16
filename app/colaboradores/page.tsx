@@ -3,9 +3,11 @@ import { IconLabel } from "../components/icon-label";
 import { PageHeader } from "../components/page-header";
 import { SectionCard } from "../components/section-card";
 import { CollaboratorsTable } from "./collaborators-table";
-import { collaborators } from "../lib/mock-data";
+import { listCollaborators } from "../lib/server/collaborators";
 
-export default function CollaboratorsPage() {
+export default async function CollaboratorsPage() {
+	const collaborators = await listCollaborators();
+
 	return (
 		<>
 			<PageHeader

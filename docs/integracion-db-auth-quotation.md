@@ -126,15 +126,34 @@ Se mantiene la invariante `subtotal + transportCost + taxAmount − discount = t
 `abono` / `pendiente` (50/50) se usan al **reservar** (Reservation
 `depositAmount` / `balanceAmount`), no en la cotización.
 
-### 3.4 PDF (`pdfUrl`) — LIMITACIÓN CONOCIDA
+### 3.4 PDF — vista previa bajo demanda
 
-`POST /documents/render` devuelve **rutas locales del sistema de archivos de la
-API** (ej. `output/api/C0620-26107.docx`), no URLs web. El CRM no puede servir
-ese archivo directamente.
+**Generación del documento.** Al generar la cotización, el CRM guarda la
+respuesta completa de la API en `Quote.documentPayload` (Json). Ese payload es lo
+que `POST /documents/preview` necesita para renderizar.
 
-**MVP:** se guarda la ruta devuelta en `Quote.pdfUrl` como referencia. La
-descarga real requiere, como trabajo siguiente, que la Quotation API exponga un
-endpoint de descarga (`GET /documents/{codigo}`) o almacenamiento compartido.
+**Vista previa.** El flujo es:
+
+```
+[Detalle de cotización] → componente <PdfPreview> (cliente)
+    │ fetch
+    ▼
+GET /api/cotizaciones/[id]/pdf   (route handler del CRM, protegido por sesión)
+    │ lee Quote.documentPayload + reenvía el id_token
+    ▼
+POST /documents/preview   (Quotation API → LibreOffice → PDF bytes)
+    │ application/pdf
+    ◄────────────────────
+  el route lo devuelve y el componente lo embebe en un <iframe> (objectURL)
+```
+
+- Se renderiza **bajo demanda** cada vez que se abre la cotización: siempre
+  refleja el payload guardado, no hay archivos que se desactualicen.
+- Si `documentPayload` es null (cotizaciones previas a esta función), la UI
+  muestra "Regenerá para previsualizar".
+- `POST /documents/render` (que devuelve rutas locales) sigue existiendo para
+  generar/persistir archivos; el almacenamiento persistente y la descarga
+  histórica desde esas rutas siguen siendo trabajo futuro.
 
 ### 3.5 Reenvío del id_token — LIMITACIÓN CONOCIDA
 

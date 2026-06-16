@@ -40,6 +40,8 @@ export type EventListItem = {
 	estimatedTotal: number | null;
 	/** Nombres de personajes/ítems de catálogo vinculados. */
 	characters: string[];
+	/** Conceptos cotizados (personajes/servicios de las líneas) — para búsqueda. */
+	serviceTags: string[];
 	collaboratorNames: string[];
 	alerts: string[];
 };
@@ -74,8 +76,7 @@ const listInclude = {
 	quotes: {
 		where: { deletedAt: null },
 		orderBy: { issuedAt: "desc" },
-		take: 1,
-		select: { total: true },
+		select: { total: true, lineItems: true },
 	},
 } as const;
 
@@ -94,8 +95,24 @@ type EventWithRelations = {
 	characters: { catalogItem: { name: string } }[];
 	assignments: { collaborator: { firstName: string; lastName: string } }[];
 	reservation: { paymentStatus: string; agreedTotal: unknown } | null;
-	quotes: { total: unknown }[];
+	quotes: { total: unknown; lineItems: unknown }[];
 };
+
+/** Extrae los conceptos (personajes/servicios) de las líneas de cotización. */
+function serviceTagsFromQuotes(quotes: { lineItems: unknown }[]): string[] {
+	const tags = new Set<string>();
+	for (const quote of quotes) {
+		if (!Array.isArray(quote.lineItems)) continue;
+		for (const line of quote.lineItems as Array<Record<string, unknown>>) {
+			const concepto = line?.concepto;
+			if (typeof concepto === "string" && !/transporte/i.test(concepto)) {
+				// Quitar prefijos tipo "Personaje: " para que la búsqueda sea natural.
+				tags.add(concepto.replace(/^[^:]+:\s*/, "").trim());
+			}
+		}
+	}
+	return [...tags];
+}
 
 function toListItem(event: EventWithRelations): EventListItem {
 	const collaboratorNames = event.assignments.map(
@@ -125,6 +142,7 @@ function toListItem(event: EventWithRelations): EventListItem {
 		paymentStatus,
 		estimatedTotal,
 		characters: event.characters.map(c => c.catalogItem.name),
+		serviceTags: serviceTagsFromQuotes(event.quotes),
 		collaboratorNames,
 		alerts: buildAlerts({ pipelineStatus, paymentStatus, collaboratorNames }),
 	};
@@ -163,7 +181,13 @@ export type EventDetail = NonNullable<
 	Awaited<ReturnType<typeof getEventDetail>>
 >;
 
-/** Clientes activos para el selector del formulario de alta. */
+const CLIENT_TYPE_LABEL: Record<string, string> = {
+	FAMILY: "Familiar",
+	EDUCATIONAL: "Educativo",
+	CORPORATE: "Corporativo",
+};
+
+/** Clientes activos para el combobox del formulario (búsqueda por nombre/teléfono). */
 export async function listClientsForSelect() {
 	const clients = await prisma.client.findMany({
 		where: { deletedAt: null },
@@ -172,17 +196,22 @@ export async function listClientsForSelect() {
 			id: true,
 			firstName: true,
 			lastName: true,
+			phone: true,
 			phoneFormatted: true,
 			type: true,
 			isRecurring: true,
 		},
 	});
-	return clients.map(c => ({
-		id: c.id,
-		label: `${c.firstName} ${c.lastName} · ${c.phoneFormatted}`,
-		type: c.type,
-		isRecurring: c.isRecurring,
-	}));
+	return clients.map(c => {
+		const name = `${c.firstName} ${c.lastName}`;
+		const typeLabel = CLIENT_TYPE_LABEL[c.type] ?? c.type;
+		return {
+			id: c.id,
+			label: `${name} · ${c.phoneFormatted}${c.isRecurring ? " · Recurrente" : ""}`,
+			// Búsqueda por nombre, teléfono formateado, teléfono E.164 y tipo.
+			searchText: `${name} ${c.phoneFormatted} ${c.phone} ${typeLabel}`,
+		};
+	});
 }
 
 /** Eventos activos para selectores (ej. generar cotización). */
@@ -249,4 +278,50 @@ export async function createEvent(
 	});
 
 	return { ok: true, id: event.id };
+}
+
+export type UpdateEventData = {
+	id: string;
+	clientId: string;
+	name: string;
+	eventType: string;
+	funnelStage: string;
+	eventDate: string | null;
+	startTime: string | null;
+	guestCount: number | null;
+	venueAddress: string | null;
+	internalNotes: string | null;
+};
+
+export async function updateEvent(
+	data: UpdateEventData,
+): Promise<CreateEventResult> {
+	const existing = await prisma.event.findFirst({
+		where: { id: data.id, deletedAt: null },
+		select: { id: true },
+	});
+	if (!existing) return { ok: false, error: "El evento no existe." };
+
+	const client = await prisma.client.findFirst({
+		where: { id: data.clientId, deletedAt: null },
+		select: { id: true },
+	});
+	if (!client) return { ok: false, error: "El cliente seleccionado no existe." };
+
+	await prisma.event.update({
+		where: { id: data.id },
+		data: {
+			clientId: data.clientId,
+			name: data.name,
+			eventType: data.eventType as never,
+			funnelStage: data.funnelStage as never,
+			eventDate: data.eventDate ? new Date(`${data.eventDate}T00:00:00Z`) : null,
+			startTime: data.startTime || null,
+			guestCount: data.guestCount ?? null,
+			venueAddress: data.venueAddress || null,
+			internalNotes: data.internalNotes || null,
+		},
+	});
+
+	return { ok: true, id: data.id };
 }

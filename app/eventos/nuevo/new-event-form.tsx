@@ -2,7 +2,10 @@
 
 import { useActionState } from "react";
 import { SectionCard } from "../../components/section-card";
-import { CLIENT_TYPE_LABELS } from "../../lib/domain/labels";
+import {
+	ClientCombobox,
+	type ComboOption,
+} from "../../components/client-combobox";
 import { createEventAction, type NewEventState } from "../actions";
 
 const initialState: NewEventState = {};
@@ -20,7 +23,7 @@ export function NewEventForm({
 	clients,
 	selectedClientId,
 }: {
-	clients: { id: string; label: string; type: string; isRecurring: boolean }[];
+	clients: ComboOption[];
 	selectedClientId?: string;
 }) {
 	const [state, formAction, pending] = useActionState(
@@ -38,35 +41,20 @@ export function NewEventForm({
 					description='El cliente conserva la relación comercial; este evento lleva su propio embudo.'
 				>
 					<div className='grid gap-5 md:grid-cols-2'>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
-							<span>Cliente</span>
-							<select
+						<div className='space-y-2 md:col-span-2'>
+							<ClientCombobox
 								name='clientId'
-								defaultValue={
-									values?.clientId ?? selectedClientId ?? clients[0]?.id ?? ""
-								}
-								className='form-control'
-							>
-								{clients.length === 0 ? (
-									<option value=''>No hay clientes — creá uno primero</option>
-								) : (
-									clients.map(client => (
-										<option key={client.id} value={client.id}>
-											{client.label} ·{" "}
-											{CLIENT_TYPE_LABELS[
-												client.type as keyof typeof CLIENT_TYPE_LABELS
-											] ?? client.type}
-											{client.isRecurring ? " · Recurrente" : ""}
-										</option>
-									))
-								)}
-							</select>
+								label='Cliente'
+								options={clients}
+								defaultId={values?.clientId ?? selectedClientId}
+								placeholder='Buscar por nombre o teléfono…'
+							/>
 							<span className='block text-base font-semibold text-[var(--text-secondary)]'>
 								El tipo comercial pertenece al cliente y se usará como base de
 								precio.
 							</span>
 							<FieldError message={errors?.clientId} />
-						</label>
+						</div>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 							<span>Etapa inicial del evento</span>
 							<select
@@ -148,15 +136,6 @@ export function NewEventForm({
 							/>
 						</label>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-							<span>Lugar</span>
-							<input
-								name='venueName'
-								defaultValue={values?.venueName}
-								className='form-control'
-								placeholder='Casa, escuela o centro de eventos'
-							/>
-						</label>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 							<span>Tipo de lugar</span>
 							<select
 								name='venueType'
@@ -168,12 +147,12 @@ export function NewEventForm({
 							</select>
 						</label>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
-							<span>Dirección completa</span>
+							<span>Dirección</span>
 							<input
 								name='venueAddress'
 								defaultValue={values?.venueAddress}
 								className='form-control'
-								placeholder='Dirección para Google Maps API'
+								placeholder='Dirección exacta del lugar'
 							/>
 						</label>
 					</div>

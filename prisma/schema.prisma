@@ -474,6 +474,11 @@ model Quote {
   /// de CorrespondencyBot). Fuente para re-render y trazabilidad histórica.
   lineItems Json
 
+  /// Respuesta completa de la Quotation API (cliente, evento, servicios, totales,
+  /// descripción, codigo). Es lo que necesita POST /documents/preview para
+  /// renderizar el PDF bajo demanda. Null en cotizaciones previas a esta función.
+  documentPayload Json?
+
   pdfUrl String?
   /// Notas visibles para el cliente en el documento.
   notes  String?

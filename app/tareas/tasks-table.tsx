@@ -3,13 +3,26 @@
 import Link from "next/link";
 import {
 	DataTable,
-	formatEnumLabel,
 	type DataTableColumn,
 } from "../components/data-table/data-table";
 import { StatusBadge } from "../components/status-badge";
-import { formatDate, type TaskRecord } from "../lib/mock-data";
+import {
+	TASK_ORIGIN_LABELS,
+	TASK_STATUS_LABELS,
+} from "../lib/domain/labels";
+import type { TaskItem } from "../lib/server/tasks";
 
-const columns: DataTableColumn<TaskRecord>[] = [
+function formatDue(date: Date | null) {
+	if (!date) return "Sin fecha límite";
+	return new Intl.DateTimeFormat("es-CR", {
+		day: "2-digit",
+		month: "short",
+		year: "numeric",
+		timeZone: "UTC",
+	}).format(date);
+}
+
+const columns: DataTableColumn<TaskItem>[] = [
 	{
 		key: "title",
 		header: "Tarea",
@@ -27,36 +40,48 @@ const columns: DataTableColumn<TaskRecord>[] = [
 	{
 		key: "entity",
 		header: "Asociada a",
-		sortValue: task => task.entityLabel.toLocaleLowerCase("es"),
-		render: task => (
-			<Link
-				href={task.entityHref}
-				className='pointer-events-auto font-bold text-[var(--secondary-color)] underline-offset-2 hover:underline'
-			>
-				{task.entityLabel}
-			</Link>
-		),
+		sortValue: task => (task.entityLabel ?? "").toLocaleLowerCase("es"),
+		render: task =>
+			task.entityHref ? (
+				<Link
+					href={task.entityHref}
+					className='pointer-events-auto font-bold text-[var(--secondary-color)] underline-offset-2 hover:underline'
+				>
+					{task.entityLabel}
+				</Link>
+			) : (
+				<span className='text-[var(--text-muted)]'>General</span>
+			),
 	},
 	{
 		key: "dueDate",
 		header: "Vence",
-		sortValue: task => task.dueDate ?? "9999-12-31",
-		render: task =>
-			task.dueDate ? formatDate(task.dueDate) : "Sin fecha límite",
+		sortValue: task => (task.dueAt ? task.dueAt.getTime() : Number.MAX_SAFE_INTEGER),
+		render: task => formatDue(task.dueAt),
 	},
 	{
 		key: "origin",
 		header: "Origen",
 		filterValue: task => task.origin,
-		filterLabel: formatEnumLabel,
-		render: task => <StatusBadge value={task.origin} />,
+		filterLabel: value => TASK_ORIGIN_LABELS[value] ?? value,
+		render: task => (
+			<StatusBadge
+				value={task.origin}
+				label={TASK_ORIGIN_LABELS[task.origin] ?? task.origin}
+			/>
+		),
 	},
 	{
 		key: "status",
 		header: "Estado",
 		filterValue: task => task.status,
-		filterLabel: formatEnumLabel,
-		render: task => <StatusBadge value={task.status} />,
+		filterLabel: value => TASK_STATUS_LABELS[value] ?? value,
+		render: task => (
+			<StatusBadge
+				value={task.status}
+				label={TASK_STATUS_LABELS[task.status] ?? task.status}
+			/>
+		),
 	},
 ];
 
@@ -64,7 +89,7 @@ export function TasksTable({
 	rows,
 	initialStatus,
 }: {
-	rows: TaskRecord[];
+	rows: TaskItem[];
 	initialStatus?: string[];
 }) {
 	return (
@@ -75,7 +100,7 @@ export function TasksTable({
 			searchLabel='Buscar tarea'
 			searchPlaceholder='Título, cliente o evento'
 			searchText={task =>
-				`${task.title} ${task.description ?? ""} ${task.entityLabel}`
+				`${task.title} ${task.description ?? ""} ${task.entityLabel ?? ""}`
 			}
 			emptyTitle='Sin tareas todavía'
 			emptyDescription='Las tareas manuales y los recordatorios automáticos aparecerán aquí.'

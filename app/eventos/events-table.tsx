@@ -32,7 +32,9 @@ const columns: DataTableColumn<EventRow>[] = [
 		render: event => (
 			<div>
 				<p className='font-black text-[var(--text-primary)]'>{event.name}</p>
-				<p className='mt-1 text-base'>{event.venueName || "Lugar por definir"}</p>
+				<p className='mt-1 text-base'>
+					{event.venueAddress || "Dirección por definir"}
+				</p>
 			</div>
 		),
 	},
@@ -125,16 +127,17 @@ export function EventsTable({
 			rows={rows}
 			rowHref={event => `/eventos/${event.id}`}
 			searchLabel='Buscar evento'
-			searchPlaceholder='Cliente, teléfono, lugar o estado'
+			searchPlaceholder='Cliente, teléfono, personaje o servicio'
 			searchText={event =>
 				[
 					event.name,
 					event.clientName,
 					event.clientPhone,
-					event.venueName,
 					event.venueAddress,
 					stageLabel(event.pipelineStatus),
 					eventTypeLabel(event.type),
+					...event.characters,
+					...event.serviceTags,
 				].join(" ")
 			}
 			emptyTitle='Sin eventos todavía'

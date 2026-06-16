@@ -7,6 +7,7 @@ import { PageHeader } from "./components/page-header";
 import { SectionCard } from "./components/section-card";
 import { StatusBadge } from "./components/status-badge";
 import { TaskList } from "./components/task-list";
+import { listAllTasks } from "./lib/server/tasks";
 import {
 	events,
 	formatCrc,
@@ -14,10 +15,9 @@ import {
 	getEventClient,
 	pipelineStages,
 	recentActivity,
-	tasks,
 } from "./lib/mock-data";
 
-export default function Home() {
+export default async function Home() {
 	const activeEvents = events.filter(event =>
 		["COTIZADO", "RESERVADO", "CONFIRMADO"].includes(event.pipelineStatus),
 	);
@@ -34,8 +34,8 @@ export default function Home() {
 		)
 		.sort((a, b) => a.date.localeCompare(b.date))
 		.slice(0, 4);
-	const openTasks = tasks.filter(task =>
-		["PENDIENTE", "EN_PROGRESO"].includes(task.status),
+	const openTasks = (await listAllTasks()).filter(task =>
+		["PENDING", "IN_PROGRESS"].includes(task.status),
 	);
 
 	return (
@@ -166,7 +166,7 @@ export default function Home() {
 							</Link>
 						}
 					>
-						<TaskList tasks={openTasks} />
+						<TaskList tasks={openTasks} completeRevalidate='/' />
 					</SectionCard>
 
 					<SectionCard

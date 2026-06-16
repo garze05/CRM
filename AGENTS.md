@@ -87,6 +87,9 @@ PROSPECTO → CONTACTADO → COTIZADO → RESERVADO → CONFIRMADO → REALIZADO
 - Si un evento está en estado `COTIZADO` y el cliente no ha respondido en 72h → segundo recordatorio con sugerencia de mensaje de seguimiento.
 - Si el último evento realizado de un cliente fue hace más de 3 meses sin nuevo contacto → recordatorio de reactivación.
 - Los recordatorios se muestran en el dashboard principal como tareas pendientes.
+- Las tareas se pueden **agregar de forma rápida e inline** desde la ficha de cada
+  entidad (cliente, evento, cotización) sin navegar a una página aparte; cada
+  ficha muestra sus tareas asociadas y permite crearlas y completarlas en sitio.
 
 ---
 
@@ -103,8 +106,11 @@ PROSPECTO → CONTACTADO → COTIZADO → RESERVADO → CONFIRMADO → REALIZADO
 - `fecha_evento` — date, requerido desde estado COTIZADO
 - `hora_inicio` — time
 - `duracion_horas` — decimal
-- `lugar_nombre` — string (nombre del venue o domicilio)
-- `lugar_direccion` — string (dirección completa para cálculo de transporte)
+- `lugar_nombre` — string (nombre del venue o domicilio). **Deprecado en la UI:** el
+  formulario de evento usa un único campo de dirección; Google Maps resuelve el
+  lugar a partir de la dirección exacta. La columna se conserva por compatibilidad.
+- `lugar_direccion` — string (dirección exacta; única entrada de lugar en la UI y
+  base del cálculo de transporte vía Google Maps)
 - `lugar_tipo` — enum: `INTERIOR` | `EXTERIOR` (afecta disponibilidad de inflables)
 - `num_invitados` — integer
 - `edad_festejado` — integer (para eventos infantiles; orienta sugerencia de personaje)
@@ -189,6 +195,16 @@ PROSPECTO → CONTACTADO → COTIZADO → RESERVADO → CONFIRMADO → REALIZADO
 - Al aceptar una cotización, el evento avanza automáticamente a estado `RESERVADO`.
 - Solo puede haber 1 cotización activa (`ENVIADA`) por evento. Las anteriores quedan en historial.
 
+**Versionado de cotizaciones (planificado, aún no implementado):**
+
+- Un evento se vincula a N cotizaciones. Cuando el cliente pide cambios y se
+  recotiza el mismo evento, la nueva cotización agrega un sufijo de versión
+  (`-2`, `-3`, …) al código (ej. `C1503-26101-2`). La versión con el consecutivo
+  más alto es la vigente.
+- La UI debe mostrar de forma **compacta** las distintas versiones de una misma
+  cotización (los clientes suelen pedir ajustes), dejando claro cuál es la actual
+  y conservando el historial.
+
 ---
 
 ### 5. Reservaciones
@@ -246,6 +262,11 @@ PROSPECTO → CONTACTADO → COTIZADO → RESERVADO → CONFIRMADO → REALIZADO
 
 - Un colaborador puede estar asignado a múltiples eventos siempre que no haya conflicto de fecha/hora.
 - El sistema debe mostrar disponibilidad del colaborador al asignarlo a un evento.
+- La asignación se hace **inline desde el detalle del evento** (sin cambiar de
+  página): se busca al colaborador en un combobox y se le fija un **rol por
+  evento** (`roleInEvent`). Ese rol puede **diferir del rol base** del colaborador
+  (ej. alguien registrado como animador que esta vez va de botarga); el rol base
+  no se modifica.
 
 ---
 
@@ -293,8 +314,14 @@ PROSPECTO → CONTACTADO → COTIZADO → RESERVADO → CONFIRMADO → REALIZADO
 ### WhatsApp Business
 
 - En el MVP: el CRM registra manualmente las interacciones de WhatsApp (el chat sigue en el teléfono).
+  El flujo humano real parte de un chat de WhatsApp: el usuario registra a mano el
+  cliente y sus estados, vincula el evento solicitado al cliente y le asocia las
+  cotizaciones.
 - El sistema genera los mensajes sugeridos de seguimiento que el usuario puede copiar y enviar.
-- Integración directa con la API de WhatsApp Business es trabajo futuro (post-MVP).
+- **Visión futura (post-MVP):** integración directa con la API de WhatsApp Business
+  para (a) **vincular cada chat de WhatsApp con su cliente** de forma intuitiva y
+  (b) **prellenar clientes automáticamente** a partir de la conversación. Hasta
+  entonces, todo el registro de clientes y eventos es manual.
 
 ### Google Maps API
 

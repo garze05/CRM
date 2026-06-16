@@ -49,3 +49,16 @@ export const COLLABORATOR_ROLE_LABELS: Record<string, string> = {
 	LOGISTICS: "Logística",
 	OTHER: "Otro",
 };
+
+export const TASK_STATUS_LABELS: Record<string, string> = {
+	PENDING: "Pendiente",
+	IN_PROGRESS: "En progreso",
+	COMPLETED: "Completada",
+	CANCELED: "Cancelada",
+};
+
+export const TASK_ORIGIN_LABELS: Record<string, string> = {
+	MANUAL: "Manual",
+	AUTOMATIC: "Automática",
+	SYSTEM: "Sistema",
+};

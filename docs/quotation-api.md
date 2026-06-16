@@ -41,7 +41,8 @@ La Quotation API verifica la firma del token y el `aud` contra `GOOGLE_OAUTH_CLI
 | `GET /catalog/servicios` | Cargar servicios disponibles |
 | `POST /quotes/manual` | Generar cotización a partir de los datos del formulario del CRM |
 | `POST /descriptions` | Enriquecer descripción introductoria con IA (opcional) |
-| `POST /documents/render` | Renderizar DOCX/PDF desde el JSON de cotización |
+| `POST /documents/render` | Renderizar DOCX/PDF desde el JSON de cotización (rutas locales) |
+| `POST /documents/preview` | Renderizar y devolver el PDF en bytes (vista previa bajo demanda) |
 
 ### Ejemplo de llamada desde el CRM (TypeScript)
 

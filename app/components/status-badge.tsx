@@ -84,6 +84,15 @@ const badgeStyles: Record<string, string> = {
 	ACCEPTED: "bg-[#d8f5f2] text-[var(--secondary-color)]",
 	EXPIRED: "bg-[#fff0cf] text-[#6f5600]",
 	REJECTED: "bg-[#ffe0e3] text-[var(--error-color)]",
+	// TaskStatus (COMPLETED/CANCELED ya definidos arriba) + TaskOrigin
+	PENDING: "bg-[#fff0cf] text-[#6f5600]",
+	IN_PROGRESS: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
+	AUTOMATIC: "bg-[#ffe2cf] text-[var(--primary-color)]",
+	SYSTEM: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
+	// CollaboratorRole (OTHER ya definido arriba)
+	MASCOT_COSTUME: "bg-[#ffe2cf] text-[var(--primary-color)]",
+	ENTERTAINER: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
+	LOGISTICS: "bg-[#d8f5f2] text-[var(--secondary-color)]",
 };
 
 export function StatusBadge({

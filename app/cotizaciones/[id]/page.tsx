@@ -4,8 +4,10 @@ import { PageHeader } from "../../components/page-header";
 import { StatusBadge } from "../../components/status-badge";
 import { TaskPanel } from "../../components/task-panel";
 import { getQuoteDetail } from "../../lib/server/quotes";
+import { listTasksForEntity } from "../../lib/server/tasks";
 import { formatCrc, formatDateKey } from "../../lib/format";
 import { QUOTE_STATUS_LABELS } from "../../lib/domain/labels";
+import { PdfPreview } from "./pdf-preview";
 
 export default async function QuoteDetailPage({
 	params,
@@ -22,6 +24,9 @@ export default async function QuoteDetailPage({
 	const event = quote.event;
 	const client = event?.client;
 	const validUntilKey = quote.validUntil.toISOString().slice(0, 10);
+	const eventTasks = event
+		? await listTasksForEntity({ eventId: event.id })
+		: [];
 
 	return (
 		<>
@@ -46,6 +51,7 @@ export default async function QuoteDetailPage({
 			/>
 
 			<div className='grid min-w-0 flex-1 gap-5 px-5 pb-28 md:px-8 md:pb-8 xl:grid-cols-[minmax(0,1fr)_360px]'>
+				<div className='min-w-0 space-y-5'>
 				<section className='surface-card min-w-0 p-5 md:p-7'>
 					<div className='mb-6'>
 						<h2 className='text-2xl font-black text-[var(--text-primary)]'>
@@ -118,6 +124,21 @@ export default async function QuoteDetailPage({
 					</form>
 				</section>
 
+				{quote.documentPayload ? (
+					<PdfPreview quoteId={quote.id} />
+				) : (
+					<section className='surface-card min-w-0 p-5 md:p-7'>
+						<h2 className='text-2xl font-black text-[var(--text-primary)]'>
+							Vista previa del documento
+						</h2>
+						<p className='mt-2 rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
+							Esta cotización se creó sin documento. Regenerala para producir el
+							PDF y previsualizarlo.
+						</p>
+					</section>
+				)}
+				</div>
+
 				<aside className='min-w-0 space-y-5'>
 					<section className='rounded-lg bg-[var(--secondary-color)] p-5 text-white shadow-[var(--soft-shadow)]'>
 						<h2 className='text-2xl font-black'>Resumen</h2>
@@ -165,12 +186,15 @@ export default async function QuoteDetailPage({
 						) : null}
 					</section>
 
-					<TaskPanel
-						title='Tareas de la cotización'
-						entityHref={`/cotizaciones/${quote.id}`}
-						entityLabel={quote.quoteNumber}
-						tasks={[]}
-					/>
+					{event ? (
+						<TaskPanel
+							title='Tareas del evento'
+							entityType='event'
+							entityId={event.id}
+							revalidatePath={`/cotizaciones/${quote.id}`}
+							tasks={eventTasks}
+						/>
+					) : null}
 				</aside>
 			</div>
 		</>

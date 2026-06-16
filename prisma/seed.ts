@@ -30,11 +30,14 @@ function phone(input: string) {
 
 async function main() {
 	// Orden inverso de dependencias para limpiar.
+	await prisma.task.deleteMany();
+	await prisma.eventAssignment.deleteMany();
 	await prisma.reservation.deleteMany();
 	await prisma.quote.deleteMany();
 	await prisma.interaction.deleteMany();
 	await prisma.event.deleteMany();
 	await prisma.client.deleteMany();
+	await prisma.collaborator.deleteMany();
 
 	const maria = await prisma.client.create({
 		data: {
@@ -210,10 +213,45 @@ async function main() {
 			validUntil: new Date("2026-06-15"),
 			status: "SENT",
 			lineItems: emmaLineItems,
+			documentPayload: {
+				codigo: "C2206-26100",
+				tipo_documento: "Cotización",
+				fecha_envio: "2026-06-08",
+				descripcion: "Paquete con personaje principal y pintacaritas.",
+				cliente: {
+					nombre: "María Rodríguez",
+					telefono: "88881144",
+					empresa: "No aplica",
+					tel_empresa: "No aplica",
+					tipo_cliente: "familiar",
+				},
+				evento: {
+					tipo: "Infantil",
+					fecha: "2026-06-22",
+					ubicacion: "San Pedro, Montes de Oca",
+					duracion: "3",
+					homenajeado: "Emma",
+					edad: "6",
+					invitados: "35",
+					info_extra: "",
+				},
+				servicios: emmaLineItems,
+				totales: {
+					subtotal_sin_iva: 125000,
+					iva: 0,
+					total: 145000,
+					abono: 72500,
+					pendiente: 72500,
+				},
+			},
 			notes: "Paquete con personaje principal y pintacaritas.",
 		},
 	});
 
+	const diaLineItems = [
+		{ concepto: "Show institucional (2 personajes)", cantidad: 2, horas: 4, precio_unitario: 210000, subtotal: 420000 },
+		{ concepto: "Transporte", cantidad: 1, horas: 1, precio_unitario: 35000, subtotal: 35000 },
+	];
 	const diaQuote = await prisma.quote.create({
 		data: {
 			eventId: diaFamiliar.id,
@@ -226,10 +264,38 @@ async function main() {
 			currency: "CRC",
 			validUntil: new Date("2026-07-11"),
 			status: "ACCEPTED",
-			lineItems: [
-				{ concepto: "Show institucional (2 personajes)", cantidad: 2, horas: 4, precio_unitario: 210000, subtotal: 420000 },
-				{ concepto: "Transporte", cantidad: 1, horas: 1, precio_unitario: 35000, subtotal: 35000 },
-			],
+			lineItems: diaLineItems,
+			documentPayload: {
+				codigo: "C1807-26101",
+				tipo_documento: "Cotización",
+				fecha_envio: "2026-06-10",
+				descripcion: "Evento institucional con factura.",
+				cliente: {
+					nombre: "Andrea Mora",
+					telefono: "87013320",
+					empresa: "No aplica",
+					tel_empresa: "No aplica",
+					tipo_cliente: "escolar",
+				},
+				evento: {
+					tipo: "Institucional",
+					fecha: "2026-07-18",
+					ubicacion: "Curridabat, San José",
+					duracion: "4",
+					homenajeado: "",
+					edad: "",
+					invitados: "180",
+					info_extra: "",
+				},
+				servicios: diaLineItems,
+				totales: {
+					subtotal_sin_iva: 455000,
+					iva: 59150,
+					total: 514150,
+					abono: 257075,
+					pendiente: 257075,
+				},
+			},
 			notes: "Evento institucional con factura.",
 		},
 	});
@@ -249,8 +315,93 @@ async function main() {
 		},
 	});
 
+	// Tareas de ejemplo (manuales y automáticas) asociadas a cliente/evento.
+	await prisma.task.createMany({
+		data: [
+			{
+				title: "Dar seguimiento a la cotización enviada",
+				description: "Cotización enviada hace 24 h sin respuesta del cliente.",
+				dueAt: new Date("2026-06-11T12:00:00Z"),
+				status: "PENDING",
+				origin: "AUTOMATIC",
+				clientId: maria.id,
+				eventId: emma.id,
+			},
+			{
+				title: "Recordar anticipo al cliente",
+				description: "El anticipo del Día familiar escolar vence pronto.",
+				dueAt: new Date("2026-07-01T12:00:00Z"),
+				status: "PENDING",
+				origin: "AUTOMATIC",
+				eventId: diaFamiliar.id,
+			},
+			{
+				title: "Confirmar dirección exacta del evento",
+				dueAt: new Date("2026-07-10T12:00:00Z"),
+				status: "IN_PROGRESS",
+				origin: "MANUAL",
+				eventId: diaFamiliar.id,
+			},
+			{
+				title: "Reactivar cliente sin contacto reciente",
+				description: "Más de 3 meses sin contacto tras su último evento.",
+				status: "PENDING",
+				origin: "AUTOMATIC",
+				clientId: carlos.id,
+			},
+		],
+	});
+
+	// Colaboradores (botargueros / animadores / logística).
+	const luis = await prisma.collaborator.create({
+		data: {
+			firstName: "Luis",
+			lastName: "Alvarado",
+			...mapPhone(phone("+506 7010 5500")),
+			role: "MASCOT_COSTUME",
+			active: true,
+			ratingAverage: 4.8,
+		},
+	});
+	const paola = await prisma.collaborator.create({
+		data: {
+			firstName: "Paola",
+			lastName: "Vargas",
+			...mapPhone(phone("+506 8890 2112")),
+			role: "ENTERTAINER",
+			active: true,
+			ratingAverage: 4.9,
+		},
+	});
+	await prisma.collaborator.create({
+		data: {
+			firstName: "Mauricio",
+			lastName: "Solano",
+			...mapPhone(phone("+506 6222 8300")),
+			role: "LOGISTICS",
+			active: true,
+		},
+	});
+
+	// Asignaciones al evento confirmado, con rol por evento.
+	await prisma.eventAssignment.createMany({
+		data: [
+			{
+				eventId: diaFamiliar.id,
+				collaboratorId: luis.id,
+				roleInEvent: "MASCOT_COSTUME",
+				notes: "Confirmar vestuario del personaje el jueves anterior.",
+			},
+			{
+				eventId: diaFamiliar.id,
+				collaboratorId: paola.id,
+				roleInEvent: "ENTERTAINER",
+			},
+		],
+	});
+
 	console.log(
-		"Seed completado: 4 clientes, 4 eventos, 3 interacciones, 2 cotizaciones, 1 reservación.",
+		"Seed completado: 4 clientes, 4 eventos, 3 interacciones, 2 cotizaciones, 1 reservación, 4 tareas, 3 colaboradores, 2 asignaciones.",
 	);
 }
 
