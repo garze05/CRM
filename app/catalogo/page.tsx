@@ -3,7 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { InventoryThumbnail } from "../components/entity-thumbnail";
 import { StatusBadge } from "../components/status-badge";
-import { inventoryItems } from "../lib/mock-data";
+import {
+	CATALOG_CATEGORY_LABELS,
+	CATALOG_CATEGORY_QUERY,
+} from "../lib/domain/catalog";
+import { listActiveCatalogItems } from "../lib/server/catalog";
 
 export const metadata: Metadata = {
 	title: "Catálogo OkiDoki — Personajes, inflables y animación",
@@ -19,6 +23,7 @@ const CATEGORIES = [
 	{ value: "PERSONAJE", label: "Personajes" },
 	{ value: "INFLABLE", label: "Inflables" },
 	{ value: "DECORACION", label: "Decoración" },
+	{ value: "SERVICIO", label: "Servicios" },
 	{ value: "OTRO", label: "Otros" },
 ] as const;
 
@@ -40,9 +45,11 @@ export default async function PublicCatalogPage({
 	searchParams: Promise<{ categoria?: string }>;
 }) {
 	const { categoria } = await searchParams;
+	const inventoryItems = await listActiveCatalogItems();
+	const categoryFilter = categoria ? CATALOG_CATEGORY_QUERY[categoria] : "";
 
 	const visibleItems = inventoryItems.filter(
-		item => item.active && (!categoria || item.category === categoria),
+		item => !categoryFilter || item.category === categoryFilter,
 	);
 
 	return (
@@ -73,8 +80,7 @@ export default async function PublicCatalogPage({
 					<h1 className='page-heading'>Nuestro catálogo</h1>
 					<p className='mx-auto mt-3 max-w-2xl text-xl font-semibold text-[var(--text-secondary)]'>
 						Personajes, inflables y animación para cumpleaños, eventos
-						escolares y corporativos. Contanos qué celebrás y armamos tu
-						paquete.
+						escolares y corporativos.
 					</p>
 				</section>
 
@@ -125,7 +131,10 @@ export default async function PublicCatalogPage({
 										<h2 className='text-xl font-black text-[var(--text-primary)]'>
 											{item.name}
 										</h2>
-										<StatusBadge value={item.category} />
+										<StatusBadge
+											value={item.category}
+											label={CATALOG_CATEGORY_LABELS[item.category]}
+										/>
 									</div>
 									<p className='mt-2 flex-1 text-base font-semibold text-[var(--text-secondary)]'>
 										{item.description}

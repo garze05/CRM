@@ -2,15 +2,16 @@
 
 import { icons as materialSymbolsIcons } from "@iconify-json/material-symbols";
 import { addCollection, Icon } from "@iconify/react";
-import type { InventoryCategory } from "../lib/mock-data";
+import type { CatalogCategory } from "../lib/domain/catalog";
 
 addCollection(materialSymbolsIcons);
 
-const inventoryCategoryIcons: Record<InventoryCategory, string> = {
-	PERSONAJE: "material-symbols:theater-comedy-rounded",
-	INFLABLE: "material-symbols:attractions-rounded",
-	DECORACION: "material-symbols:celebration-rounded",
-	OTRO: "material-symbols:widgets-rounded",
+const inventoryCategoryIcons: Record<CatalogCategory, string> = {
+	CHARACTER: "material-symbols:theater-comedy-rounded",
+	INFLATABLE: "material-symbols:attractions-rounded",
+	DECORATION: "material-symbols:celebration-rounded",
+	SERVICE: "material-symbols:room-service-rounded",
+	OTHER: "material-symbols:widgets-rounded",
 };
 
 export function InitialsThumbnail({
@@ -41,7 +42,7 @@ export function InventoryThumbnail({
 	category,
 	size = "sm",
 }: {
-	category: InventoryCategory;
+	category: CatalogCategory;
 	size?: "sm" | "lg";
 }) {
 	const iconSize = size === "lg" ? "h-16 w-16" : "h-10 w-10";

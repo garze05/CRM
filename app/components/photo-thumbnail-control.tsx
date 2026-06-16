@@ -3,7 +3,7 @@
 import { icons as materialSymbolsIcons } from "@iconify-json/material-symbols";
 import { addCollection, Icon } from "@iconify/react";
 import { useRef, useState, type ChangeEvent } from "react";
-import type { InventoryCategory } from "../lib/mock-data";
+import type { CatalogCategory } from "../lib/domain/catalog";
 import { InitialsThumbnail, InventoryThumbnail } from "./entity-thumbnail";
 
 addCollection(materialSymbolsIcons);
@@ -22,7 +22,7 @@ type PhotoThumbnailControlProps =
 	| {
 			kind: "inventory";
 			name: string;
-			category: InventoryCategory;
+			category: CatalogCategory;
 	  };
 
 export function PhotoThumbnailControl(props: PhotoThumbnailControlProps) {

@@ -257,7 +257,7 @@ function GlobalSearch() {
 						<input
 							type='search'
 							placeholder='Buscar cliente o evento'
-							className='h-11 w-full rounded-lg border border-[color:var(--border-color)] bg-[#efede8] pl-11 pr-4 text-sm font-bold text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[color:var(--accent-color)] focus:bg-[var(--surface-color)] focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--accent-color)_20%,transparent)]'
+							className='search-control h-11 min-h-11 bg-[#efede8] text-sm'
 						/>
 					</label>
 					<button

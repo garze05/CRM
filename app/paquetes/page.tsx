@@ -2,12 +2,9 @@ import Link from "next/link";
 import { IconLabel } from "../components/icon-label";
 import { PageHeader } from "../components/page-header";
 import { SectionCard } from "../components/section-card";
-
-// Regla del MVP: la aplicación NO asume paquetes ni servicios iniciales.
-// Estas listas se llenan desde el creador de paquetes y la migración de
-// precios del Sheets (fase 2); mientras tanto los estados vacíos guían.
-const packages: never[] = [];
-const services: never[] = [];
+import { StatusBadge } from "../components/status-badge";
+import { formatCrc } from "../lib/format";
+import { listPackages, listServices } from "../lib/server/packages";
 
 export default async function PackagesPage({
 	searchParams,
@@ -16,6 +13,10 @@ export default async function PackagesPage({
 }) {
 	const { tab } = await searchParams;
 	const activeTab = tab === "servicios" ? "servicios" : "paquetes";
+	const [packages, services] = await Promise.all([
+		listPackages(),
+		listServices(),
+	]);
 
 	return (
 		<>
@@ -25,7 +26,7 @@ export default async function PackagesPage({
 					{ label: "Paquetes y servicios" },
 				]}
 				title='Paquetes y servicios'
-				description='La oferta comercial: paquetes por tipo de cliente y servicios adicionales.'
+				description='Oferta comercial y precios base.'
 				actions={
 					<Link
 						href='/paquetes/nuevo'
@@ -84,7 +85,33 @@ export default async function PackagesPage({
 									<IconLabel label='Crear el primer paquete' />
 								</Link>
 							</div>
-						) : null
+						) : (
+							<ul className='grid list-none gap-3 p-0 md:grid-cols-2 xl:grid-cols-3'>
+								{packages.map(item => (
+									<li
+										key={item.id}
+										className='rounded-lg border border-[color:var(--border-color)] bg-[var(--surface-color)] p-4'
+									>
+										<div className='flex items-start justify-between gap-3'>
+											<div>
+												<p className='text-lg font-black text-[var(--text-primary)]'>
+													{item.name}
+												</p>
+												<p className='mt-1 text-base font-semibold text-[var(--text-secondary)]'>
+													{item.durationHours} h · {item.itemCount} ítems
+												</p>
+											</div>
+											<StatusBadge value={item.active ? "ACTIVO" : "PAUSADO"} />
+										</div>
+										<div className='mt-4 grid gap-2 text-base font-bold text-[var(--text-secondary)]'>
+											<span>Familiar: {formatCrc(item.priceFamily)}</span>
+											<span>Educativo: {formatCrc(item.priceEducational)}</span>
+											<span>Corporativo: {formatCrc(item.priceCorporate)}</span>
+										</div>
+									</li>
+								))}
+							</ul>
+						)
 					) : services.length === 0 ? (
 						<div className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-10 text-center'>
 							<p className='text-2xl font-black text-[var(--text-primary)]'>
@@ -97,7 +124,31 @@ export default async function PackagesPage({
 								aquí.
 							</p>
 						</div>
-					) : null}
+					) : (
+						<ul className='grid list-none gap-3 p-0 md:grid-cols-2 xl:grid-cols-3'>
+							{services.map(service => (
+								<li
+									key={service.id}
+									className='rounded-lg border border-[color:var(--border-color)] bg-[var(--surface-color)] p-4'
+								>
+									<div className='flex items-start justify-between gap-3'>
+										<div>
+											<p className='text-lg font-black text-[var(--text-primary)]'>
+												{service.name}
+											</p>
+											<p className='mt-1 text-base font-semibold text-[var(--text-secondary)]'>
+												{service.category ?? "General"} · {service.priceType}
+											</p>
+										</div>
+										<StatusBadge value={service.active ? "ACTIVO" : "PAUSADO"} />
+									</div>
+									<p className='mt-4 text-xl font-black text-[var(--primary-color)]'>
+										{formatCrc(service.unitPrice)}
+									</p>
+								</li>
+							))}
+						</ul>
+					)}
 				</SectionCard>
 			</div>
 		</>

@@ -95,6 +95,54 @@ export async function listAllTasks(): Promise<TaskItem[]> {
 	return tasks.map(t => toTaskItem(t as unknown as TaskRow));
 }
 
+export type TaskEntityOption = {
+	value: string;
+	label: string;
+	group: string;
+};
+
+export async function listTaskEntityOptions(): Promise<TaskEntityOption[]> {
+	const [clients, events, quotes] = await Promise.all([
+		prisma.client.findMany({
+			where: { deletedAt: null },
+			orderBy: { firstName: "asc" },
+			select: { id: true, firstName: true, lastName: true },
+		}),
+		prisma.event.findMany({
+			where: { deletedAt: null },
+			orderBy: [{ eventDate: "desc" }, { createdAt: "desc" }],
+			select: { id: true, name: true },
+		}),
+		prisma.quote.findMany({
+			where: { deletedAt: null },
+			orderBy: { issuedAt: "desc" },
+			select: {
+				quoteNumber: true,
+				eventId: true,
+				event: { select: { name: true } },
+			},
+		}),
+	]);
+
+	return [
+		...clients.map(client => ({
+			value: `client:${client.id}`,
+			label: `${client.firstName} ${client.lastName}`,
+			group: "Clientes",
+		})),
+		...events.map(event => ({
+			value: `event:${event.id}`,
+			label: event.name,
+			group: "Eventos",
+		})),
+		...quotes.map(quote => ({
+			value: `event:${quote.eventId}`,
+			label: `${quote.quoteNumber} · ${quote.event.name}`,
+			group: "Cotizaciones",
+		})),
+	];
+}
+
 export type CreateTaskData = {
 	title: string;
 	description?: string | null;

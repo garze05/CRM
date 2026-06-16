@@ -142,7 +142,26 @@ textarea {
 }
 
 .form-control-with-leading-icon {
-	padding-inline-start: 3.75rem;
+	padding-inline-start: 3.25rem;
+}
+
+.search-control {
+	min-height: 2.75rem;
+	width: 100%;
+	border: 1px solid var(--border-color);
+	border-radius: 8px;
+	background: #f3f0eb;
+	padding-inline: 3.25rem 1rem;
+	color: var(--text-primary);
+	font-size: 1rem;
+	font-weight: 650;
+	outline: none;
+}
+
+.search-control:focus {
+	border-color: var(--accent-color);
+	background: var(--surface-color);
+	box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-color) 22%, transparent);
 }
 
 .form-control:focus {

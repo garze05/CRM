@@ -22,6 +22,7 @@ const badgeStyles: Record<string, string> = {
 	PERSONAJE: "bg-[#ffe2cf] text-[var(--primary-color)]",
 	INFLABLE: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
 	DECORACION: "bg-[#d8f5f2] text-[var(--secondary-color)]",
+	SERVICIO: "bg-[#fff0cf] text-[#6f5600]",
 	OTRO: "bg-[#eee8e1] text-[var(--text-secondary)]",
 	RESERVADO_INVENTARIO: "bg-[#f5ddc8] text-[var(--primary-active)]",
 	MANTENIMIENTO_PENDIENTE: "bg-[#fff0cf] text-[#6f5600]",
@@ -65,6 +66,14 @@ const badgeStyles: Record<string, string> = {
 	// EventType
 	CHILDREN: "bg-[#ffe2cf] text-[var(--primary-color)]",
 	INSTITUTIONAL: "bg-[#d8f5f2] text-[var(--secondary-color)]",
+	// CatalogCategory / availability
+	CHARACTER: "bg-[#ffe2cf] text-[var(--primary-color)]",
+	INFLATABLE: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
+	DECORATION: "bg-[#d8f5f2] text-[var(--secondary-color)]",
+	SERVICE: "bg-[#fff0cf] text-[#6f5600]",
+	AVAILABLE: "bg-[#d8f5f2] text-[var(--secondary-color)]",
+	RESERVED_INVENTORY: "bg-[#f5ddc8] text-[var(--primary-active)]",
+	MAINTENANCE_PENDING: "bg-[#fff0cf] text-[#6f5600]",
 	// VenueType
 	INDOOR: "bg-[#d8f5f2] text-[var(--secondary-color)]",
 	OUTDOOR: "bg-[#d9f8f5] text-[var(--secondary-hover)]",

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { auth } from "../auth";
 import {
 	createTask,
@@ -47,6 +48,7 @@ export async function createTaskAction(
 
 	await createTask({
 		title,
+		description: String(formData.get("description") ?? "").trim() || null,
 		dueAt,
 		ref,
 		createdById: session?.user?.id,
@@ -55,6 +57,35 @@ export async function createTaskAction(
 	if (revalidate) revalidatePath(revalidate);
 	revalidatePath("/tareas");
 	return { ok: true };
+}
+
+function refFromValue(value: string): EntityRef {
+	const [type, id] = value.split(":");
+	if (!id) return {};
+	if (type === "client") return { clientId: id };
+	if (type === "event") return { eventId: id };
+	if (type === "collaborator") return { collaboratorId: id };
+	return {};
+}
+
+export async function createStandaloneTaskAction(formData: FormData): Promise<void> {
+	const title = String(formData.get("title") ?? "").trim();
+	if (!title) return;
+
+	const dueDateRaw = String(formData.get("dueDate") ?? "").trim();
+	const dueAt = dueDateRaw ? new Date(`${dueDateRaw}T12:00:00Z`) : null;
+	const session = await auth();
+
+	await createTask({
+		title,
+		description: String(formData.get("description") ?? "").trim() || null,
+		dueAt,
+		ref: refFromValue(String(formData.get("entity") ?? "")),
+		createdById: session?.user?.id,
+	});
+
+	revalidatePath("/tareas");
+	redirect("/tareas");
 }
 
 export async function completeTaskAction(formData: FormData): Promise<void> {

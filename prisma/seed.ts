@@ -1,5 +1,5 @@
-// Seed de desarrollo — traduce los datos de ejemplo (antes en app/lib/mock-data.ts)
-// al esquema real de Prisma. Idempotente: limpia y recarga las tablas sembradas.
+// Seed de desarrollo sobre el esquema real de Prisma.
+// Idempotente: limpia y recarga las tablas sembradas.
 //
 // Ejecutar: npx prisma db seed
 import { loadEnvFile } from "node:process";
@@ -17,6 +17,7 @@ const adapter = new PrismaPg({
 	connectionString: process.env.DATABASE_URL ?? "",
 });
 const prisma = new PrismaClient({ adapter });
+const purgeOnly = process.argv.includes("--purge");
 
 // Normalización mínima para el seed (números CR conocidos). En el flujo real,
 // el alta de cliente usa normalizePhone() de app/lib/validation/phone.ts; aquí
@@ -28,16 +29,102 @@ function phone(input: string) {
 	return { e164: digits, country: "CR", formatted };
 }
 
-async function main() {
-	// Orden inverso de dependencias para limpiar.
+async function purgeBusinessData() {
+	// Orden inverso de dependencias para limpiar solo datos de negocio/demo.
+	await prisma.payment.deleteMany();
+	await prisma.note.deleteMany();
+	await prisma.auditLog.deleteMany();
 	await prisma.task.deleteMany();
 	await prisma.eventAssignment.deleteMany();
 	await prisma.reservation.deleteMany();
 	await prisma.quote.deleteMany();
 	await prisma.interaction.deleteMany();
+	await prisma.eventCatalogItem.deleteMany();
+	await prisma.eventService.deleteMany();
 	await prisma.event.deleteMany();
 	await prisma.client.deleteMany();
+	await prisma.collaboratorCharacter.deleteMany();
 	await prisma.collaborator.deleteMany();
+	await prisma.packageItem.deleteMany();
+	await prisma.package.deleteMany();
+	await prisma.service.deleteMany();
+	await prisma.catalogItem.deleteMany();
+	await prisma.documentCounter.deleteMany();
+	await prisma.settings.deleteMany();
+}
+
+async function main() {
+	await purgeBusinessData();
+
+	if (purgeOnly) {
+		console.log("Seed purgado: datos de negocio eliminados. Usuarios/auth se conservaron.");
+		return;
+	}
+
+	await prisma.settings.create({ data: {} });
+
+	const princesa = await prisma.catalogItem.create({
+		data: {
+			name: "Princesa Estrella",
+			category: "CHARACTER",
+			description: "Personaje principal para fiestas infantiles con sesión de fotos.",
+			tags: ["princesas", "niñas", "fotos"],
+			hourlyPrice: 90000,
+		},
+	});
+	const superheroe = await prisma.catalogItem.create({
+		data: {
+			name: "Superhéroe Azul",
+			category: "CHARACTER",
+			description: "Botarga de superhéroe con dinámica de juegos.",
+			tags: ["superheroes", "niños", "juegos"],
+			hourlyPrice: 85000,
+		},
+	});
+	const inflable = await prisma.catalogItem.create({
+		data: {
+			name: "Inflable Jungla",
+			category: "INFLATABLE",
+			description: "Inflable mediano para exterior.",
+			tags: ["inflable", "jungla", "exterior"],
+			hourlyPrice: 70000,
+		},
+	});
+
+	const pintacaritas = await prisma.service.create({
+		data: {
+			name: "Pintacaritas",
+			category: "Animación",
+			unitPrice: 35000,
+			priceType: "PER_HOUR",
+		},
+	});
+	await prisma.service.create({
+		data: {
+			name: "Hora adicional",
+			category: "Extensión",
+			unitPrice: 25000,
+			priceType: "PER_HOUR",
+		},
+	});
+
+	await prisma.package.create({
+		data: {
+			name: "Fiesta",
+			description: "Personaje, animación e inflable para fiesta infantil.",
+			durationHours: 3,
+			priceFamily: 150000,
+			priceEducational: 157500,
+			priceCorporate: 165000,
+			items: {
+				create: [
+					{ catalogItemId: princesa.id, quantity: 1 },
+					{ catalogItemId: inflable.id, quantity: 1 },
+					{ serviceId: pintacaritas.id, quantity: 1, hours: 1 },
+				],
+			},
+		},
+	});
 
 	const maria = await prisma.client.create({
 		data: {
@@ -158,6 +245,20 @@ async function main() {
 			honoreeAge: 7,
 			rating: 5,
 		},
+	});
+
+	await prisma.eventCatalogItem.createMany({
+		data: [
+			{ eventId: emma.id, catalogItemId: princesa.id, quantity: 1 },
+			{ eventId: diaFamiliar.id, catalogItemId: princesa.id, quantity: 1 },
+			{ eventId: diaFamiliar.id, catalogItemId: inflable.id, quantity: 1 },
+		],
+	});
+
+	await prisma.eventService.createMany({
+		data: [
+			{ eventId: emma.id, serviceId: pintacaritas.id, quantity: 1, hours: 2 },
+		],
 	});
 
 	// Interacciones de María (actualizan el último contacto en el flujo real).
@@ -383,6 +484,13 @@ async function main() {
 		},
 	});
 
+	await prisma.collaboratorCharacter.createMany({
+		data: [
+			{ collaboratorId: luis.id, catalogItemId: superheroe.id },
+			{ collaboratorId: paola.id, catalogItemId: princesa.id },
+		],
+	});
+
 	// Asignaciones al evento confirmado, con rol por evento.
 	await prisma.eventAssignment.createMany({
 		data: [
@@ -401,7 +509,7 @@ async function main() {
 	});
 
 	console.log(
-		"Seed completado: 4 clientes, 4 eventos, 3 interacciones, 2 cotizaciones, 1 reservación, 4 tareas, 3 colaboradores, 2 asignaciones.",
+		"Seed completado: catálogo, servicios, paquetes, 4 clientes, 4 eventos, 3 interacciones, 2 cotizaciones, 1 reservación, 4 tareas, 3 colaboradores, 2 asignaciones.",
 	);
 }
 

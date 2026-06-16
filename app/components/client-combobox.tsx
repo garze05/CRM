@@ -91,7 +91,7 @@ export function ClientCombobox({
 				<div className='relative'>
 					<Icon
 						icon='material-symbols:search-rounded'
-						className='pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--text-muted)]'
+						className='pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--text-muted)]'
 						aria-hidden='true'
 					/>
 					<input
@@ -111,7 +111,7 @@ export function ClientCombobox({
 						}}
 						onFocus={() => setOpen(true)}
 						onKeyDown={onKeyDown}
-						className='form-control pl-10'
+						className='search-control'
 					/>
 				</div>
 

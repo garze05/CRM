@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { PageHeader } from "../../components/page-header";
 import { PackageBuilder } from "./package-builder";
-import { inventoryItems } from "../../lib/mock-data";
+import { listActiveCatalogItems } from "../../lib/server/catalog";
 
-export default function NewPackagePage() {
+export default async function NewPackagePage() {
+	const inventoryItems = await listActiveCatalogItems();
+
 	return (
 		<>
 			<PageHeader
@@ -13,7 +15,7 @@ export default function NewPackagePage() {
 					{ label: "Crear paquete" },
 				]}
 				title='Crear paquete'
-				description='Componé un paquete desde el catálogo con precio por tipo de cliente.'
+				description='Componé un paquete desde el catálogo.'
 				actions={
 					<Link
 						href='/paquetes'

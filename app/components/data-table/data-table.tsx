@@ -198,7 +198,7 @@ export function DataTable<Row extends { id: string }>({
 						<span className='relative block'>
 							<Icon
 								icon='material-symbols:search-rounded'
-								className='pointer-events-none absolute left-4 top-1/2 h-6 w-6 -translate-y-1/2 text-[var(--text-muted)]'
+								className='pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--text-muted)]'
 								aria-hidden='true'
 							/>
 							<input
@@ -206,7 +206,7 @@ export function DataTable<Row extends { id: string }>({
 								value={globalFilter}
 								onChange={event => setGlobalFilter(event.target.value)}
 								placeholder={searchPlaceholder}
-								className='form-control form-control-with-leading-icon'
+								className='search-control'
 							/>
 						</span>
 					</label>

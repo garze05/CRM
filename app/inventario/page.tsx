@@ -3,15 +3,17 @@ import { IconLabel } from "../components/icon-label";
 import { PageHeader } from "../components/page-header";
 import { SectionCard } from "../components/section-card";
 import { InventoryTable } from "./inventory-table";
-import { inventoryItems } from "../lib/mock-data";
+import { listCatalogItems } from "../lib/server/catalog";
 
-export default function InventoryPage() {
+export default async function InventoryPage() {
+	const inventoryItems = await listCatalogItems();
+
 	return (
 		<>
 			<PageHeader
 				breadcrumb={[{ label: "Inicio", href: "/" }, { label: "Catálogo" }]}
 				title='Catálogo'
-				description='Personajes, inflables y decoración: alimenta las cotizaciones, el creador de paquetes y la vista pública.'
+				description='Personajes, inflables y decoración para cotizaciones y vista pública.'
 				actions={
 					<Link
 						href='/inventario/nuevo'

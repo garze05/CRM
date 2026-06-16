@@ -2,10 +2,7 @@ import Link from "next/link";
 import { IconLabel } from "../components/icon-label";
 import { PageHeader } from "../components/page-header";
 import { SectionCard } from "../components/section-card";
-import {
-	EventsCalendar,
-	type CalendarRange,
-} from "./calendar/events-calendar";
+import { EventsCalendar, type CalendarRange } from "./calendar/events-calendar";
 import type { CalendarEvent } from "./calendar/event-card";
 import { EventsTable } from "./events-table";
 import { listEvents } from "../lib/server/events";
@@ -63,7 +60,7 @@ export default async function EventsPage({
 				<SectionCard>
 					<nav
 						aria-label='Modo de vista'
-						className='mb-5 flex w-fit rounded-full border border-[color:var(--border-color)] bg-[var(--surface-color)] p-1'
+						className='mb-5 flex w-fit bg-[var(--surface-color)] p-1'
 					>
 						<Link
 							href={tableHref}
@@ -74,7 +71,10 @@ export default async function EventsPage({
 									: "text-[var(--text-secondary)] hover:bg-[#f0ebe4]"
 							}`}
 						>
-							<IconLabel icon='material-symbols:table-rows-rounded' label='Tabla' />
+							<IconLabel
+								icon='material-symbols:table-rows-rounded'
+								label='Tabla'
+							/>
 						</Link>
 						<Link
 							href={calendarHref}

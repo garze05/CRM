@@ -34,12 +34,13 @@ export function TaskPanel({
 	);
 	const formRef = useRef<HTMLFormElement>(null);
 
-	// Al guardar con éxito, limpiar y cerrar el mini-form.
 	useEffect(() => {
-		if (state.ok) {
+		if (!state.ok) return;
+		const timer = window.setTimeout(() => {
 			formRef.current?.reset();
 			setOpen(false);
-		}
+		}, 0);
+		return () => window.clearTimeout(timer);
 	}, [state.ok]);
 
 	return (
@@ -49,9 +50,6 @@ export function TaskPanel({
 					<h2 className='text-2xl font-black text-[var(--text-primary)]'>
 						{title}
 					</h2>
-					<p className='mt-1 text-base font-semibold text-[var(--text-secondary)]'>
-						Seguimientos asociados a este registro.
-					</p>
 				</div>
 				<button
 					type='button'

@@ -1,4 +1,9 @@
-import type { ActivityEntry } from "../lib/mock-data";
+export type ActivityEntry = {
+	id: string;
+	actor: string;
+	description: string;
+	timeAgo: string;
+};
 
 /** Actividad reciente del equipo (vista previa de la bitácora de auditoría). */
 export function ActivityFeed({ entries }: { entries: ActivityEntry[] }) {

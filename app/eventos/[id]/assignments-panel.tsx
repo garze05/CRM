@@ -57,10 +57,12 @@ export function AssignmentsPanel({
 	const formRef = useRef<HTMLFormElement>(null);
 
 	useEffect(() => {
-		if (state.ok) {
+		if (!state.ok) return;
+		const timer = window.setTimeout(() => {
 			formRef.current?.reset();
 			setOpen(false);
-		}
+		}, 0);
+		return () => window.clearTimeout(timer);
 	}, [state.ok]);
 
 	return (
@@ -105,10 +107,6 @@ export function AssignmentsPanel({
 						<span>Rol en este evento</span>
 						<RoleSelect name='roleInEvent' />
 					</label>
-					<p className='text-sm font-semibold text-[var(--text-secondary)]'>
-						El rol puede diferir del rol base del colaborador (ej. un animador
-						que esta vez va de botarga).
-					</p>
 					{state.error ? (
 						<p className='text-sm font-bold text-[var(--error-color)]'>
 							{state.error}

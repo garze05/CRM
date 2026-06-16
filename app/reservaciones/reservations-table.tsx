@@ -2,19 +2,14 @@
 
 import {
 	DataTable,
-	formatEnumLabel,
 	type DataTableColumn,
 } from "../components/data-table/data-table";
 import { StatusBadge } from "../components/status-badge";
-import { formatCrc, formatDate, type EventRecord } from "../lib/mock-data";
+import { formatCrc, formatDateKey } from "../lib/format";
+import { PAYMENT_STATUS_LABELS } from "../lib/domain/labels";
+import type { ReservationListRow } from "../lib/server/reservations";
 
-export type ReservationRow = EventRecord & {
-	clientName: string;
-	quoteNumber: string;
-	reservationNumber: string;
-	advancePayment: number;
-	balancePayment: number;
-};
+export type ReservationRow = ReservationListRow;
 
 const columns: DataTableColumn<ReservationRow>[] = [
 	{
@@ -33,8 +28,8 @@ const columns: DataTableColumn<ReservationRow>[] = [
 	{
 		key: "event",
 		header: "Evento",
-		sortValue: row => row.name.toLocaleLowerCase("es"),
-		render: row => row.name,
+		sortValue: row => row.eventName.toLocaleLowerCase("es"),
+		render: row => row.eventName,
 	},
 	{
 		key: "client",
@@ -45,15 +40,20 @@ const columns: DataTableColumn<ReservationRow>[] = [
 	{
 		key: "date",
 		header: "Fecha",
-		sortValue: row => row.date,
-		render: row => formatDate(row.date),
+		sortValue: row => row.eventDate?.getTime() ?? 0,
+		render: row => formatDateKey(row.eventDate),
 	},
 	{
 		key: "payment",
 		header: "Pago",
 		filterValue: row => row.paymentStatus,
-		filterLabel: formatEnumLabel,
-		render: row => <StatusBadge value={row.paymentStatus} />,
+		filterLabel: value => PAYMENT_STATUS_LABELS[value] ?? value,
+		render: row => (
+			<StatusBadge
+				value={row.paymentStatus}
+				label={PAYMENT_STATUS_LABELS[row.paymentStatus]}
+			/>
+		),
 	},
 	{
 		key: "advance",
@@ -86,7 +86,7 @@ export function ReservationsTable({ rows }: { rows: ReservationRow[] }) {
 			searchLabel='Buscar reservación'
 			searchPlaceholder='Código, cliente o evento'
 			searchText={row =>
-				`${row.reservationNumber} ${row.quoteNumber} ${row.name} ${row.clientName}`
+				`${row.reservationNumber} ${row.quoteNumber} ${row.eventName} ${row.clientName}`
 			}
 			emptyTitle='Sin reservaciones todavía'
 			emptyDescription='Las reservaciones se crean al aceptar una cotización.'

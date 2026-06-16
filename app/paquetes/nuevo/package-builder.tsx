@@ -2,15 +2,19 @@
 
 import { addCollection, Icon } from "@iconify/react";
 import { icons as materialSymbolsIcons } from "@iconify-json/material-symbols";
-import { useMemo, useState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { InventoryThumbnail } from "../../components/entity-thumbnail";
 import { StatusBadge } from "../../components/status-badge";
-import type { InventoryItem } from "../../lib/mock-data";
+import {
+	CATALOG_CATEGORY_LABELS,
+	type CatalogListItem,
+} from "../../lib/domain/catalog";
+import { createPackageAction, type PackageFormState } from "../actions";
 
 addCollection(materialSymbolsIcons);
 
 type BuilderLine = {
-	item: InventoryItem;
+	item: CatalogListItem;
 	quantity: number;
 };
 
@@ -19,10 +23,17 @@ type BuilderLine = {
  * Interactivo en el cliente; el guardado real llega con los server actions
  * de la fase 11 (los datos componen el payload de `PackageItem`).
  */
-export function PackageBuilder({ catalog }: { catalog: InventoryItem[] }) {
+const initialState: PackageFormState = {};
+
+export function PackageBuilder({ catalog }: { catalog: CatalogListItem[] }) {
+	const [state, formAction, pending] = useActionState(
+		createPackageAction,
+		initialState,
+	);
 	const [search, setSearch] = useState("");
 	const [lines, setLines] = useState<BuilderLine[]>([]);
 	const [name, setName] = useState("");
+	const [durationHours, setDurationHours] = useState("");
 	const [priceFamily, setPriceFamily] = useState("");
 	const [priceEducational, setPriceEducational] = useState("");
 	const [priceCorporate, setPriceCorporate] = useState("");
@@ -38,7 +49,7 @@ export function PackageBuilder({ catalog }: { catalog: InventoryItem[] }) {
 		);
 	}, [catalog, search]);
 
-	function addItem(item: InventoryItem) {
+	function addItem(item: CatalogListItem) {
 		setLines(current => {
 			const existing = current.find(line => line.item.id === item.id);
 			if (existing) {
@@ -68,6 +79,9 @@ export function PackageBuilder({ catalog }: { catalog: InventoryItem[] }) {
 	if (name.trim() === "") {
 		validationIssues.push("El paquete necesita un nombre.");
 	}
+	if (durationHours.trim() === "" || Number(durationHours) <= 0) {
+		validationIssues.push("Definí la duración incluida.");
+	}
 	if (lines.length === 0) {
 		validationIssues.push("Agregá al menos un ítem del catálogo.");
 	}
@@ -82,14 +96,30 @@ export function PackageBuilder({ catalog }: { catalog: InventoryItem[] }) {
 	}
 
 	return (
-		<div className='grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]'>
+		<form
+			action={formAction}
+			className='grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]'
+		>
+			{lines.map(line => (
+				<input
+					key={line.item.id}
+					type='hidden'
+					name='catalogItemId'
+					value={line.item.id}
+				/>
+			))}
+			{lines.map(line => (
+				<input
+					key={`${line.item.id}-quantity`}
+					type='hidden'
+					name={`quantity:${line.item.id}`}
+					value={line.quantity}
+				/>
+			))}
 			<section className='surface-card min-w-0 p-5'>
 				<h2 className='text-2xl font-black text-[var(--text-primary)]'>
 					Catálogo disponible
 				</h2>
-				<p className='mt-1 text-lg text-[var(--text-secondary)]'>
-					Buscá y agregá personajes, inflables o decoración al paquete.
-				</p>
 
 				<label className='mt-4 block space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 					<span>Buscar en el catálogo</span>
@@ -118,7 +148,10 @@ export function PackageBuilder({ catalog }: { catalog: InventoryItem[] }) {
 									<p className='font-black text-[var(--text-primary)]'>
 										{item.name}
 									</p>
-									<StatusBadge value={item.category} />
+									<StatusBadge
+										value={item.category}
+										label={CATALOG_CATEGORY_LABELS[item.category]}
+									/>
 								</div>
 								<button
 									type='button'
@@ -142,17 +175,29 @@ export function PackageBuilder({ catalog }: { catalog: InventoryItem[] }) {
 				<h2 className='text-2xl font-black text-[var(--text-primary)]'>
 					Composición del paquete
 				</h2>
-				<p className='mt-1 text-lg text-[var(--text-secondary)]'>
-					Nombre, contenido y precio por tipo de cliente.
-				</p>
 
 				<div className='mt-4 grid gap-4'>
 					<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 						<span>Nombre del paquete</span>
 						<input
+							name='name'
 							value={name}
 							onChange={event => setName(event.target.value)}
 							placeholder='Ej. Fiesta Premium'
+							className='form-control'
+						/>
+					</label>
+
+					<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
+						<span>Duración incluida (horas)</span>
+						<input
+							name='durationHours'
+							type='number'
+							min='0.5'
+							step='0.5'
+							value={durationHours}
+							onChange={event => setDurationHours(event.target.value)}
+							placeholder='3'
 							className='form-control'
 						/>
 					</label>
@@ -210,6 +255,7 @@ export function PackageBuilder({ catalog }: { catalog: InventoryItem[] }) {
 							<span>Precio familiar (₡)</span>
 							<input
 								type='number'
+								name='priceFamily'
 								min='0'
 								value={priceFamily}
 								onChange={event => setPriceFamily(event.target.value)}
@@ -221,6 +267,7 @@ export function PackageBuilder({ catalog }: { catalog: InventoryItem[] }) {
 							<span>Precio educativo (₡)</span>
 							<input
 								type='number'
+								name='priceEducational'
 								min='0'
 								value={priceEducational}
 								onChange={event => setPriceEducational(event.target.value)}
@@ -232,6 +279,7 @@ export function PackageBuilder({ catalog }: { catalog: InventoryItem[] }) {
 							<span>Precio corporativo (₡)</span>
 							<input
 								type='number'
+								name='priceCorporate'
 								min='0'
 								value={priceCorporate}
 								onChange={event => setPriceCorporate(event.target.value)}
@@ -268,15 +316,21 @@ export function PackageBuilder({ catalog }: { catalog: InventoryItem[] }) {
 						</p>
 					)}
 
+					{state.error ? (
+						<p className='rounded-lg bg-[#ffe0e3] p-4 text-base font-bold text-[var(--error-color)]'>
+							{state.error}
+						</p>
+					) : null}
+
 					<button
-						type='button'
-						disabled={validationIssues.length > 0}
+						type='submit'
+						disabled={pending || validationIssues.length > 0}
 						className='primary-action min-h-12 w-full rounded-full px-5 py-3 text-base font-black transition disabled:cursor-not-allowed disabled:opacity-50'
 					>
-						Guardar paquete
+						{pending ? "Guardando…" : "Guardar paquete"}
 					</button>
 				</div>
 			</section>
-		</div>
+		</form>
 	);
 }

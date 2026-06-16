@@ -7,43 +7,30 @@ import { PageHeader } from "./components/page-header";
 import { SectionCard } from "./components/section-card";
 import { StatusBadge } from "./components/status-badge";
 import { TaskList } from "./components/task-list";
-import { listAllTasks } from "./lib/server/tasks";
+import { formatCrc, formatDateKey } from "./lib/format";
 import {
-	events,
-	formatCrc,
-	formatDate,
-	getEventClient,
-	pipelineStages,
-	recentActivity,
-} from "./lib/mock-data";
+	PAYMENT_STATUS_LABELS,
+	FUNNEL_STAGE_LABELS,
+} from "./lib/domain/labels";
+import { getDashboardData } from "./lib/server/dashboard";
 
 export default async function Home() {
-	const activeEvents = events.filter(event =>
-		["COTIZADO", "RESERVADO", "CONFIRMADO"].includes(event.pipelineStatus),
-	);
-	const confirmedIncome = events
-		.filter(event => ["CONFIRMADO", "REALIZADO"].includes(event.pipelineStatus))
-		.reduce((total, event) => total + event.estimatedTotal, 0);
-	const projectedIncome = activeEvents.reduce(
-		(total, event) => total + event.estimatedTotal,
-		0,
-	);
-	const nextEvents = events
-		.filter(event =>
-			["RESERVADO", "CONFIRMADO", "COTIZADO"].includes(event.pipelineStatus),
-		)
-		.sort((a, b) => a.date.localeCompare(b.date))
-		.slice(0, 4);
-	const openTasks = (await listAllTasks()).filter(task =>
-		["PENDING", "IN_PROGRESS"].includes(task.status),
-	);
+	const {
+		funnelStages,
+		nextEvents,
+		openTasks,
+		confirmedIncome,
+		projectedIncome,
+		closeRate,
+		recentActivity,
+	} = await getDashboardData();
 
 	return (
 		<>
 			<PageHeader
 				breadcrumb={[{ label: "Inicio" }]}
 				title='Página Principal'
-				description='Qué hay que hacer hoy y cómo va el mes: embudo, eventos próximos y tareas.'
+				description='Embudo, eventos próximos y tareas.'
 				actions={
 					<div className='flex flex-wrap gap-3'>
 						<Link
@@ -69,14 +56,12 @@ export default async function Home() {
 				<div className='min-w-0 space-y-5'>
 					<SectionCard
 						title='Embudo de ventas'
-						description='Eventos activos por etapa este mes. Tocá una etapa para ver su lista.'
 					>
-						<FunnelBoard stages={pipelineStages} />
+						<FunnelBoard stages={funnelStages} />
 					</SectionCard>
 
 					<SectionCard
 						title='Próximos eventos'
-						description='Lo que viene en los siguientes días, con su estado de pago.'
 						action={
 							<Link
 								href='/eventos?vista=calendario'
@@ -91,8 +76,6 @@ export default async function Home() {
 					>
 						<div className='grid gap-3 md:grid-cols-2'>
 							{nextEvents.map(event => {
-								const client = getEventClient(event);
-
 								return (
 									<Link
 										key={event.id}
@@ -105,20 +88,25 @@ export default async function Home() {
 													{event.name}
 												</p>
 												<p className='mt-1 text-base font-semibold text-[var(--text-secondary)]'>
-													{formatDate(event.date)} · {event.startTime}
+													{formatDateKey(event.date)} · {event.startTime || "Sin hora"}
 												</p>
 											</div>
-											<StatusBadge value={event.pipelineStatus} />
+											<StatusBadge
+												value={event.pipelineStatus}
+												label={FUNNEL_STAGE_LABELS[event.pipelineStatus]}
+											/>
 										</div>
 										<p className='mt-3 text-base font-semibold text-[var(--text-secondary)]'>
-											{client
-												? `${client.firstName} ${client.lastName}`
-												: "Sin cliente"}{" "}
-											· {event.venueName}
+											{event.clientName} · {event.venueAddress || "Sin dirección"}
 										</p>
-										<div className='mt-3'>
-											<StatusBadge value={event.paymentStatus} />
-										</div>
+										{event.paymentStatus ? (
+											<div className='mt-3'>
+												<StatusBadge
+													value={event.paymentStatus}
+													label={PAYMENT_STATUS_LABELS[event.paymentStatus]}
+												/>
+											</div>
+										) : null}
 									</Link>
 								);
 							})}
@@ -128,7 +116,7 @@ export default async function Home() {
 					<section className='grid gap-4 md:grid-cols-2 xl:grid-cols-4'>
 						<MetricCard
 							label='Tasa de cierre'
-							value='38%'
+							value={closeRate}
 							helper='Prospectos a eventos realizados'
 							accentColor='var(--secondary-color)'
 						/>
@@ -156,7 +144,6 @@ export default async function Home() {
 				<aside className='min-w-0 space-y-5'>
 					<SectionCard
 						title='Tareas pendientes'
-						description='Recordatorios automáticos y tareas del equipo.'
 						action={
 							<Link
 								href='/tareas'
@@ -171,7 +158,6 @@ export default async function Home() {
 
 					<SectionCard
 						title='Actividad reciente'
-						description='Quién hizo qué y cuándo.'
 					>
 						<ActivityFeed entries={recentActivity} />
 					</SectionCard>
