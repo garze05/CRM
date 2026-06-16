@@ -142,7 +142,7 @@ textarea {
 }
 
 .form-control-with-leading-icon {
-	padding-left: 3rem;
+	padding-inline-start: 3.75rem;
 }
 
 .form-control:focus {
