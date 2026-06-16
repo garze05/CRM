@@ -6,8 +6,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { logout } from "../lib/actions/auth";
 
 addCollection(materialSymbolsIcons);
+
+export type ShellUser = {
+	name: string;
+	email: string;
+	initials: string;
+};
 
 type NavigationItem = {
 	label: string;
@@ -83,12 +90,6 @@ const navigationGroups = [
 		],
 	},
 ];
-
-const mockUser = {
-	name: "Huberth Rodríguez",
-	role: "Administrador",
-	initials: "HR",
-};
 
 const accountItems = [
 	{
@@ -184,18 +185,18 @@ function NavigationContent({ onNavigate }: { onNavigate?: () => void }) {
 	);
 }
 
-function SidebarUser() {
+function SidebarUser({ user }: { user: ShellUser }) {
 	return (
 		<div className='mb-5 flex items-center gap-3'>
 			<div className='grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[var(--accent-color)] text-sm font-black text-[var(--on-accent)]'>
-				{mockUser.initials}
+				{user.initials}
 			</div>
 			<div className='min-w-0'>
 				<p className='truncate text-[0.95rem] font-black text-[var(--primary-color)]'>
-					{mockUser.name}
+					{user.name}
 				</p>
-				<p className='text-sm font-semibold text-[var(--text-secondary)]'>
-					{mockUser.role}
+				<p className='truncate text-xs font-semibold text-[var(--text-secondary)]'>
+					{user.email}
 				</p>
 			</div>
 		</div>
@@ -214,10 +215,16 @@ function AccountActions({ onNavigate }: { onNavigate?: () => void }) {
 	);
 }
 
-function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+function SidebarContent({
+	user,
+	onNavigate,
+}: {
+	user: ShellUser;
+	onNavigate?: () => void;
+}) {
 	return (
 		<>
-			<SidebarUser />
+			<SidebarUser user={user} />
 			<NavigationContent onNavigate={onNavigate} />
 			<AccountActions onNavigate={onNavigate} />
 		</>
@@ -254,17 +261,19 @@ function GlobalSearch() {
 						<span>Voz</span>
 					</button>
 				</div>
-				<Link
-					href='/'
-					className='flex h-11 shrink-0 items-center gap-2 rounded-lg px-3 text-sm font-black text-[var(--text-secondary)] transition hover:bg-[#f0ebe4] hover:text-[var(--primary-color)]'
-				>
-					<Icon
-						icon='material-symbols:logout-rounded'
-						className='h-5 w-5 shrink-0'
-						aria-hidden='true'
-					/>
-					<span>Cerrar sesión</span>
-				</Link>
+				<form action={logout}>
+					<button
+						type='submit'
+						className='flex h-11 shrink-0 items-center gap-2 rounded-lg px-3 text-sm font-black text-[var(--text-secondary)] transition hover:bg-[#f0ebe4] hover:text-[var(--primary-color)]'
+					>
+						<Icon
+							icon='material-symbols:logout-rounded'
+							className='h-5 w-5 shrink-0'
+							aria-hidden='true'
+						/>
+						<span>Cerrar sesión</span>
+					</button>
+				</form>
 			</div>
 		</header>
 	);
@@ -310,12 +319,23 @@ function MobileNavigation() {
 	);
 }
 
-export function CrmShell({ children }: { children: ReactNode }) {
+export function CrmShell({
+	user,
+	children,
+}: {
+	user: ShellUser | null;
+	children: ReactNode;
+}) {
 	const pathname = usePathname();
 
-	// La vista pública del catálogo vive fuera del shell autenticado
-	// (en la fase 1 esto se formaliza con el grupo de rutas (app) + middleware).
-	if (pathname.startsWith("/catalogo")) {
+	// La vista pública del catálogo y el login viven fuera del shell autenticado.
+	// El middleware ya garantiza que el resto de rutas tengan sesión, pero si por
+	// alguna razón no hay usuario, renderizamos el contenido sin shell.
+	if (
+		pathname.startsWith("/catalogo") ||
+		pathname.startsWith("/login") ||
+		!user
+	) {
 		return <main id='contenido-principal'>{children}</main>;
 	}
 
@@ -339,10 +359,13 @@ export function CrmShell({ children }: { children: ReactNode }) {
 							className='h-auto max-h-28 w-full object-contain'
 						/>
 					</Link>
-					<SidebarContent />
+					<SidebarContent user={user} />
 				</aside>
 
-				<section id='contenido-principal' className='flex min-w-0 flex-1 flex-col'>
+				<section
+					id='contenido-principal'
+					className='flex min-w-0 flex-1 flex-col'
+				>
 					<GlobalSearch />
 
 					{children}

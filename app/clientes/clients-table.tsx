@@ -4,19 +4,39 @@ import { DeleteAction } from "../components/delete-action";
 import { InitialsThumbnail } from "../components/entity-thumbnail";
 import {
 	DataTable,
-	formatEnumLabel,
 	type DataTableColumn,
 } from "../components/data-table/data-table";
 import { StatusBadge } from "../components/status-badge";
-import { formatDate, getClientFullName, type Client } from "../lib/mock-data";
+import type { ClientListRow } from "../lib/server/clients";
+import {
+	CLIENT_TYPE_LABELS,
+	FUNNEL_STAGE_LABELS,
+} from "../lib/domain/labels";
 
-export type ClientRow = Client & { eventsCount: number };
+export type ClientRow = ClientListRow;
+
+function fullName(client: ClientRow) {
+	return `${client.firstName} ${client.lastName}`;
+}
+
+function typeLabel(type: string) {
+	return CLIENT_TYPE_LABELS[type as keyof typeof CLIENT_TYPE_LABELS] ?? type;
+}
+
+function formatDate(date: Date) {
+	return new Intl.DateTimeFormat("es-CR", {
+		day: "2-digit",
+		month: "short",
+		year: "numeric",
+		timeZone: "America/Costa_Rica",
+	}).format(date);
+}
 
 const columns: DataTableColumn<ClientRow>[] = [
 	{
 		key: "name",
 		header: "Cliente",
-		sortValue: client => getClientFullName(client).toLocaleLowerCase("es"),
+		sortValue: client => fullName(client).toLocaleLowerCase("es"),
 		render: client => (
 			<div className='flex items-center gap-3'>
 				<InitialsThumbnail
@@ -24,9 +44,9 @@ const columns: DataTableColumn<ClientRow>[] = [
 				/>
 				<div>
 					<p className='font-black text-[var(--text-primary)]'>
-						{getClientFullName(client)}
+						{fullName(client)}
 					</p>
-					<p className='mt-1 text-base'>{client.phone}</p>
+					<p className='mt-1 text-base'>{client.phoneFormatted}</p>
 				</div>
 			</div>
 		),
@@ -35,21 +55,36 @@ const columns: DataTableColumn<ClientRow>[] = [
 		key: "type",
 		header: "Tipo",
 		filterValue: client => client.type,
-		filterLabel: formatEnumLabel,
-		render: client => <StatusBadge value={client.type} />,
+		filterLabel: typeLabel,
+		render: client => (
+			<StatusBadge value={client.type} label={typeLabel(client.type)} />
+		),
 	},
 	{
-		key: "status",
+		key: "stage",
 		header: "Estado",
-		filterValue: client => client.pipelineStatus,
-		filterLabel: formatEnumLabel,
-		render: client => <StatusBadge value={client.pipelineStatus} />,
+		filterValue: client => (client.isRecurring ? "RECURRING" : client.stage),
+		filterLabel: value =>
+			value === "RECURRING"
+				? "Recurrente"
+				: FUNNEL_STAGE_LABELS[value as keyof typeof FUNNEL_STAGE_LABELS] ?? value,
+		render: client => (
+			<div className='flex flex-wrap items-center gap-1.5'>
+				<StatusBadge
+					value={client.stage}
+					label={FUNNEL_STAGE_LABELS[client.stage]}
+				/>
+				{client.isRecurring ? (
+					<StatusBadge value='RECURRING' label='Recurrente' />
+				) : null}
+			</div>
+		),
 	},
 	{
 		key: "lastContact",
 		header: "Último contacto",
-		sortValue: client => client.lastContactDate,
-		render: client => formatDate(client.lastContactDate),
+		sortValue: client => client.lastContactAt.getTime(),
+		render: client => formatDate(client.lastContactAt),
 	},
 	{
 		key: "events",
@@ -79,7 +114,7 @@ export function ClientsTable({ rows }: { rows: ClientRow[] }) {
 			searchLabel='Buscar cliente'
 			searchPlaceholder='Nombre, teléfono o tipo de cliente'
 			searchText={client =>
-				`${getClientFullName(client)} ${client.phone} ${formatEnumLabel(client.type)}`
+				`${fullName(client)} ${client.phoneFormatted} ${typeLabel(client.type)}`
 			}
 			emptyTitle='Sin clientes todavía'
 			emptyDescription='Creá el primer cliente para iniciar el embudo de ventas.'

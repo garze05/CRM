@@ -3,13 +3,10 @@ import { IconLabel } from "../components/icon-label";
 import { PageHeader } from "../components/page-header";
 import { SectionCard } from "../components/section-card";
 import { ClientsTable, type ClientRow } from "./clients-table";
-import { clients, getClientEvents } from "../lib/mock-data";
+import { listClients } from "../lib/server/clients";
 
-export default function ClientsPage() {
-	const rows: ClientRow[] = clients.map(client => ({
-		...client,
-		eventsCount: getClientEvents(client.id).length,
-	}));
+export default async function ClientsPage() {
+	const rows: ClientRow[] = await listClients();
 
 	return (
 		<>

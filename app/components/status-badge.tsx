@@ -45,6 +45,45 @@ const badgeStyles: Record<string, string> = {
 	LLAMADA: "bg-[#fff0cf] text-[#6f5600]",
 	ENTRANTE: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
 	SALIENTE: "bg-[#ffe2cf] text-[var(--primary-color)]",
+
+	// --- Claves en inglés (enums de Prisma) — mismas paletas que sus
+	// equivalentes en español. Permiten pasar el valor real de la BD como
+	// `value` y la etiqueta en español como `label`.
+	// ClientType
+	FAMILY: "bg-[#fff0cf] text-[#6f5600]",
+	EDUCATIONAL: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
+	CORPORATE: "bg-[#f5ddc8] text-[var(--primary-active)]",
+	// FunnelStage
+	PROSPECT: "bg-[#fff0cf] text-[#6f5600]",
+	CONTACTED: "bg-[#ffe2cf] text-[var(--primary-active)]",
+	QUOTED: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
+	RESERVED: "bg-[#ffe2cf] text-[var(--primary-color)]",
+	CONFIRMED: "bg-[#d8f5f2] text-[var(--secondary-color)]",
+	COMPLETED: "bg-[#eee8e1] text-[var(--text-secondary)]",
+	CANCELED: "bg-[#ffe0e3] text-[var(--error-color)]",
+	RECURRING: "bg-[#f5ddc8] text-[var(--primary-active)]",
+	// EventType
+	CHILDREN: "bg-[#ffe2cf] text-[var(--primary-color)]",
+	INSTITUTIONAL: "bg-[#d8f5f2] text-[var(--secondary-color)]",
+	// VenueType
+	INDOOR: "bg-[#d8f5f2] text-[var(--secondary-color)]",
+	OUTDOOR: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
+	// InteractionChannel / Direction
+	PHONE_CALL: "bg-[#fff0cf] text-[#6f5600]",
+	IN_PERSON: "bg-[#eee8e1] text-[var(--text-secondary)]",
+	INBOUND: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
+	OUTBOUND: "bg-[#ffe2cf] text-[var(--primary-color)]",
+	// PaymentStatus
+	PENDING_DEPOSIT: "bg-[#fff0cf] text-[#6f5600]",
+	DEPOSIT_RECEIVED: "bg-[#d8f5f2] text-[var(--secondary-color)]",
+	BALANCE_PENDING: "bg-[#ffe2cf] text-[var(--primary-color)]",
+	FULLY_PAID: "bg-[#f5ddc8] text-[var(--primary-active)]",
+	// QuoteStatus
+	DRAFT: "bg-[#eee8e1] text-[var(--text-secondary)]",
+	SENT: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
+	ACCEPTED: "bg-[#d8f5f2] text-[var(--secondary-color)]",
+	EXPIRED: "bg-[#fff0cf] text-[#6f5600]",
+	REJECTED: "bg-[#ffe0e3] text-[var(--error-color)]",
 };
 
 export function StatusBadge({
