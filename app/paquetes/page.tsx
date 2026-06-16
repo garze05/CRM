@@ -41,7 +41,7 @@ export default async function PackagesPage({
 				<SectionCard>
 					<nav
 						aria-label='Sección de oferta'
-						className='mb-5 flex w-fit rounded-full border border-[color:var(--border-color)] bg-[var(--surface-color)] p-1'
+						className='mb-5 flex w-fit bg-[var(--surface-color)] p-1'
 					>
 						<Link
 							href='/paquetes'
@@ -140,7 +140,9 @@ export default async function PackagesPage({
 												{service.category ?? "General"} · {service.priceType}
 											</p>
 										</div>
-										<StatusBadge value={service.active ? "ACTIVO" : "PAUSADO"} />
+										<StatusBadge
+											value={service.active ? "ACTIVO" : "PAUSADO"}
+										/>
 									</div>
 									<p className='mt-4 text-xl font-black text-[var(--primary-color)]'>
 										{formatCrc(service.unitPrice)}

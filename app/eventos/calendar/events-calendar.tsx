@@ -301,7 +301,7 @@ export function EventsCalendar({
 			<div className='flex flex-wrap items-center justify-between gap-3'>
 				<nav
 					aria-label='Rango del calendario'
-					className='flex rounded-full border border-[color:var(--border-color)] bg-[var(--surface-color)] p-1'
+					className='flex bg-[var(--surface-color)] p-1'
 				>
 					{rangeTabs.map(tab => (
 						<Link
