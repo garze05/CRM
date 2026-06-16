@@ -14,6 +14,7 @@ export type ShellUser = {
 	name: string;
 	email: string;
 	initials: string;
+	image?: string | null;
 };
 
 type NavigationItem = {
@@ -188,9 +189,19 @@ function NavigationContent({ onNavigate }: { onNavigate?: () => void }) {
 function SidebarUser({ user }: { user: ShellUser }) {
 	return (
 		<div className='mb-5 flex items-center gap-3'>
-			<div className='grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[var(--accent-color)] text-sm font-black text-[var(--on-accent)]'>
-				{user.initials}
-			</div>
+			{user.image ? (
+				<Image
+					src={user.image}
+					alt={`Foto de perfil de ${user.name}`}
+					width={44}
+					height={44}
+					className='h-11 w-11 shrink-0 rounded-full object-cover'
+				/>
+			) : (
+				<div className='grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[var(--accent-color)] text-sm font-black text-[var(--on-accent)]'>
+					{user.initials}
+				</div>
+			)}
 			<div className='min-w-0'>
 				<p className='truncate text-[0.95rem] font-black text-[var(--primary-color)]'>
 					{user.name}

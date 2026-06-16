@@ -9,7 +9,9 @@ export const metadata: Metadata = {
 };
 
 function toShellUser(
-  user: { name?: string | null; email?: string | null } | undefined,
+  user:
+    | { name?: string | null; email?: string | null; image?: string | null }
+    | undefined,
 ): ShellUser | null {
   if (!user?.email) return null;
   const name = user.name?.trim() || user.email;
@@ -20,7 +22,7 @@ function toShellUser(
     .join("")
     || user.email[0]?.toUpperCase()
     || "?";
-  return { name, email: user.email, initials };
+  return { name, email: user.email, initials, image: user.image };
 }
 
 export default async function RootLayout({

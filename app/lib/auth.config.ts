@@ -20,6 +20,44 @@ function isPublicPath(pathname: string): boolean {
 	);
 }
 
+function getProfilePicture(profile: unknown): string | null {
+	if (
+		typeof profile === "object" &&
+		profile !== null &&
+		"picture" in profile &&
+		typeof profile.picture === "string"
+	) {
+		return profile.picture;
+	}
+
+	return null;
+}
+
+async function getGoogleUserInfoPicture(
+	accessToken: string | undefined,
+): Promise<string | null> {
+	if (!accessToken) {
+		return null;
+	}
+
+	try {
+		const response = await fetch(
+			"https://openidconnect.googleapis.com/v1/userinfo",
+			{
+				headers: { Authorization: `Bearer ${accessToken}` },
+			},
+		);
+
+		if (!response.ok) {
+			return null;
+		}
+
+		return getProfilePicture(await response.json());
+	} catch {
+		return null;
+	}
+}
+
 export const authConfig = {
 	trustHost: true,
 	session: { strategy: "jwt" },
@@ -29,7 +67,11 @@ export const authConfig = {
 			// access_type=offline + prompt=consent para recibir refresh_token la
 			// primera vez; el id_token llega por el scope openid por defecto.
 			authorization: {
-				params: { access_type: "offline", prompt: "consent" },
+				params: {
+					access_type: "offline",
+					prompt: "consent",
+					scope: "openid email profile",
+				},
 			},
 		}),
 	],
@@ -50,17 +92,29 @@ export const authConfig = {
 			return verified === true && email.endsWith(`@${domain.toLowerCase()}`);
 		},
 		// Persistimos el id_token de Google en el JWT al iniciar sesión.
-		jwt({ token, account }) {
+		async jwt({ token, account, profile, user }) {
+			const profilePicture = getProfilePicture(profile);
+			const userInfoPicture = await getGoogleUserInfoPicture(
+				account?.access_token,
+			);
 			if (account) {
 				token.idToken = account.id_token;
 				// Vencimiento del id_token (epoch segundos) para detectar expiración.
 				token.idTokenExpires = account.expires_at;
 			}
+			token.picture =
+				user?.image ??
+				profilePicture ??
+				userInfoPicture ??
+				token.picture;
 			return token;
 		},
 		session({ session, token }) {
 			if (session.user && token.sub) {
 				session.user.id = token.sub;
+			}
+			if (session.user && typeof token.picture === "string") {
+				session.user.image = token.picture;
 			}
 			return session;
 		},
