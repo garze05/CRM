@@ -359,7 +359,7 @@ export function CrmShell({
 				Saltar al contenido principal
 			</a>
 			<div className='flex min-h-screen'>
-				<aside className='sticky top-0 hidden h-screen w-60 shrink-0 flex-col overflow-y-auto border-r border-[color:var(--border-color)] bg-[var(--surface-color)] px-4 py-5 text-[var(--text-primary)] lg:flex'>
+				<aside className='sticky top-0 hidden h-screen w-70 shrink-0 flex-col overflow-y-auto border-r border-[color:var(--border-color)] bg-[var(--surface-color)] px-4 py-5 text-[var(--text-primary)] lg:flex'>
 					<Link href='/' className='mb-4 block'>
 						<Image
 							src='/okidokicrm_black_logo.png'
@@ -367,7 +367,7 @@ export function CrmShell({
 							width={220}
 							height={80}
 							priority
-							className='h-auto max-h-28 w-full object-contain'
+							className='h-auto max-h-24 w-full object-contain'
 						/>
 					</Link>
 					<SidebarContent user={user} />
