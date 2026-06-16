@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: okidoki-crm-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: okidoki_crm
+      POSTGRES_USER: okidoki
+      POSTGRES_PASSWORD: okidoki
+    volumes:
+      - okidoki_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U okidoki -d okidoki_crm"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  okidoki_postgres_data:

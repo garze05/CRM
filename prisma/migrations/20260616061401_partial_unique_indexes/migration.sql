@@ -1,11 +1,5 @@
--- OkiDoki CRM — Restricciones que Prisma no puede declarar en el schema.
--- Columnas camelCase requieren comillas dobles en PostgreSQL (Prisma no agrega @map
--- a esos campos, por lo que la BD los guarda tal cual: "deletedAt", "eventId", etc.)
---
--- Cómo aplicar:
---   1. npx prisma migrate dev --create-only --name partial_unique_indexes
---   2. Copiar este contenido al migration.sql generado.
---   3. npx prisma migrate dev
+-- Restricciones que Prisma no puede declarar en el schema.
+-- Columnas camelCase requieren comillas dobles en PostgreSQL.
 
 -- Teléfono de cliente único entre clientes NO eliminados (soft delete permite
 -- recrear un cliente cuyo registro anterior fue enviado a papelería).
