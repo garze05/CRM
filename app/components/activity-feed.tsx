@@ -1,38 +1,123 @@
+"use client";
+
+import { useMemo, useState } from "react";
+
 export type ActivityEntry = {
 	id: string;
 	actor: string;
 	description: string;
-	timeAgo: string;
+	occurredAt: string;
+	kind: "Cambios" | "Interacciones" | "Papelera" | "Tareas";
 };
 
-/** Actividad reciente del equipo (vista previa de la bitácora de auditoría). */
+const PAGE_SIZE = 10;
+const FILTERS = ["Todo", "Cambios", "Interacciones", "Papelera", "Tareas"] as const;
+
+function formatActivityDate(value: string) {
+	return new Intl.DateTimeFormat("es-CR", {
+		day: "2-digit",
+		month: "short",
+		hour: "2-digit",
+		minute: "2-digit",
+		timeZone: "America/Costa_Rica",
+	}).format(new Date(value));
+}
+
 export function ActivityFeed({ entries }: { entries: ActivityEntry[] }) {
-	if (entries.length === 0) {
-		return (
-			<p className='text-lg font-semibold text-[var(--text-secondary)]'>
-				Sin actividad registrada todavía.
-			</p>
-		);
+	const [filter, setFilter] = useState<(typeof FILTERS)[number]>("Todo");
+	const [page, setPage] = useState(0);
+
+	const filtered = useMemo(
+		() =>
+			filter === "Todo"
+				? entries
+				: entries.filter(entry => entry.kind === filter),
+		[entries, filter],
+	);
+	const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+	const currentPage = Math.min(page, totalPages - 1);
+	const pageEntries = filtered.slice(
+		currentPage * PAGE_SIZE,
+		currentPage * PAGE_SIZE + PAGE_SIZE,
+	);
+
+	function changeFilter(next: (typeof FILTERS)[number]) {
+		setFilter(next);
+		setPage(0);
 	}
 
 	return (
-		<ol className='list-none space-y-4 p-0'>
-			{entries.map(entry => (
-				<li
-					key={entry.id}
-					className='border-l-4 border-[color:var(--border-color)] pl-3'
+		<div className='flex h-80 min-h-0 flex-col'>
+			<div className='mb-3 flex flex-wrap items-center justify-between gap-2'>
+				<div className='flex flex-wrap gap-1.5'>
+					{FILTERS.map(item => (
+						<button
+							key={item}
+							type='button'
+							onClick={() => changeFilter(item)}
+							className={`min-h-8 rounded-lg border px-3 text-xs font-black transition ${
+								filter === item
+									? "border-transparent bg-[var(--accent-color)] text-[var(--on-accent)]"
+									: "border-[color:var(--border-color)] bg-[var(--surface-color)] text-[var(--text-secondary)] hover:bg-[#f0ebe4]"
+							}`}
+						>
+							{item}
+						</button>
+					))}
+				</div>
+				<p className='text-xs font-bold text-[var(--text-muted)]'>
+					{filtered.length} registros
+				</p>
+			</div>
+
+			{pageEntries.length === 0 ? (
+				<p className='grid flex-1 place-items-center rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] text-sm font-bold text-[var(--text-secondary)]'>
+					Sin actividad registrada.
+				</p>
+			) : (
+				<ol className='min-h-0 flex-1 list-none space-y-2 overflow-y-auto pr-1'>
+					{pageEntries.map(entry => (
+						<li
+							key={entry.id}
+							className='rounded-lg border border-[color:var(--border-color)] bg-[var(--surface-color)] px-3 py-2'
+						>
+							<div className='flex flex-wrap items-center gap-2 text-xs font-black text-[var(--text-muted)]'>
+								<span>{formatActivityDate(entry.occurredAt)}</span>
+								<span>·</span>
+								<span>{entry.kind}</span>
+							</div>
+							<p className='mt-1 text-sm font-semibold leading-5 text-[var(--text-secondary)]'>
+								<span className='font-black text-[var(--text-primary)]'>
+									{entry.actor}
+								</span>{" "}
+								{entry.description}
+							</p>
+						</li>
+					))}
+				</ol>
+			)}
+
+			<div className='mt-3 flex items-center justify-between gap-3 border-t border-[color:var(--border-color)] pt-3'>
+				<button
+					type='button'
+					onClick={() => setPage(value => Math.max(0, value - 1))}
+					disabled={currentPage === 0}
+					className='secondary-action min-h-8 rounded-lg px-3 text-xs font-black transition disabled:opacity-45'
 				>
-					<p className='text-base font-semibold text-[var(--text-secondary)]'>
-						<span className='font-black text-[var(--text-primary)]'>
-							{entry.actor}
-						</span>{" "}
-						{entry.description}
-					</p>
-					<p className='mt-1 text-sm font-bold uppercase text-[var(--text-muted)]'>
-						{entry.timeAgo}
-					</p>
-				</li>
-			))}
-		</ol>
+					Anterior
+				</button>
+				<span className='text-xs font-black text-[var(--text-muted)]'>
+					{currentPage + 1} / {totalPages}
+				</span>
+				<button
+					type='button'
+					onClick={() => setPage(value => Math.min(totalPages - 1, value + 1))}
+					disabled={currentPage >= totalPages - 1}
+					className='secondary-action min-h-8 rounded-lg px-3 text-xs font-black transition disabled:opacity-45'
+				>
+					Siguiente
+				</button>
+			</div>
+		</div>
 	);
 }

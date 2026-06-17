@@ -111,7 +111,9 @@ const columns: DataTableColumn<ClientRow>[] = [
 		key: "action",
 		header: "Acción",
 		width: "minmax(130px, 0.75fr)",
-		render: () => <DeleteAction />,
+		render: client => (
+			<DeleteAction entityType='Client' id={client.id} returnTo='/clientes' />
+		),
 	},
 ];
 

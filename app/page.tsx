@@ -139,6 +139,10 @@ export default async function Home() {
 							accentColor='var(--warning-color)'
 						/>
 					</section>
+
+					<SectionCard title='Actividad reciente'>
+						<ActivityFeed entries={recentActivity} />
+					</SectionCard>
 				</div>
 
 				<aside className='min-w-0 space-y-5'>
@@ -156,11 +160,6 @@ export default async function Home() {
 						<TaskList tasks={openTasks} completeRevalidate='/' />
 					</SectionCard>
 
-					<SectionCard
-						title='Actividad reciente'
-					>
-						<ActivityFeed entries={recentActivity} />
-					</SectionCard>
 				</aside>
 			</div>
 		</>

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "../db";
+import { recordActivity } from "../server/activity";
 
 export type AssignmentState = { error?: string; ok?: boolean };
 
@@ -40,8 +41,15 @@ export async function assignCollaboratorAction(
 	await prisma.eventAssignment.create({
 		data: { eventId, collaboratorId, roleInEvent: roleInEvent as never },
 	});
+	await recordActivity({
+		action: "event.collaborator_assigned",
+		entityType: "Event",
+		entityId: eventId,
+		summary: "asignó un colaborador a un evento",
+	});
 
 	revalidatePath(`/eventos/${eventId}`);
+	revalidatePath("/");
 	return { ok: true };
 }
 
@@ -58,8 +66,17 @@ export async function updateAssignmentRoleAction(
 		where: { id: assignmentId },
 		data: { roleInEvent: roleInEvent as never },
 	});
+	if (eventId) {
+		await recordActivity({
+			action: "event.assignment_role_updated",
+			entityType: "Event",
+			entityId: eventId,
+			summary: "actualizó rol de colaborador en evento",
+		});
+	}
 
 	if (eventId) revalidatePath(`/eventos/${eventId}`);
+	revalidatePath("/");
 }
 
 export async function removeAssignmentAction(formData: FormData): Promise<void> {
@@ -68,6 +85,15 @@ export async function removeAssignmentAction(formData: FormData): Promise<void> 
 	if (!assignmentId) return;
 
 	await prisma.eventAssignment.delete({ where: { id: assignmentId } });
+	if (eventId) {
+		await recordActivity({
+			action: "event.collaborator_removed",
+			entityType: "Event",
+			entityId: eventId,
+			summary: "quitó un colaborador de un evento",
+		});
+	}
 
 	if (eventId) revalidatePath(`/eventos/${eventId}`);
+	revalidatePath("/");
 }

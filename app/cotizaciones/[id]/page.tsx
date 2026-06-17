@@ -8,6 +8,10 @@ import { listTasksForEntity } from "../../lib/server/tasks";
 import { formatCrc, formatDateKey } from "../../lib/format";
 import { QUOTE_STATUS_LABELS } from "../../lib/domain/labels";
 import { PdfPreview } from "./pdf-preview";
+import {
+	moveToTrashAction,
+	updateQuoteDetailAction,
+} from "../../lib/actions/details";
 
 export default async function QuoteDetailPage({
 	params,
@@ -44,9 +48,14 @@ export default async function QuoteDetailPage({
 					/>
 				}
 				actions={
-					<button className='primary-action min-h-12 rounded-full px-5 py-3 text-base font-black transition'>
-						Guardar cambios
-					</button>
+					<form action={moveToTrashAction}>
+						<input type='hidden' name='entityType' value='Quote' />
+						<input type='hidden' name='id' value={quote.id} />
+						<input type='hidden' name='returnTo' value='/cotizaciones' />
+						<button className='secondary-action min-h-12 rounded-full px-5 py-3 text-base font-black text-[var(--error-color)] transition'>
+							Eliminar
+						</button>
+					</form>
 				}
 			/>
 
@@ -61,7 +70,8 @@ export default async function QuoteDetailPage({
 							Documento comercial generado para un evento específico.
 						</p>
 					</div>
-					<form className='grid gap-5 md:grid-cols-2'>
+					<form action={updateQuoteDetailAction} className='grid gap-5 md:grid-cols-2'>
+						<input type='hidden' name='id' value={quote.id} />
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 							<span>Número</span>
 							<input
@@ -72,7 +82,7 @@ export default async function QuoteDetailPage({
 						</label>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 							<span>Estado</span>
-							<select defaultValue={quote.status} className='form-control'>
+							<select name='status' defaultValue={quote.status} className='form-control'>
 								<option value='DRAFT'>Borrador</option>
 								<option value='SENT'>Enviada</option>
 								<option value='ACCEPTED'>Aceptada</option>
@@ -102,6 +112,7 @@ export default async function QuoteDetailPage({
 							<span>Vigencia</span>
 							<input
 								type='date'
+								name='validUntil'
 								defaultValue={validUntilKey}
 								className='form-control'
 							/>
@@ -117,10 +128,14 @@ export default async function QuoteDetailPage({
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
 							<span>Notas visibles para cliente</span>
 							<textarea
+								name='notes'
 								defaultValue={quote.notes ?? ""}
 								className='form-control min-h-28 resize-none py-3 leading-7'
 							/>
 						</label>
+						<button className='primary-action min-h-12 rounded-full px-5 py-3 text-base font-black transition md:col-span-2'>
+							Guardar cambios
+						</button>
 					</form>
 				</section>
 

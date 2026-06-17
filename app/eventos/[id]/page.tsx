@@ -15,6 +15,7 @@ import {
 } from "../../lib/domain/labels";
 import { EventDetailForm } from "./event-detail-form";
 import { AssignmentsPanel, type AssignmentRow } from "./assignments-panel";
+import { moveToTrashAction } from "../../lib/actions/details";
 
 export default async function EventDetailPage({
 	params,
@@ -74,6 +75,16 @@ export default async function EventDetailPage({
 							/>
 						) : null}
 					</div>
+				}
+				actions={
+					<form action={moveToTrashAction}>
+						<input type='hidden' name='entityType' value='Event' />
+						<input type='hidden' name='id' value={event.id} />
+						<input type='hidden' name='returnTo' value='/eventos' />
+						<button className='secondary-action min-h-12 rounded-full px-5 py-3 text-base font-black text-[var(--error-color)] transition'>
+							Eliminar
+						</button>
+					</form>
 				}
 			/>
 

@@ -5,6 +5,10 @@ import { PhoneInput } from "../../components/phone-input";
 import { PhotoThumbnailControl } from "../../components/photo-thumbnail-control";
 import { StatusBadge } from "../../components/status-badge";
 import { TaskPanel } from "../../components/task-panel";
+import {
+	moveToTrashAction,
+	updateClientDetailAction,
+} from "../../lib/actions/details";
 import { getClientDetail } from "../../lib/server/clients";
 import { listTasksForEntity } from "../../lib/server/tasks";
 import {
@@ -85,9 +89,14 @@ export default async function ClientDetailPage({
 				}
 				actions={
 					<div className='grid grid-cols-2 gap-3 sm:flex'>
-						<button className='secondary-action min-h-12 rounded-full px-5 py-3 text-base font-black transition'>
-							Guardar cambios
-						</button>
+						<form action={moveToTrashAction}>
+							<input type='hidden' name='entityType' value='Client' />
+							<input type='hidden' name='id' value={client.id} />
+							<input type='hidden' name='returnTo' value='/clientes' />
+							<button className='secondary-action min-h-12 rounded-full px-5 py-3 text-base font-black text-[var(--error-color)] transition'>
+								Eliminar
+							</button>
+						</form>
 						<Link
 							href={`/eventos/nuevo?cliente=${client.id}`}
 							className='primary-action flex min-h-12 items-center justify-center rounded-full px-5 py-3 text-base font-black transition'
@@ -114,10 +123,12 @@ export default async function ClientDetailPage({
 							<StatusBadge value={client.type} label={typeLabel} />
 						</div>
 
-						<form className='grid gap-5 md:grid-cols-2'>
+						<form action={updateClientDetailAction} className='grid gap-5 md:grid-cols-2'>
+							<input type='hidden' name='id' value={client.id} />
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 								<span>Nombre</span>
 								<input
+									name='firstName'
 									defaultValue={client.firstName}
 									className='form-control'
 								/>
@@ -125,6 +136,7 @@ export default async function ClientDetailPage({
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 								<span>Apellidos</span>
 								<input
+									name='lastName'
 									defaultValue={client.lastName}
 									className='form-control'
 								/>
@@ -136,7 +148,7 @@ export default async function ClientDetailPage({
 							/>
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 								<span>Tipo comercial</span>
-								<select defaultValue={client.type} className='form-control'>
+								<select name='type' defaultValue={client.type} className='form-control'>
 									<option value='FAMILY'>Familiar</option>
 									<option value='EDUCATIONAL'>Educativo</option>
 									<option value='CORPORATE'>Corporativo</option>
@@ -148,10 +160,14 @@ export default async function ClientDetailPage({
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
 								<span>Notas</span>
 								<textarea
+									name='notes'
 									defaultValue={client.notes ?? ""}
 									className='form-control min-h-28 resize-none py-3 leading-7'
 								/>
 							</label>
+							<button className='primary-action min-h-12 rounded-full px-5 py-3 text-base font-black transition md:col-span-2'>
+								Guardar cambios
+							</button>
 						</form>
 					</section>
 

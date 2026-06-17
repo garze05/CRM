@@ -8,25 +8,28 @@ import type { ActivityEntry } from "@/app/components/activity-feed";
 const ACTIVE_STAGES = ["QUOTED", "RESERVED", "CONFIRMED"] as const;
 const CONFIRMED_INCOME_STAGES = ["CONFIRMED", "COMPLETED"] as const;
 
-function daysAgoLabel(date: Date) {
-	const diffMs = Date.now() - date.getTime();
-	const diffDays = Math.max(0, Math.floor(diffMs / 86_400_000));
-	if (diffDays === 0) return "Hoy";
-	if (diffDays === 1) return "Ayer";
-	return `Hace ${diffDays} días`;
+function activityKind(action: string): ActivityEntry["kind"] {
+	if (action.includes("task")) return "Tareas";
+	if (action.includes("trashed") || action.includes("restored")) return "Papelera";
+	return "Cambios";
 }
 
 export async function getDashboardData() {
-	const [events, tasks, interactions] = await Promise.all([
+	const [events, tasks, interactions, auditLogs] = await Promise.all([
 		listEvents(),
 		listAllTasks(),
 		prisma.interaction.findMany({
 			orderBy: { occurredAt: "desc" },
-			take: 6,
+			take: 50,
 			include: {
 				client: { select: { firstName: true, lastName: true } },
 				event: { select: { name: true } },
 			},
+		}),
+		prisma.auditLog.findMany({
+			orderBy: { createdAt: "desc" },
+			take: 50,
+			include: { actor: { select: { name: true, email: true } } },
 		}),
 	]);
 
@@ -54,7 +57,7 @@ export async function getDashboardData() {
 		.sort((a, b) => (a.date || "9999-12-31").localeCompare(b.date || "9999-12-31"))
 		.slice(0, 4);
 
-	const recentActivity: ActivityEntry[] = interactions.map(interaction => {
+	const interactionActivity: ActivityEntry[] = interactions.map(interaction => {
 		const clientName = `${interaction.client.firstName} ${interaction.client.lastName}`;
 		const channel = interaction.channel === "PHONE_CALL" ? "llamada" : "WhatsApp";
 		return {
@@ -63,9 +66,29 @@ export async function getDashboardData() {
 			description: interaction.event
 				? `registró ${channel} en ${interaction.event.name}`
 				: `registró ${channel}`,
-			timeAgo: daysAgoLabel(interaction.occurredAt),
+			occurredAt: interaction.occurredAt.toISOString(),
+			kind: "Interacciones",
 		};
 	});
+	const auditActivity: ActivityEntry[] = auditLogs.map(log => ({
+		id: log.id,
+		actor: log.actor?.name ?? log.actor?.email ?? "Sistema",
+		description:
+			typeof log.context === "object" &&
+			log.context !== null &&
+			"summary" in log.context &&
+			typeof log.context.summary === "string"
+				? log.context.summary
+				: log.action,
+		occurredAt: log.createdAt.toISOString(),
+		kind: activityKind(log.action),
+	}));
+	const recentActivity = [...auditActivity, ...interactionActivity]
+		.sort(
+			(a, b) =>
+				new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime(),
+		)
+		.slice(0, 50);
 
 	return {
 		funnelStages: FUNNEL_STAGES.map(stage => ({

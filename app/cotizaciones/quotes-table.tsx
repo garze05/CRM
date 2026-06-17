@@ -71,7 +71,9 @@ const columns: DataTableColumn<QuoteRow>[] = [
 		key: "action",
 		header: "Acción",
 		width: "minmax(130px, 0.75fr)",
-		render: () => <DeleteAction />,
+		render: quote => (
+			<DeleteAction entityType='Quote' id={quote.id} returnTo='/cotizaciones' />
+		),
 	},
 ];
 

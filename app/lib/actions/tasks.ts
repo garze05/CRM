@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { auth } from "../auth";
+import { recordActivity } from "../server/activity";
+import { prisma } from "../db";
 import {
 	createTask,
 	completeTask,
@@ -53,6 +55,19 @@ export async function createTaskAction(
 		ref,
 		createdById: session?.user?.id,
 	});
+	const entityId = ref.clientId ?? ref.eventId ?? ref.collaboratorId;
+	if (entityId) {
+		await recordActivity({
+			action: "task.created",
+			entityType: ref.clientId
+				? "Client"
+				: ref.eventId
+					? "Event"
+					: "Collaborator",
+			entityId,
+			summary: `creó tarea ${title}`,
+		});
+	}
 
 	if (revalidate) revalidatePath(revalidate);
 	revalidatePath("/tareas");
@@ -91,7 +106,24 @@ export async function createStandaloneTaskAction(formData: FormData): Promise<vo
 export async function completeTaskAction(formData: FormData): Promise<void> {
 	const id = String(formData.get("taskId") ?? "");
 	if (!id) return;
+	const task = await prisma.task.findUnique({
+		where: { id },
+		select: { title: true, clientId: true, eventId: true, collaboratorId: true },
+	});
 	await completeTask(id);
+	const entityId = task?.clientId ?? task?.eventId ?? task?.collaboratorId;
+	if (task && entityId) {
+		await recordActivity({
+			action: "task.completed",
+			entityType: task.clientId
+				? "Client"
+				: task.eventId
+					? "Event"
+					: "Collaborator",
+			entityId,
+			summary: `completó tarea ${task.title}`,
+		});
+	}
 
 	const revalidate = String(formData.get("revalidate") ?? "");
 	if (revalidate) revalidatePath(revalidate);

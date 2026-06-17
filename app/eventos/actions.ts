@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { eventSchema } from "../lib/validation/event";
 import { createEvent, updateEvent } from "../lib/server/events";
+import { recordActivity } from "../lib/server/activity";
 
 const ALL_FUNNEL_STAGES = [
 	"PROSPECT",
@@ -133,7 +134,15 @@ export async function updateEventAction(
 
 	if (!result.ok) return { error: result.error };
 
+	await recordActivity({
+		action: "event.updated",
+		entityType: "Event",
+		entityId: id,
+		summary: `actualizó evento ${name}`,
+	});
+
 	revalidatePath(`/eventos/${id}`);
 	revalidatePath("/eventos");
+	revalidatePath("/");
 	return { ok: true };
 }

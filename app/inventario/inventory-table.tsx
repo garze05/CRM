@@ -80,7 +80,9 @@ const columns: DataTableColumn<CatalogListItem>[] = [
 		key: "action",
 		header: "Acción",
 		width: "minmax(130px, 0.75fr)",
-		render: () => <DeleteAction />,
+		render: item => (
+			<DeleteAction entityType='CatalogItem' id={item.id} returnTo='/inventario' />
+		),
 	},
 ];
 

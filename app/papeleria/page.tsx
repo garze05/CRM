@@ -1,4 +1,3 @@
-import { DeleteAction } from "../components/delete-action";
 import {
 	ManagementTable,
 	type ManagementColumn,
@@ -6,33 +5,11 @@ import {
 import { PageHeader } from "../components/page-header";
 import { SectionCard } from "../components/section-card";
 import { StatusBadge } from "../components/status-badge";
+import { restoreFromTrashAction } from "../lib/actions/details";
+import { formatDateKey } from "../lib/format";
+import { listTrash, type TrashRow } from "../lib/server/trash";
 
-type DeletedResource = {
-	id: string;
-	name: string;
-	module: string;
-	deletedAt: string;
-	status: string;
-};
-
-const deletedResources: DeletedResource[] = [
-	{
-		id: "trash-1",
-		name: "Decoración Arco Fiesta",
-		module: "Inventario",
-		deletedAt: "09 jun 2026",
-		status: "PAUSADO",
-	},
-	{
-		id: "trash-2",
-		name: "Cliente duplicado sin teléfono",
-		module: "Clientes",
-		deletedAt: "08 jun 2026",
-		status: "CANCELADO",
-	},
-];
-
-const columns: ManagementColumn<DeletedResource>[] = [
+const columns: ManagementColumn<TrashRow>[] = [
 	{
 		key: "name",
 		header: "Recurso",
@@ -46,7 +23,7 @@ const columns: ManagementColumn<DeletedResource>[] = [
 	{
 		key: "deletedAt",
 		header: "Eliminado",
-		render: row => row.deletedAt,
+		render: row => formatDateKey(row.deletedAt),
 	},
 	{
 		key: "status",
@@ -58,29 +35,51 @@ const columns: ManagementColumn<DeletedResource>[] = [
 		header: "Acción",
 		width: "minmax(130px, 0.75fr)",
 		render: () => (
-			<DeleteAction
-				icon='material-symbols:restore-from-trash-rounded'
-				label='Restaurar'
-			/>
+			<span />
 		),
 	},
 ];
 
-export default function PaperworkPage() {
+export default async function PaperworkPage() {
+	const deletedResources = await listTrash();
+	const rows = deletedResources.map(row => ({
+		...row,
+		actionNode: (
+			<form action={restoreFromTrashAction}>
+				<input type='hidden' name='entityType' value={row.entityType} />
+				<input type='hidden' name='id' value={row.id} />
+				<button className='secondary-action flex min-h-11 items-center rounded-full px-4 py-2 text-base font-black transition'>
+					Restaurar
+				</button>
+			</form>
+		),
+	}));
+	const tableColumns: ManagementColumn<TrashRow & { actionNode: React.ReactNode }>[] =
+		columns.map(column =>
+			column.key === "action"
+				? { ...column, render: row => row.actionNode }
+				: column,
+		);
+
 	return (
 		<>
 			<PageHeader
 				breadcrumb={[{ label: "Inicio", href: "/" }, { label: "Papelería" }]}
 				title='Papelería'
-				description='Recuperación de recursos removidos por soft delete antes de una limpieza definitiva.'
+				description='Recuperación de registros enviados a papelera.'
 			/>
 
 			<div className='space-y-5 px-5 pb-28 md:px-8 md:pb-8'>
 				<SectionCard
 					title='Recursos eliminados'
-					description='Todas las entidades principales usan soft delete; nada se borra físicamente desde el MVP.'
 				>
-					<ManagementTable columns={columns} rows={deletedResources} />
+					{rows.length === 0 ? (
+						<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-8 text-center text-lg font-bold text-[var(--text-secondary)]'>
+							La papelera está vacía.
+						</p>
+					) : (
+						<ManagementTable columns={tableColumns} rows={rows} />
+					)}
 				</SectionCard>
 			</div>
 		</>

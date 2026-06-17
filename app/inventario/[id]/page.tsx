@@ -7,6 +7,10 @@ import {
 	CATALOG_CATEGORY_LABELS,
 } from "../../lib/domain/catalog";
 import { getCatalogItem } from "../../lib/server/catalog";
+import {
+	moveToTrashAction,
+	updateCatalogItemDetailAction,
+} from "../../lib/actions/details";
 
 export default async function InventoryDetailPage({
 	params,
@@ -42,9 +46,14 @@ export default async function InventoryDetailPage({
 							<StatusBadge value={item.active ? "ACTIVO" : "PAUSADO"} />
 						</div>
 					</div>
-					<button className='primary-action min-h-12 rounded-full px-5 py-3 text-base font-black transition'>
-						Guardar cambios
-					</button>
+					<form action={moveToTrashAction}>
+						<input type='hidden' name='entityType' value='CatalogItem' />
+						<input type='hidden' name='id' value={item.id} />
+						<input type='hidden' name='returnTo' value='/inventario' />
+						<button className='secondary-action min-h-12 rounded-full px-5 py-3 text-base font-black text-[var(--error-color)] transition'>
+							Eliminar
+						</button>
+					</form>
 				</div>
 			</header>
 
@@ -55,14 +64,15 @@ export default async function InventoryDetailPage({
 								Datos del inventario
 							</h2>
 					</div>
-					<form className='grid gap-5 md:grid-cols-2'>
+					<form action={updateCatalogItemDetailAction} className='grid gap-5 md:grid-cols-2'>
+						<input type='hidden' name='id' value={item.id} />
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 							<span>Nombre</span>
-							<input defaultValue={item.name} className='form-control' />
+							<input name='name' defaultValue={item.name} className='form-control' />
 						</label>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 							<span>Categoría</span>
-							<select defaultValue={item.category} className='form-control'>
+							<select name='category' defaultValue={item.category} className='form-control'>
 								<option value='CHARACTER'>Personaje</option>
 								<option value='INFLATABLE'>Inflable</option>
 								<option value='DECORATION'>Decoración</option>
@@ -72,9 +82,9 @@ export default async function InventoryDetailPage({
 						</label>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 							<span>Estado</span>
-							<select defaultValue={item.active ? "ACTIVO" : "PAUSADO"} className='form-control'>
-								<option value='ACTIVO'>Activo</option>
-								<option value='PAUSADO'>Pausado</option>
+							<select name='active' defaultValue={item.active ? "ACTIVE" : "INACTIVE"} className='form-control'>
+								<option value='ACTIVE'>Activo</option>
+								<option value='INACTIVE'>Pausado</option>
 							</select>
 						</label>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
@@ -92,13 +102,17 @@ export default async function InventoryDetailPage({
 							<span>Descripción</span>
 							<textarea
 								defaultValue={item.description}
+								name='description'
 								className='form-control min-h-28 resize-none py-3 leading-7'
 							/>
 						</label>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
 							<span>Etiquetas</span>
-							<input defaultValue={item.tags.join(", ")} className='form-control' />
+							<input name='tags' defaultValue={item.tags.join(", ")} className='form-control' />
 						</label>
+						<button className='primary-action min-h-12 rounded-full px-5 py-3 text-base font-black transition md:col-span-2'>
+							Guardar cambios
+						</button>
 					</form>
 				</section>
 

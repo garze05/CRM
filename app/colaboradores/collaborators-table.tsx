@@ -67,7 +67,13 @@ const columns: DataTableColumn<CollaboratorListRow>[] = [
 		key: "action",
 		header: "Acción",
 		width: "minmax(130px, 0.75fr)",
-		render: () => <DeleteAction />,
+		render: collaborator => (
+			<DeleteAction
+				entityType='Collaborator'
+				id={collaborator.id}
+				returnTo='/colaboradores'
+			/>
+		),
 	},
 ];
 

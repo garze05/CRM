@@ -108,7 +108,9 @@ const columns: DataTableColumn<EventRow>[] = [
 		key: "action",
 		header: "Acción",
 		width: "minmax(130px, 0.75fr)",
-		render: () => <DeleteAction />,
+		render: event => (
+			<DeleteAction entityType='Event' id={event.id} returnTo='/eventos' />
+		),
 	},
 ];
 

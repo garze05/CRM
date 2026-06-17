@@ -8,6 +8,10 @@ import { StatusBadge } from "../../components/status-badge";
 import { getCollaboratorDetail } from "../../lib/server/collaborators";
 import { COLLABORATOR_ROLE_LABELS } from "../../lib/domain/labels";
 import { formatDateKey } from "../../lib/format";
+import {
+	moveToTrashAction,
+	updateCollaboratorDetailAction,
+} from "../../lib/actions/details";
 
 function roleLabel(role: string | null) {
 	if (!role) return "Sin rol";
@@ -63,9 +67,14 @@ export default async function CollaboratorDetailPage({
 					/>
 				}
 				actions={
-					<button className='primary-action min-h-12 rounded-full px-5 py-3 text-base font-black transition'>
-						Guardar cambios
-					</button>
+					<form action={moveToTrashAction}>
+						<input type='hidden' name='entityType' value='Collaborator' />
+						<input type='hidden' name='id' value={collaborator.id} />
+						<input type='hidden' name='returnTo' value='/colaboradores' />
+						<button className='secondary-action min-h-12 rounded-full px-5 py-3 text-base font-black text-[var(--error-color)] transition'>
+							Eliminar
+						</button>
+					</form>
 				}
 			/>
 
@@ -80,10 +89,12 @@ export default async function CollaboratorDetailPage({
 								Perfil operativo para asignación a eventos y disponibilidad.
 							</p>
 						</div>
-						<form className='grid gap-5 md:grid-cols-2'>
+						<form action={updateCollaboratorDetailAction} className='grid gap-5 md:grid-cols-2'>
+							<input type='hidden' name='id' value={collaborator.id} />
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 								<span>Nombre</span>
 								<input
+									name='firstName'
 									defaultValue={collaborator.firstName}
 									className='form-control'
 								/>
@@ -91,6 +102,7 @@ export default async function CollaboratorDetailPage({
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 								<span>Apellidos</span>
 								<input
+									name='lastName'
 									defaultValue={collaborator.lastName}
 									className='form-control'
 								/>
@@ -102,7 +114,7 @@ export default async function CollaboratorDetailPage({
 							/>
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 								<span>Rol base</span>
-								<select defaultValue={collaborator.role} className='form-control'>
+								<select name='role' defaultValue={collaborator.role} className='form-control'>
 									<option value='MASCOT_COSTUME'>Botarga</option>
 									<option value='ENTERTAINER'>Animador</option>
 									<option value='LOGISTICS'>Logística</option>
@@ -115,6 +127,7 @@ export default async function CollaboratorDetailPage({
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 								<span>Estado</span>
 								<select
+									name='active'
 									defaultValue={collaborator.active ? "ACTIVE" : "INACTIVE"}
 									className='form-control'
 								>
@@ -122,6 +135,17 @@ export default async function CollaboratorDetailPage({
 									<option value='INACTIVE'>Inactivo</option>
 								</select>
 							</label>
+							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
+								<span>Notas</span>
+								<textarea
+									name='notes'
+									defaultValue={collaborator.notes ?? ""}
+									className='form-control min-h-28 resize-none py-3 leading-7'
+								/>
+							</label>
+							<button className='primary-action min-h-12 rounded-full px-5 py-3 text-base font-black transition md:col-span-2'>
+								Guardar cambios
+							</button>
 						</form>
 					</section>
 
