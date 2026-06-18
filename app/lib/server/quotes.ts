@@ -19,6 +19,8 @@ const CLIENT_TYPE_TO_API: Record<string, string> = {
 	FAMILY: "familiar",
 	EDUCATIONAL: "escolar",
 	CORPORATE: "corporativo",
+	SHOPPING_CENTER: "centro comercial",
+	ADVERTISING_AGENCY: "agencia de publicidad",
 };
 
 const EVENT_TYPE_TO_LABEL: Record<string, string> = {

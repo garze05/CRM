@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { CrmShell, type ShellUser } from "./components/crm-shell";
+import { ToastProvider } from "./components/toast";
 import { auth } from "./lib/auth";
+import { purgeExpiredTrashIfDue } from "./lib/server/trash";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -32,6 +34,9 @@ export default async function RootLayout({
 }>) {
   const session = await auth();
   const user = toShellUser(session?.user);
+  if (user) {
+    await purgeExpiredTrashIfDue();
+  }
 
   return (
     <html
@@ -39,7 +44,9 @@ export default async function RootLayout({
       className="h-full antialiased"
     >
       <body className="min-h-full flex flex-col">
-        <CrmShell user={user}>{children}</CrmShell>
+        <ToastProvider>
+          <CrmShell user={user}>{children}</CrmShell>
+        </ToastProvider>
       </body>
     </html>
   );

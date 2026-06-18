@@ -6,7 +6,7 @@ import { MetricCard } from "./components/metric-card";
 import { PageHeader } from "./components/page-header";
 import { SectionCard } from "./components/section-card";
 import { StatusBadge } from "./components/status-badge";
-import { TaskList } from "./components/task-list";
+import { TaskPanel } from "./components/task-panel";
 import { formatCrc, formatDateKey } from "./lib/format";
 import {
 	PAYMENT_STATUS_LABELS,
@@ -146,19 +146,12 @@ export default async function Home() {
 				</div>
 
 				<aside className='min-w-0 space-y-5'>
-					<SectionCard
+					<TaskPanel
 						title='Tareas pendientes'
-						action={
-							<Link
-								href='/tareas'
-								className='secondary-action flex min-h-10 w-fit items-center rounded-lg px-4 py-2 text-sm font-black transition'
-							>
-								Ver todas
-							</Link>
-						}
-					>
-						<TaskList tasks={openTasks} completeRevalidate='/' />
-					</SectionCard>
+						tasks={openTasks}
+						revalidatePath='/'
+						viewAllHref='/tareas'
+					/>
 
 				</aside>
 			</div>

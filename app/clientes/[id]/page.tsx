@@ -5,10 +5,9 @@ import { PhoneInput } from "../../components/phone-input";
 import { PhotoThumbnailControl } from "../../components/photo-thumbnail-control";
 import { StatusBadge } from "../../components/status-badge";
 import { TaskPanel } from "../../components/task-panel";
-import {
-	moveToTrashAction,
-	updateClientDetailAction,
-} from "../../lib/actions/details";
+import { updateClientDetailAction } from "../../lib/actions/details";
+import { TrashButton } from "../../components/trash-button";
+import { ClientTypeFields } from "../client-type-fields";
 import { getClientDetail } from "../../lib/server/clients";
 import { listTasksForEntity } from "../../lib/server/tasks";
 import {
@@ -89,14 +88,7 @@ export default async function ClientDetailPage({
 				}
 				actions={
 					<div className='grid grid-cols-2 gap-3 sm:flex'>
-						<form action={moveToTrashAction}>
-							<input type='hidden' name='entityType' value='Client' />
-							<input type='hidden' name='id' value={client.id} />
-							<input type='hidden' name='returnTo' value='/clientes' />
-							<button className='secondary-action min-h-12 rounded-full px-5 py-3 text-base font-black text-[var(--error-color)] transition'>
-								Eliminar
-							</button>
-						</form>
+						<TrashButton entityType='Client' id={client.id} returnTo='/clientes' />
 						<Link
 							href={`/eventos/nuevo?cliente=${client.id}`}
 							className='primary-action flex min-h-12 items-center justify-center rounded-full px-5 py-3 text-base font-black transition'
@@ -146,17 +138,14 @@ export default async function ClientDetailPage({
 								label='Teléfono'
 								defaultValue={client.phone}
 							/>
-							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-								<span>Tipo comercial</span>
-								<select name='type' defaultValue={client.type} className='form-control'>
-									<option value='FAMILY'>Familiar</option>
-									<option value='EDUCATIONAL'>Educativo</option>
-									<option value='CORPORATE'>Corporativo</option>
-								</select>
-								<span className='block text-base font-semibold text-[var(--text-secondary)]'>
-									Se usa para cotizar; no cambia el tipo de cada evento.
-								</span>
-							</label>
+							<div className='contents'>
+								<ClientTypeFields
+									defaultType={client.type}
+									companyName={client.companyName}
+									companyPhone={client.companyPhone}
+									typeHint='Se usa para cotizar; no cambia el tipo de cada evento.'
+								/>
+							</div>
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
 								<span>Notas</span>
 								<textarea

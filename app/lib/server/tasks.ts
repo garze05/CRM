@@ -95,6 +95,22 @@ export async function listAllTasks(): Promise<TaskItem[]> {
 	return tasks.map(t => toTaskItem(t as unknown as TaskRow));
 }
 
+/** Tareas generales: no están asociadas a cliente, evento ni colaborador. */
+export async function listGeneralTasks(): Promise<TaskItem[]> {
+	const tasks = await prisma.task.findMany({
+		where: {
+			deletedAt: null,
+			clientId: null,
+			eventId: null,
+			collaboratorId: null,
+			status: { in: ["PENDING", "IN_PROGRESS"] },
+		},
+		orderBy: [{ dueAt: "asc" }, { createdAt: "desc" }],
+		include: entityInclude,
+	});
+	return tasks.map(t => toTaskItem(t as unknown as TaskRow));
+}
+
 export type TaskEntityOption = {
 	value: string;
 	label: string;

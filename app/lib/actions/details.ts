@@ -4,7 +4,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "../db";
 import { normalizePhone } from "../validation/phone";
+import { currentUserId } from "../server/session";
 import { recordActivity, type EntityType } from "../server/activity";
+import {
+	deleteTrashItemPermanently,
+	type TrashEntityType,
+} from "../server/trash";
 
 function text(formData: FormData, key: string) {
 	return String(formData.get(key) ?? "").trim();
@@ -38,6 +43,12 @@ export async function updateClientDetailAction(
 	const normalized = normalizePhone(phone, "CR");
 	if (!normalized) return;
 
+	// Empresa solo aplica a tipos distintos de Familiar.
+	const isCompany = type !== "FAMILY";
+	const companyPhone = isCompany
+		? normalizePhone(text(formData, "companyPhone"), "CR")
+		: null;
+
 	await prisma.client.update({
 		where: { id },
 		data: {
@@ -47,7 +58,11 @@ export async function updateClientDetailAction(
 			phoneCountry: normalized.country,
 			phoneFormatted: normalized.formatted,
 			type: type as never,
+			companyName: isCompany ? text(formData, "companyName") || null : null,
+			companyPhone: companyPhone?.e164 ?? null,
 			notes: notes || null,
+			// El responsable queda como el usuario de la sesión actual.
+			responsibleId: (await currentUserId()) ?? undefined,
 		},
 	});
 	await touchActivity("client.updated", "Client", id, `actualizó cliente ${firstName} ${lastName}`);
@@ -136,6 +151,156 @@ export async function updateQuoteDetailAction(
 	revalidatePath("/cotizaciones");
 }
 
+export async function moveToTrashNoRedirect(
+	entityType: EntityType,
+	id: string,
+): Promise<{ label: string }> {
+	const now = new Date();
+	let label = "registro";
+
+	if (entityType === "Client") {
+		const row = await prisma.client.update({
+			where: { id },
+			data: { deletedAt: now },
+			select: { firstName: true, lastName: true },
+		});
+		label = `${row.firstName} ${row.lastName}`;
+		revalidatePath("/clientes");
+	} else if (entityType === "Event") {
+		const row = await prisma.event.update({
+			where: { id },
+			data: { deletedAt: now },
+			select: { name: true },
+		});
+		label = row.name;
+		revalidatePath("/eventos");
+	} else if (entityType === "Quote") {
+		const row = await prisma.quote.update({
+			where: { id },
+			data: { deletedAt: now },
+			select: { quoteNumber: true },
+		});
+		label = row.quoteNumber;
+		revalidatePath("/cotizaciones");
+	} else if (entityType === "CatalogItem") {
+		const row = await prisma.catalogItem.update({
+			where: { id },
+			data: { deletedAt: now },
+			select: { name: true },
+		});
+		label = row.name;
+		revalidatePath("/inventario");
+	} else if (entityType === "Collaborator") {
+		const row = await prisma.collaborator.update({
+			where: { id },
+			data: { deletedAt: now },
+			select: { firstName: true, lastName: true },
+		});
+		label = `${row.firstName} ${row.lastName}`;
+		revalidatePath("/colaboradores");
+	}
+
+	await touchActivity(
+		`${entityType.toLowerCase()}.trashed`,
+		entityType,
+		id,
+		`envió a papelera ${label}`,
+	);
+	return { label };
+}
+
+export async function undoTrashAction(
+	entityType: EntityType,
+	id: string,
+): Promise<void> {
+	if (entityType === "Client") {
+		await prisma.client.update({ where: { id }, data: { deletedAt: null } });
+		revalidatePath("/clientes");
+		revalidatePath(`/clientes/${id}`);
+	} else if (entityType === "Event") {
+		await prisma.event.update({ where: { id }, data: { deletedAt: null } });
+		revalidatePath("/eventos");
+		revalidatePath(`/eventos/${id}`);
+	} else if (entityType === "Quote") {
+		await prisma.quote.update({ where: { id }, data: { deletedAt: null } });
+		revalidatePath("/cotizaciones");
+		revalidatePath(`/cotizaciones/${id}`);
+	} else if (entityType === "CatalogItem") {
+		await prisma.catalogItem.update({ where: { id }, data: { deletedAt: null } });
+		revalidatePath("/inventario");
+		revalidatePath(`/inventario/${id}`);
+	} else if (entityType === "Collaborator") {
+		await prisma.collaborator.update({ where: { id }, data: { deletedAt: null } });
+		revalidatePath("/colaboradores");
+		revalidatePath(`/colaboradores/${id}`);
+	} else {
+		return;
+	}
+	await touchActivity(
+		`${entityType.toLowerCase()}.restored`,
+		entityType,
+		id,
+		"deshizo eliminación a papelera",
+	);
+}
+
+export async function restoreNoRedirect(
+	entityType: EntityType,
+	id: string,
+): Promise<{ label: string }> {
+	let label = "registro";
+
+	if (entityType === "Client") {
+		const row = await prisma.client.update({
+			where: { id },
+			data: { deletedAt: null },
+			select: { firstName: true, lastName: true },
+		});
+		label = `${row.firstName} ${row.lastName}`;
+		revalidatePath("/clientes");
+	} else if (entityType === "Event") {
+		const row = await prisma.event.update({
+			where: { id },
+			data: { deletedAt: null },
+			select: { name: true },
+		});
+		label = row.name;
+		revalidatePath("/eventos");
+	} else if (entityType === "Quote") {
+		const row = await prisma.quote.update({
+			where: { id },
+			data: { deletedAt: null },
+			select: { quoteNumber: true },
+		});
+		label = row.quoteNumber;
+		revalidatePath("/cotizaciones");
+	} else if (entityType === "CatalogItem") {
+		const row = await prisma.catalogItem.update({
+			where: { id },
+			data: { deletedAt: null },
+			select: { name: true },
+		});
+		label = row.name;
+		revalidatePath("/inventario");
+	} else if (entityType === "Collaborator") {
+		const row = await prisma.collaborator.update({
+			where: { id },
+			data: { deletedAt: null },
+			select: { firstName: true, lastName: true },
+		});
+		label = `${row.firstName} ${row.lastName}`;
+		revalidatePath("/colaboradores");
+	}
+
+	await touchActivity(
+		`${entityType.toLowerCase()}.restored`,
+		entityType,
+		id,
+		`restauró desde papelera ${label}`,
+	);
+	return { label };
+}
+
 export async function moveToTrashAction(formData: FormData): Promise<void> {
 	const entityType = text(formData, "entityType") as EntityType;
 	const id = text(formData, "id");
@@ -207,4 +372,40 @@ export async function restoreFromTrashAction(formData: FormData): Promise<void> 
 	await touchActivity(`${entityType.toLowerCase()}.restored`, entityType, id, "restauró un registro desde papelera");
 	revalidatePath("/papeleria");
 	redirect("/papeleria");
+}
+
+export async function deletePermanentlyAction(formData: FormData): Promise<void> {
+	const entityType = text(formData, "entityType") as TrashEntityType;
+	const id = text(formData, "id");
+	if (!id) return;
+
+	const label = await deleteTrashItemPermanently(entityType, id);
+	if (!label) return;
+
+	await touchActivity(
+		`${entityType.toLowerCase()}.permanently_deleted`,
+		entityType,
+		id,
+		`eliminó definitivamente ${label}`,
+	);
+	revalidatePath("/papeleria");
+	redirect("/papeleria");
+}
+
+export async function deletePermanentlyNoRedirect(
+	entityType: TrashEntityType,
+	id: string,
+): Promise<{ label: string } | null> {
+	const label = await deleteTrashItemPermanently(entityType, id);
+	if (!label) return null;
+
+	await touchActivity(
+		`${entityType.toLowerCase()}.permanently_deleted`,
+		entityType,
+		id,
+		`eliminó definitivamente ${label}`,
+	);
+	revalidatePath("/papeleria");
+	revalidatePath("/");
+	return { label };
 }

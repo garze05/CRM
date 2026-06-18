@@ -54,6 +54,8 @@ const badgeStyles: Record<string, string> = {
 	FAMILY: "bg-[#fff0cf] text-[#6f5600]",
 	EDUCATIONAL: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
 	CORPORATE: "bg-[#f5ddc8] text-[var(--primary-active)]",
+	SHOPPING_CENTER: "bg-[#e8e0f5] text-[#4a2e7a]",
+	ADVERTISING_AGENCY: "bg-[#f5d9e6] text-[#8a2356]",
 	// FunnelStage
 	PROSPECT: "bg-[#fff0cf] text-[#6f5600]",
 	CONTACTED: "bg-[#ffe2cf] text-[var(--primary-active)]",

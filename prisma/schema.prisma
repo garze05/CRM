@@ -21,10 +21,16 @@ datasource db {
 // Enums
 // ---------------------------------------------------------------------------
 
+/// Tipo comercial del cliente. Determina los recargos por defecto al cotizar
+/// (ver Settings.surcharge*Percent), heredados de REGLAS_DESCUENTO del Sheets.
+/// SHOPPING_CENTER y ADVERTISING_AGENCY se separan de CORPORATE porque tienen
+/// recargo distinto en las reglas originales (10% vs 15%).
 enum ClientType {
   FAMILY
   EDUCATIONAL
   CORPORATE
+  SHOPPING_CENTER
+  ADVERTISING_AGENCY
 }
 
 /// Etapa del embudo de un EVENTO (la oportunidad comercial).
@@ -138,13 +144,14 @@ model User {
   emailVerified DateTime?
   image         String?
 
-  accounts        Account[]
-  sessions        Session[]
-  tasksAssigned   Task[]      @relation("TaskAssignee")
-  tasksCreated    Task[]      @relation("TaskCreator")
-  notes           Note[]
-  interactions    Interaction[]
-  auditLogs       AuditLog[]
+  accounts          Account[]
+  sessions          Session[]
+  tasksAssigned     Task[]      @relation("TaskAssignee")
+  tasksCreated      Task[]      @relation("TaskCreator")
+  notes             Note[]
+  interactions      Interaction[]
+  auditLogs         AuditLog[]
+  clientsResponsible Client[]   @relation("ClientResponsible")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -209,6 +216,12 @@ model Client {
   phoneFormatted String
   type           ClientType
   notes          String?
+  /// Datos de empresa. Solo aplican (y se muestran en la UI) cuando type != FAMILY.
+  companyName    String?
+  companyPhone   String?
+  /// Usuario responsable de la relación. En el alta/edición desde la UI se fija al
+  /// usuario de la sesión actual; en la migración histórica se mapea desde el Sheets.
+  responsibleId  String? @db.Uuid
   /// Cliente con más de 1 evento COMPLETED. Cache mantenido por el servicio de dominio
   /// al marcar eventos como realizados (ver lib/domain — recomputeClientRecurrence).
   isRecurring Boolean @default(false)
@@ -221,6 +234,7 @@ model Client {
   interactions Interaction[]
   tasks        Task[]
   notesLog     Note[]
+  responsible  User?         @relation("ClientResponsible", fields: [responsibleId], references: [id])
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -229,6 +243,7 @@ model Client {
   @@index([phone])
   @@index([type])
   @@index([isRecurring])
+  @@index([responsibleId])
   @@index([deletedAt])
   @@map("clients")
 }
@@ -755,8 +770,12 @@ model Settings {
   /// Tope de descuento acumulado.
   maxDiscountPercent      Decimal @db.Decimal(5, 2) @default(30)
   /// Recargo por tipo de cliente (FAMILIAR = 0 implícito).
-  surchargeEducationalPercent Decimal @db.Decimal(5, 2) @default(5)
-  surchargeCorporatePercent   Decimal @db.Decimal(5, 2) @default(10)
+  /// Defaults heredados de REGLAS_DESCUENTO: Escuela 5%, Empresa 10%,
+  /// Centro Comercial 10%, Agencia de Publicidad 15%.
+  surchargeEducationalPercent    Decimal @db.Decimal(5, 2) @default(5)
+  surchargeCorporatePercent      Decimal @db.Decimal(5, 2) @default(10)
+  surchargeShoppingCenterPercent Decimal @db.Decimal(5, 2) @default(10)
+  surchargeAgencyPercent         Decimal @db.Decimal(5, 2) @default(15)
 
   updatedAt DateTime @updatedAt
 

@@ -8,10 +8,8 @@ import { listTasksForEntity } from "../../lib/server/tasks";
 import { formatCrc, formatDateKey } from "../../lib/format";
 import { QUOTE_STATUS_LABELS } from "../../lib/domain/labels";
 import { PdfPreview } from "./pdf-preview";
-import {
-	moveToTrashAction,
-	updateQuoteDetailAction,
-} from "../../lib/actions/details";
+import { updateQuoteDetailAction } from "../../lib/actions/details";
+import { TrashButton } from "../../components/trash-button";
 
 export default async function QuoteDetailPage({
 	params,
@@ -48,14 +46,7 @@ export default async function QuoteDetailPage({
 					/>
 				}
 				actions={
-					<form action={moveToTrashAction}>
-						<input type='hidden' name='entityType' value='Quote' />
-						<input type='hidden' name='id' value={quote.id} />
-						<input type='hidden' name='returnTo' value='/cotizaciones' />
-						<button className='secondary-action min-h-12 rounded-full px-5 py-3 text-base font-black text-[var(--error-color)] transition'>
-							Eliminar
-						</button>
-					</form>
+					<TrashButton entityType='Quote' id={quote.id} returnTo='/cotizaciones' />
 				}
 			/>
 

@@ -7,10 +7,8 @@ import {
 	CATALOG_CATEGORY_LABELS,
 } from "../../lib/domain/catalog";
 import { getCatalogItem } from "../../lib/server/catalog";
-import {
-	moveToTrashAction,
-	updateCatalogItemDetailAction,
-} from "../../lib/actions/details";
+import { updateCatalogItemDetailAction } from "../../lib/actions/details";
+import { TrashButton } from "../../components/trash-button";
 
 export default async function InventoryDetailPage({
 	params,
@@ -46,14 +44,7 @@ export default async function InventoryDetailPage({
 							<StatusBadge value={item.active ? "ACTIVO" : "PAUSADO"} />
 						</div>
 					</div>
-					<form action={moveToTrashAction}>
-						<input type='hidden' name='entityType' value='CatalogItem' />
-						<input type='hidden' name='id' value={item.id} />
-						<input type='hidden' name='returnTo' value='/inventario' />
-						<button className='secondary-action min-h-12 rounded-full px-5 py-3 text-base font-black text-[var(--error-color)] transition'>
-							Eliminar
-						</button>
-					</form>
+					<TrashButton entityType='CatalogItem' id={item.id} returnTo='/inventario' />
 				</div>
 			</header>
 

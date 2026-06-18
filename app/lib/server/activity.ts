@@ -7,7 +7,8 @@ export type EntityType =
 	| "Event"
 	| "Quote"
 	| "CatalogItem"
-	| "Collaborator";
+	| "Collaborator"
+	| "Task";
 
 export async function recordActivity({
 	action,

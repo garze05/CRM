@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { PhoneInput } from "../../components/phone-input";
 import { SectionCard } from "../../components/section-card";
+import { ClientTypeFields } from "../client-type-fields";
 import { createClientAction, type NewClientState } from "../actions";
 
 const initialState: NewClientState = {};
@@ -61,22 +62,15 @@ export function NewClientForm() {
 						/>
 						<FieldError message={errors?.phone} />
 					</div>
-					<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-						<span>Tipo comercial</span>
-						<select
-							name='type'
-							defaultValue={values?.type ?? "FAMILY"}
-							className='form-control'
-						>
-							<option value='FAMILY'>Familiar</option>
-							<option value='EDUCATIONAL'>Educativo</option>
-							<option value='CORPORATE'>Corporativo</option>
-						</select>
-						<span className='block text-base font-semibold text-[var(--text-secondary)]'>
-							Define la lógica de precios por defecto para sus cotizaciones.
-						</span>
+					<div className='contents'>
+						<ClientTypeFields
+							defaultType={values?.type ?? "FAMILY"}
+							companyName={values?.companyName}
+							companyPhone={values?.companyPhone}
+							typeHint='Define la lógica de precios por defecto para sus cotizaciones.'
+						/>
 						<FieldError message={errors?.type} />
-					</label>
+					</div>
 					<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
 						<span>Notas</span>
 						<textarea

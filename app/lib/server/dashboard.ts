@@ -1,7 +1,7 @@
 import "server-only";
 import { FUNNEL_STAGES } from "../domain/funnel";
 import { listEvents } from "./events";
-import { listAllTasks } from "./tasks";
+import { listGeneralTasks } from "./tasks";
 import { prisma } from "../db";
 import type { ActivityEntry } from "@/app/components/activity-feed";
 
@@ -17,13 +17,13 @@ function activityKind(action: string): ActivityEntry["kind"] {
 export async function getDashboardData() {
 	const [events, tasks, interactions, auditLogs] = await Promise.all([
 		listEvents(),
-		listAllTasks(),
+		listGeneralTasks(),
 		prisma.interaction.findMany({
 			orderBy: { occurredAt: "desc" },
 			take: 50,
 			include: {
 				client: { select: { firstName: true, lastName: true } },
-				event: { select: { name: true } },
+				event: { select: { id: true, name: true } },
 			},
 		}),
 		prisma.auditLog.findMany({
@@ -67,7 +67,8 @@ export async function getDashboardData() {
 				? `registró ${channel} en ${interaction.event.name}`
 				: `registró ${channel}`,
 			occurredAt: interaction.occurredAt.toISOString(),
-			kind: "Interacciones",
+			kind: "Interacciones" as const,
+			source: "interaction" as const,
 		};
 	});
 	const auditActivity: ActivityEntry[] = auditLogs.map(log => ({
@@ -82,6 +83,7 @@ export async function getDashboardData() {
 				: log.action,
 		occurredAt: log.createdAt.toISOString(),
 		kind: activityKind(log.action),
+		source: "audit" as const,
 	}));
 	const recentActivity = [...auditActivity, ...interactionActivity]
 		.sort(
@@ -96,9 +98,7 @@ export async function getDashboardData() {
 			total: events.filter(event => event.pipelineStatus === stage).length,
 		})),
 		nextEvents,
-		openTasks: tasks.filter(task =>
-			["PENDING", "IN_PROGRESS"].includes(task.status),
-		),
+		openTasks: tasks,
 		confirmedIncome,
 		projectedIncome,
 		closeRate,

@@ -185,6 +185,8 @@ const CLIENT_TYPE_LABEL: Record<string, string> = {
 	FAMILY: "Familiar",
 	EDUCATIONAL: "Educativo",
 	CORPORATE: "Corporativo",
+	SHOPPING_CENTER: "Centro Comercial",
+	ADVERTISING_AGENCY: "Agencia de Publicidad",
 };
 
 /** Clientes activos para el combobox del formulario (búsqueda por nombre/teléfono). */

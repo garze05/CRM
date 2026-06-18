@@ -25,7 +25,7 @@ export function ManagementTable<Row extends { id: string }>({
 	return (
 		<div className='max-w-full overflow-x-auto rounded-lg border border-[color:var(--border-color)] bg-[var(--card-color)] shadow-[var(--crisp-shadow)]'>
 			<div
-				className='grid min-w-[860px] bg-[#f0ebe4] px-5 py-4 text-base font-black text-[var(--text-secondary)]'
+				className='grid min-w-[860px] bg-[#f0ebe4] px-5 py-3 text-sm font-black text-[var(--text-secondary)]'
 				style={{ gridTemplateColumns }}
 			>
 				{columns.map(column => (

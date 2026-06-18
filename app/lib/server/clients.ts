@@ -88,7 +88,10 @@ export type CreateClientData = {
 	phoneCountry: string;
 	phoneFormatted: string;
 	type: string;
+	companyName?: string | null;
+	companyPhone?: string | null;
 	notes?: string;
+	responsibleId?: string | null;
 };
 
 export type CreateClientResult =
@@ -122,7 +125,10 @@ export async function createClient(
 			phoneCountry: data.phoneCountry,
 			phoneFormatted: data.phoneFormatted,
 			type: data.type as never,
+			companyName: data.companyName ?? null,
+			companyPhone: data.companyPhone ?? null,
 			notes: data.notes || null,
+			responsibleId: data.responsibleId ?? null,
 		},
 		select: { id: true },
 	});

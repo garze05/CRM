@@ -2,7 +2,11 @@
 
 import { icons as materialSymbolsIcons } from "@iconify-json/material-symbols";
 import { addCollection, Icon } from "@iconify/react";
-import { moveToTrashAction } from "../lib/actions/details";
+import { useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { moveToTrashNoRedirect, undoTrashAction } from "../lib/actions/details";
+import { useToast } from "./toast";
+import type { EntityType } from "../lib/server/activity";
 
 addCollection(materialSymbolsIcons);
 
@@ -15,32 +19,42 @@ export function DeleteAction({
 }: {
 	icon?: string;
 	label?: string;
-	entityType?: "Client" | "Event" | "Quote" | "CatalogItem" | "Collaborator";
+	entityType?: Exclude<EntityType, "Task">;
 	id?: string;
 	returnTo?: string;
 }) {
-	const button = (
-		<button
-			type={entityType && id ? "submit" : "button"}
-			className='cursor-pointer flex min-h-11 items-center gap-2 rounded-full px-4 py-2 text-base font-black text-[var(--primary-color)] transition hover:bg-[#ffe2cf]'
-		>
-			<Icon
-				icon={icon}
-				className='h-5 w-5 shrink-0'
-				aria-hidden='true'
-			/>
-			<span>{label}</span>
-		</button>
-	);
+	const [pending, startTransition] = useTransition();
+	const router = useRouter();
+	const { addToast } = useToast();
 
-	if (!entityType || !id) return button;
+	const disabled = !entityType || !id;
+
+	function handleConfirm() {
+		if (!entityType || !id) return;
+		startTransition(async () => {
+			const { label: entityLabel } = await moveToTrashNoRedirect(entityType, id);
+			addToast({
+				message: `${entityLabel} enviado a la papelera`,
+				type: "trash",
+				onUndo: async () => {
+					await undoTrashAction(entityType, id);
+					router.refresh();
+				},
+			});
+			if (returnTo) router.push(returnTo);
+			else router.refresh();
+		});
+	}
 
 	return (
-		<form action={moveToTrashAction}>
-			<input type='hidden' name='entityType' value={entityType} />
-			<input type='hidden' name='id' value={id} />
-			<input type='hidden' name='returnTo' value={returnTo ?? "/"} />
-			{button}
-		</form>
+		<button
+			type='button'
+			onClick={handleConfirm}
+			disabled={disabled || pending}
+			className='flex min-h-11 cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-base font-black text-[var(--primary-color)] transition hover:bg-[#ffe2cf] disabled:cursor-not-allowed disabled:opacity-60'
+		>
+			<Icon icon={icon} className='h-5 w-5 shrink-0' aria-hidden='true' />
+			<span>{pending ? "Eliminando…" : label}</span>
+		</button>
 	);
 }

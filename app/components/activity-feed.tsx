@@ -1,6 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { icons as materialSymbolsIcons } from "@iconify-json/material-symbols";
+import { addCollection, Icon } from "@iconify/react";
+import { useMemo, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { dismissActivityEntry } from "../lib/actions/activity";
+
+addCollection(materialSymbolsIcons);
 
 export type ActivityEntry = {
 	id: string;
@@ -8,10 +14,13 @@ export type ActivityEntry = {
 	description: string;
 	occurredAt: string;
 	kind: "Cambios" | "Interacciones" | "Papelera" | "Tareas";
+	source: "audit" | "interaction";
 };
 
 const PAGE_SIZE = 10;
 const FILTERS = ["Todo", "Cambios", "Interacciones", "Papelera", "Tareas"] as const;
+const SWIPE_THRESHOLD = 88;
+const MAX_SWIPE = 104;
 
 function formatActivityDate(value: string) {
 	return new Intl.DateTimeFormat("es-CR", {
@@ -21,6 +30,96 @@ function formatActivityDate(value: string) {
 		minute: "2-digit",
 		timeZone: "America/Costa_Rica",
 	}).format(new Date(value));
+}
+
+function SwipeActivityItem({ entry }: { entry: ActivityEntry }) {
+	const [swipeX, setSwipeX] = useState(0);
+	const [isDragging, setIsDragging] = useState(false);
+	const [dismissed, setDismissed] = useState(false);
+	const [, startTransition] = useTransition();
+	const startXRef = useRef<number | null>(null);
+	const swipeXRef = useRef(0);
+	const router = useRouter();
+
+	function startSwipe(clientX: number) {
+		if (dismissed) return;
+		startXRef.current = clientX;
+		setIsDragging(true);
+	}
+
+	function updateSwipe(clientX: number) {
+		if (startXRef.current === null || dismissed) return;
+		const delta = Math.max(0, startXRef.current - clientX);
+		const next = Math.min(MAX_SWIPE, delta);
+		swipeXRef.current = next;
+		setSwipeX(next);
+	}
+
+	function endSwipe() {
+		if (startXRef.current === null) return;
+		startXRef.current = null;
+		setIsDragging(false);
+		if (swipeXRef.current >= SWIPE_THRESHOLD) {
+			swipeXRef.current = 0;
+			setDismissed(true);
+			startTransition(async () => {
+				await dismissActivityEntry(entry.id, entry.source);
+				router.refresh();
+			});
+			return;
+		}
+		swipeXRef.current = 0;
+		setSwipeX(0);
+	}
+
+	if (dismissed) return null;
+
+	return (
+		<li className='relative overflow-hidden rounded-lg border border-[color:var(--border-color)] bg-[#fff4f0]'>
+			<div className='absolute inset-y-0 right-0 flex w-28 items-center justify-center gap-1.5 text-xs font-black text-[var(--error-color)]'>
+				<Icon
+					icon='material-symbols:delete-outline-rounded'
+					className='h-4 w-4 shrink-0'
+					aria-hidden='true'
+				/>
+				<span>Eliminar</span>
+			</div>
+			<div
+				onPointerDown={event => {
+					event.currentTarget.setPointerCapture(event.pointerId);
+					startSwipe(event.clientX);
+				}}
+				onPointerMove={event => updateSwipe(event.clientX)}
+				onPointerUp={endSwipe}
+				onPointerCancel={endSwipe}
+				style={{ transform: `translateX(-${swipeX}px)` }}
+				className={`relative cursor-grab rounded-lg bg-[var(--surface-color)] px-3 py-2 active:cursor-grabbing ${
+					isDragging ? "" : "transition-transform duration-200"
+				}`}
+				aria-label='Deslizar hacia la izquierda para eliminar de la lista'
+			>
+				<div className='flex flex-wrap items-center gap-2 text-xs font-black text-[var(--text-muted)]'>
+					<span>{formatActivityDate(entry.occurredAt)}</span>
+					<span>·</span>
+					<span>{entry.kind}</span>
+					<span className='ml-auto inline-flex items-center gap-1 text-[var(--primary-color)]'>
+						<Icon
+							icon='material-symbols:swipe-left-rounded'
+							className='h-4 w-4'
+							aria-hidden='true'
+						/>
+						<span>Deslizar para borrar</span>
+					</span>
+				</div>
+				<p className='mt-1 text-sm font-semibold leading-5 text-[var(--text-secondary)]'>
+					<span className='font-black text-[var(--text-primary)]'>
+						{entry.actor}
+					</span>{" "}
+					{entry.description}
+				</p>
+			</div>
+		</li>
+	);
 }
 
 export function ActivityFeed({ entries }: { entries: ActivityEntry[] }) {
@@ -77,22 +176,7 @@ export function ActivityFeed({ entries }: { entries: ActivityEntry[] }) {
 			) : (
 				<ol className='min-h-0 flex-1 list-none space-y-2 overflow-y-auto pr-1'>
 					{pageEntries.map(entry => (
-						<li
-							key={entry.id}
-							className='rounded-lg border border-[color:var(--border-color)] bg-[var(--surface-color)] px-3 py-2'
-						>
-							<div className='flex flex-wrap items-center gap-2 text-xs font-black text-[var(--text-muted)]'>
-								<span>{formatActivityDate(entry.occurredAt)}</span>
-								<span>·</span>
-								<span>{entry.kind}</span>
-							</div>
-							<p className='mt-1 text-sm font-semibold leading-5 text-[var(--text-secondary)]'>
-								<span className='font-black text-[var(--text-primary)]'>
-									{entry.actor}
-								</span>{" "}
-								{entry.description}
-							</p>
-						</li>
+						<SwipeActivityItem key={entry.id} entry={entry} />
 					))}
 				</ol>
 			)}

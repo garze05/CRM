@@ -242,7 +242,7 @@ export function DataTable<Row extends { id: string }>({
 			>
 				<div
 					role='row'
-					className='grid min-w-[860px] bg-[#f0ebe4] px-5 py-2 text-base font-black text-[var(--text-secondary)]'
+					className='grid min-w-[860px] bg-[#f0ebe4] px-5 py-2 text-sm font-black text-[var(--text-secondary)]'
 					style={{ gridTemplateColumns }}
 				>
 					{columns.map(column => (

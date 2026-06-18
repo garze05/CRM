@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { clientSchema } from "../lib/validation/client";
 import { normalizePhone } from "../lib/validation/phone";
 import { createClient } from "../lib/server/clients";
+import { currentUserId } from "../lib/server/session";
 
 export type NewClientState = {
 	error?: string;
@@ -14,6 +15,8 @@ export type NewClientState = {
 		lastName: string;
 		phone: string;
 		type: string;
+		companyName: string;
+		companyPhone: string;
 		notes: string;
 	};
 };
@@ -27,6 +30,8 @@ export async function createClientAction(
 		lastName: String(formData.get("lastName") ?? ""),
 		phone: String(formData.get("phone") ?? ""),
 		type: String(formData.get("type") ?? ""),
+		companyName: String(formData.get("companyName") ?? ""),
+		companyPhone: String(formData.get("companyPhone") ?? ""),
 		notes: String(formData.get("notes") ?? ""),
 	};
 
@@ -35,6 +40,8 @@ export async function createClientAction(
 		lastName: raw.lastName,
 		phone: raw.phone,
 		type: raw.type,
+		companyName: raw.companyName,
+		companyPhone: raw.companyPhone,
 		notes: raw.notes,
 	});
 
@@ -62,6 +69,12 @@ export async function createClientAction(
 		};
 	}
 
+	// Empresa solo aplica a tipos distintos de Familiar.
+	const isCompany = parsed.data.type !== "FAMILY";
+	const companyPhone = isCompany
+		? normalizePhone(parsed.data.companyPhone ?? "", "CR")
+		: null;
+
 	const result = await createClient({
 		firstName: parsed.data.firstName,
 		lastName: parsed.data.lastName,
@@ -69,7 +82,10 @@ export async function createClientAction(
 		phoneCountry: normalized.country,
 		phoneFormatted: normalized.formatted,
 		type: parsed.data.type,
+		companyName: isCompany ? parsed.data.companyName || null : null,
+		companyPhone: companyPhone?.e164 ?? null,
 		notes: parsed.data.notes,
+		responsibleId: await currentUserId(),
 	});
 
 	if (!result.ok) {

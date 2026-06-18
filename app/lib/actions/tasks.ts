@@ -10,6 +10,7 @@ import {
 	completeTask,
 	type EntityRef,
 } from "../server/tasks";
+import type { EntityType } from "../server/activity";
 
 export type QuickTaskState = { error?: string; ok?: boolean };
 
@@ -34,6 +35,18 @@ function refFromForm(formData: FormData): {
 	return { ref: {}, revalidate: null };
 }
 
+function activityTargetFromRef(ref: EntityRef, fallbackTaskId: string): {
+	entityType: EntityType;
+	entityId: string;
+} {
+	if (ref.clientId) return { entityType: "Client", entityId: ref.clientId };
+	if (ref.eventId) return { entityType: "Event", entityId: ref.eventId };
+	if (ref.collaboratorId) {
+		return { entityType: "Collaborator", entityId: ref.collaboratorId };
+	}
+	return { entityType: "Task", entityId: fallbackTaskId };
+}
+
 export async function createTaskAction(
 	_prevState: QuickTaskState,
 	formData: FormData,
@@ -46,30 +59,25 @@ export async function createTaskAction(
 	const dueAt = dueDateRaw ? new Date(`${dueDateRaw}T12:00:00Z`) : null;
 
 	const { ref, revalidate } = refFromForm(formData);
+	const explicitRevalidate = String(formData.get("revalidate") ?? "").trim();
 	const session = await auth();
 
-	await createTask({
+	const task = await createTask({
 		title,
 		description: String(formData.get("description") ?? "").trim() || null,
 		dueAt,
 		ref,
 		createdById: session?.user?.id,
 	});
-	const entityId = ref.clientId ?? ref.eventId ?? ref.collaboratorId;
-	if (entityId) {
-		await recordActivity({
-			action: "task.created",
-			entityType: ref.clientId
-				? "Client"
-				: ref.eventId
-					? "Event"
-					: "Collaborator",
-			entityId,
-			summary: `creó tarea ${title}`,
-		});
-	}
+	const activityTarget = activityTargetFromRef(ref, task.id);
+	await recordActivity({
+		action: "task.created",
+		...activityTarget,
+		summary: `creó tarea ${title}`,
+	});
 
-	if (revalidate) revalidatePath(revalidate);
+	if (explicitRevalidate) revalidatePath(explicitRevalidate);
+	else if (revalidate) revalidatePath(revalidate);
 	revalidatePath("/tareas");
 	return { ok: true };
 }
@@ -90,17 +98,69 @@ export async function createStandaloneTaskAction(formData: FormData): Promise<vo
 	const dueDateRaw = String(formData.get("dueDate") ?? "").trim();
 	const dueAt = dueDateRaw ? new Date(`${dueDateRaw}T12:00:00Z`) : null;
 	const session = await auth();
+	const ref = refFromValue(String(formData.get("entity") ?? ""));
 
-	await createTask({
+	const task = await createTask({
 		title,
 		description: String(formData.get("description") ?? "").trim() || null,
 		dueAt,
-		ref: refFromValue(String(formData.get("entity") ?? "")),
+		ref,
 		createdById: session?.user?.id,
+	});
+	const activityTarget = activityTargetFromRef(ref, task.id);
+	await recordActivity({
+		action: "task.created",
+		...activityTarget,
+		summary: `creó tarea ${title}`,
 	});
 
 	revalidatePath("/tareas");
 	redirect("/tareas");
+}
+
+export async function updateTaskAction(formData: FormData): Promise<void> {
+	const id = String(formData.get("taskId") ?? "");
+	if (!id) return;
+
+	const title = String(formData.get("title") ?? "").trim();
+	if (!title) return;
+
+	const dueDateRaw = String(formData.get("dueDate") ?? "").trim();
+	const dueAt = dueDateRaw ? new Date(`${dueDateRaw}T12:00:00Z`) : null;
+	const description = String(formData.get("description") ?? "").trim() || null;
+
+	const task = await prisma.task.findUnique({
+		where: { id },
+		select: {
+			clientId: true,
+			eventId: true,
+			collaboratorId: true,
+		},
+	});
+	if (!task) return;
+
+	await prisma.task.update({
+		where: { id },
+		data: { title, description, dueAt },
+	});
+
+	const activityTarget = activityTargetFromRef(
+		{
+			clientId: task.clientId ?? undefined,
+			eventId: task.eventId ?? undefined,
+			collaboratorId: task.collaboratorId ?? undefined,
+		},
+		id,
+	);
+	await recordActivity({
+		action: "task.updated",
+		...activityTarget,
+		summary: `actualizó tarea ${title}`,
+	});
+
+	const revalidate = String(formData.get("revalidate") ?? "");
+	if (revalidate) revalidatePath(revalidate);
+	revalidatePath("/tareas");
 }
 
 export async function completeTaskAction(formData: FormData): Promise<void> {
@@ -111,16 +171,18 @@ export async function completeTaskAction(formData: FormData): Promise<void> {
 		select: { title: true, clientId: true, eventId: true, collaboratorId: true },
 	});
 	await completeTask(id);
-	const entityId = task?.clientId ?? task?.eventId ?? task?.collaboratorId;
-	if (task && entityId) {
+	if (task) {
+		const activityTarget = activityTargetFromRef(
+			{
+				clientId: task.clientId ?? undefined,
+				eventId: task.eventId ?? undefined,
+				collaboratorId: task.collaboratorId ?? undefined,
+			},
+			id,
+		);
 		await recordActivity({
 			action: "task.completed",
-			entityType: task.clientId
-				? "Client"
-				: task.eventId
-					? "Event"
-					: "Collaborator",
-			entityId,
+			...activityTarget,
 			summary: `completó tarea ${task.title}`,
 		});
 	}

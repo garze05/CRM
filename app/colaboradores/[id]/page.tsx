@@ -5,13 +5,13 @@ import { PhoneInput } from "../../components/phone-input";
 import { PhotoThumbnailControl } from "../../components/photo-thumbnail-control";
 import { StarRating } from "../../components/star-rating";
 import { StatusBadge } from "../../components/status-badge";
+import { TaskPanel } from "../../components/task-panel";
 import { getCollaboratorDetail } from "../../lib/server/collaborators";
+import { listTasksForEntity } from "../../lib/server/tasks";
 import { COLLABORATOR_ROLE_LABELS } from "../../lib/domain/labels";
 import { formatDateKey } from "../../lib/format";
-import {
-	moveToTrashAction,
-	updateCollaboratorDetailAction,
-} from "../../lib/actions/details";
+import { updateCollaboratorDetailAction } from "../../lib/actions/details";
+import { TrashButton } from "../../components/trash-button";
 
 function roleLabel(role: string | null) {
 	if (!role) return "Sin rol";
@@ -29,6 +29,7 @@ export default async function CollaboratorDetailPage({
 	if (!collaborator) {
 		notFound();
 	}
+	const collaboratorTasks = await listTasksForEntity({ collaboratorId: collaborator.id });
 
 	const fullName = `${collaborator.firstName} ${collaborator.lastName}`;
 	const initials = `${collaborator.firstName[0]}${collaborator.lastName[0]}`;
@@ -67,14 +68,7 @@ export default async function CollaboratorDetailPage({
 					/>
 				}
 				actions={
-					<form action={moveToTrashAction}>
-						<input type='hidden' name='entityType' value='Collaborator' />
-						<input type='hidden' name='id' value={collaborator.id} />
-						<input type='hidden' name='returnTo' value='/colaboradores' />
-						<button className='secondary-action min-h-12 rounded-full px-5 py-3 text-base font-black text-[var(--error-color)] transition'>
-							Eliminar
-						</button>
-					</form>
+					<TrashButton entityType='Collaborator' id={collaborator.id} returnTo='/colaboradores' />
 				}
 			/>
 
@@ -284,6 +278,14 @@ export default async function CollaboratorDetailPage({
 							</ul>
 						</section>
 					) : null}
+
+					<TaskPanel
+						title='Tareas del colaborador'
+						entityType='collaborator'
+						entityId={collaborator.id}
+						revalidatePath={`/colaboradores/${collaborator.id}`}
+						tasks={collaboratorTasks}
+					/>
 				</aside>
 			</div>
 		</>
