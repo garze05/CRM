@@ -4,7 +4,9 @@ import { PageHeader } from "../components/page-header";
 import { SectionCard } from "../components/section-card";
 import { StatusBadge } from "../components/status-badge";
 import { formatCrc } from "../lib/format";
+import { SERVICE_PRICE_TYPE_LABELS } from "../lib/domain/package-builder";
 import { listPackages, listServices } from "../lib/server/packages";
+import { PackageItemsDisclosure } from "./package-items-disclosure";
 import { getSettings } from "../lib/server/settings";
 import { packagePriceBreakdown } from "../lib/domain/pricing";
 
@@ -40,12 +42,21 @@ export default async function PackagesPage({
 				title='Paquetes y servicios'
 				description='Oferta comercial y precios base.'
 				actions={
-					<Link
-						href='/paquetes/nuevo'
-						className='primary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
-					>
-						<IconLabel label='Crear paquete' />
-					</Link>
+					activeTab === "servicios" ? (
+						<Link
+							href='/paquetes/servicios/nuevo'
+							className='primary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
+						>
+							<IconLabel label='Crear servicio' />
+						</Link>
+					) : (
+						<Link
+							href='/paquetes/nuevo'
+							className='primary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
+						>
+							<IconLabel label='Crear paquete' />
+						</Link>
+					)
 				}
 			/>
 
@@ -115,6 +126,7 @@ export default async function PackagesPage({
 											</div>
 											<StatusBadge value={item.active ? "ACTIVO" : "PAUSADO"} />
 										</div>
+										<PackageItemsDisclosure items={item.items} />
 										<div className='mt-4 space-y-2 text-base'>
 											<p className='font-black text-[var(--text-primary)]'>
 												Precio base: {formatCrc(item.basePrice)}
@@ -155,11 +167,16 @@ export default async function PackagesPage({
 								Sin servicios adicionales todavía
 							</p>
 							<p className='mx-auto mt-2 max-w-xl text-lg font-semibold text-[var(--text-secondary)]'>
-								Los servicios à la carte (hora adicional, pintacaritas,
-								transporte especial…) se importarán desde el catálogo de precios
-								actual durante la migración de datos, y podrán administrarse
-								aquí.
+								Los servicios à la carte (sonido, animación, inflables, hora
+								adicional…) sirven para armar paquetes o venderse sueltos. Creá
+								el primero para empezar.
 							</p>
+							<Link
+								href='/paquetes/servicios/nuevo'
+								className='primary-action mx-auto mt-5 flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
+							>
+								<IconLabel label='Crear el primer servicio' />
+							</Link>
 						</div>
 					) : (
 						<ul className='grid list-none gap-3 p-0 md:grid-cols-2 xl:grid-cols-3'>
@@ -174,7 +191,9 @@ export default async function PackagesPage({
 												{service.name}
 											</p>
 											<p className='mt-1 text-base font-semibold text-[var(--text-secondary)]'>
-												{service.category ?? "General"} · {service.priceType}
+												{service.category ?? "General"} · Precio{" "}
+												{SERVICE_PRICE_TYPE_LABELS[service.priceType] ??
+													service.priceType}
 											</p>
 										</div>
 										<StatusBadge
@@ -183,7 +202,17 @@ export default async function PackagesPage({
 									</div>
 									<p className='mt-4 text-xl font-black text-[var(--primary-color)]'>
 										{formatCrc(service.unitPrice)}
+										{service.priceType === "PER_HOUR" ? "/h" : ""}
 									</p>
+									<Link
+										href={`/paquetes/servicios/${service.id}/editar`}
+										className='secondary-action mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-full px-4 py-2 text-base font-black transition'
+									>
+										<IconLabel
+											icon='material-symbols:edit-rounded'
+											label='Editar servicio'
+										/>
+									</Link>
 								</li>
 							))}
 						</ul>

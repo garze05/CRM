@@ -2,8 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "../../../components/page-header";
 import { PackageBuilder } from "../../nuevo/package-builder";
-import { listActiveCatalogItems } from "../../../lib/server/catalog";
-import { getPackageForEdit } from "../../../lib/server/packages";
+import {
+	getPackageForEdit,
+	listPackageBuilderEntries,
+} from "../../../lib/server/packages";
+import { getSettings } from "../../../lib/server/settings";
 
 export default async function EditPackagePage({
 	params,
@@ -11,12 +14,21 @@ export default async function EditPackagePage({
 	params: Promise<{ id: string }>;
 }) {
 	const { id } = await params;
-	const [pkg, inventoryItems] = await Promise.all([
+	const [pkg, entries, settings] = await Promise.all([
 		getPackageForEdit(id),
-		listActiveCatalogItems(),
+		listPackageBuilderEntries(),
+		getSettings(),
 	]);
 
 	if (!pkg) notFound();
+
+	const builderSettings = {
+		quantityDiscountPercent: Number(settings.quantityDiscountPercent),
+		hoursDiscountPercent: Number(settings.hoursDiscountPercent),
+		hoursDiscountMinHours: Number(settings.hoursDiscountMinHours),
+		maxDiscountPercent: Number(settings.maxDiscountPercent),
+		priceRoundingTo: settings.priceRoundingTo,
+	};
 
 	return (
 		<>
@@ -40,7 +52,8 @@ export default async function EditPackagePage({
 
 			<div className='px-5 pb-28 md:px-8 md:pb-8'>
 				<PackageBuilder
-					catalog={inventoryItems}
+					entries={entries}
+					settings={builderSettings}
 					mode='edit'
 					packageId={pkg.id}
 					initialLines={pkg.lines}

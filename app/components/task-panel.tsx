@@ -71,14 +71,14 @@ export function TaskPanel({
 						/>
 						<span>{open ? "Cerrar" : "Agregar"}</span>
 					</button>
-					{viewAllHref ? (
+					{/* {viewAllHref ? (
 						<Link
 							href={viewAllHref}
 							className='secondary-action flex min-h-11 items-center justify-center rounded-full px-4 py-2 text-sm font-black transition sm:text-base'
 						>
 							Ver todas
 						</Link>
-					) : null}
+					) : null} */}
 				</div>
 			</div>
 

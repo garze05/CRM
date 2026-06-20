@@ -2,7 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createPackage, updatePackage } from "../lib/server/packages";
+import {
+	createPackage,
+	updatePackage,
+	type PackageItemInput,
+} from "../lib/server/packages";
 
 export type PackageFormState = { error?: string };
 
@@ -15,8 +19,23 @@ type ParsedPackageForm = {
 	name: string;
 	durationHours: number;
 	basePrice: number;
-	items: { catalogItemId: string; quantity: number }[];
+	items: PackageItemInput[];
 };
+
+/**
+ * Cada línea viaja como un input oculto `item` con valor "kind:id:quantity"
+ * (kind = "catalog" | "service"). Los UUID no contienen ":", así que es seguro.
+ */
+function parseItem(raw: string): PackageItemInput | null {
+	const [kind, id, quantityRaw] = raw.split(":");
+	if ((kind !== "catalog" && kind !== "service") || !id) return null;
+	const quantity = Number(quantityRaw);
+	return {
+		kind,
+		id,
+		quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : 1,
+	};
+}
 
 function parsePackageForm(
 	formData: FormData,
@@ -24,17 +43,11 @@ function parsePackageForm(
 	const name = String(formData.get("name") ?? "").trim();
 	const durationHours = positiveNumber(formData.get("durationHours"));
 	const basePrice = positiveNumber(formData.get("basePrice"));
-	const rawItems = formData.getAll("catalogItemId").map(String);
-
-	const items = rawItems
-		.map(id => {
-			const quantity = Number(formData.get(`quantity:${id}`) ?? "1");
-			return {
-				catalogItemId: id,
-				quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : 1,
-			};
-		})
-		.filter(item => item.catalogItemId);
+	const items = formData
+		.getAll("item")
+		.map(String)
+		.map(parseItem)
+		.filter((item): item is PackageItemInput => item != null);
 
 	if (!name) return { error: "El paquete necesita un nombre." };
 	if (!durationHours) return { error: "Definí la duración incluida." };

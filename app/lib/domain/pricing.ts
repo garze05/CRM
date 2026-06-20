@@ -106,3 +106,91 @@ export function packagePriceBreakdown(
     price: effectivePackagePrice(basePrice, clientType, settings),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Precio base sugerido de un paquete (suma de sus componentes)
+//
+// Porta la lógica de descuentos del motor de cotización (Quotation API,
+// cotizador_okidoki.py): por cada ítem el subtotal es
+//   precio × (1 − descuento) × horas × cantidad
+// donde el descuento aplicable = max(
+//   descuento por cantidad (solo del 2.º+ ítem de un mismo grupo/categoría),
+//   descuento por horas (si la duración alcanza el mínimo),
+// ) topado en maxDiscountPercent.
+//
+// El precio base del paquete es el precio FAMILIAR (sin recargo por tipo de
+// cliente); el recargo se aplica después con packagePriceBreakdown. Por eso
+// aquí NO se aplica recargo.
+// ---------------------------------------------------------------------------
+
+/** Reglas de descuento por cantidad/horas (coinciden con Settings). */
+export type DiscountSettings = {
+  quantityDiscountPercent: number;
+  hoursDiscountPercent: number;
+  hoursDiscountMinHours: number;
+  maxDiscountPercent: number;
+};
+
+/** Un componente del paquete para calcular su aporte al precio base. */
+export type PackageComponentInput = {
+  /** Clave de agrupación para el descuento por cantidad (ej. la categoría). */
+  groupKey: string;
+  /** Precio unitario del catálogo (por hora si `perHour`, fijo si no). */
+  unitPrice: number;
+  /** Si el precio se multiplica por la duración del paquete. */
+  perHour: boolean;
+  quantity: number;
+};
+
+export type PackageComponentCost = PackageComponentInput & {
+  /** Descuento aplicado a la línea (fracción 0–1). */
+  discount: number;
+  /** Aporte de la línea al precio base (ya con descuento, sin recargo). */
+  subtotal: number;
+};
+
+/**
+ * Calcula el aporte de cada componente al precio base, aplicando descuentos por
+ * cantidad y horas como el motor de cotización. El primer ítem de cada grupo no
+ * recibe descuento por cantidad; el 2.º en adelante sí.
+ */
+export function packageComponentCosts(
+  components: PackageComponentInput[],
+  durationHours: number,
+  settings: DiscountSettings,
+): PackageComponentCost[] {
+  const qtyDiscount = settings.quantityDiscountPercent / 100;
+  const hoursDiscount =
+    durationHours >= settings.hoursDiscountMinHours
+      ? settings.hoursDiscountPercent / 100
+      : 0;
+  const cap = settings.maxDiscountPercent / 100;
+  const seenGroups = new Set<string>();
+
+  return components.map(component => {
+    const isFirstInGroup = !seenGroups.has(component.groupKey);
+    seenGroups.add(component.groupKey);
+    const quantityPart = isFirstInGroup ? 0 : qtyDiscount;
+    const discount = Math.min(cap, Math.max(quantityPart, hoursDiscount));
+    const hoursFactor = component.perHour ? Math.max(durationHours, 0) : 1;
+    const subtotal =
+      component.unitPrice * (1 - discount) * hoursFactor * component.quantity;
+    return { ...component, discount, subtotal };
+  });
+}
+
+/**
+ * Precio base sugerido = suma de los aportes de cada componente, redondeada al
+ * múltiplo configurado. Es solo una sugerencia: el usuario puede ajustarla.
+ */
+export function suggestedPackageBasePrice(
+  components: PackageComponentInput[],
+  durationHours: number,
+  settings: DiscountSettings & { priceRoundingTo: number },
+): number {
+  const total = packageComponentCosts(components, durationHours, settings).reduce(
+    (sum, component) => sum + component.subtotal,
+    0,
+  );
+  return roundToMultiple(total, settings.priceRoundingTo);
+}
