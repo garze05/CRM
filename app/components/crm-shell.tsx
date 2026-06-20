@@ -217,7 +217,7 @@ function SidebarUser({ user }: { user: ShellUser }) {
 
 function AccountActions({ onNavigate }: { onNavigate?: () => void }) {
 	return (
-		<div className='mt-auto border-t border-[color:var(--border-color)] pt-4'>
+		<div className='border-t border-[color:var(--border-color)] mt-4 pt-4'>
 			<div className='space-y-1.5'>
 				{accountItems.map(item => (
 					<NavigationLink key={item.label} item={item} onClick={onNavigate} />

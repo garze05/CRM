@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createPackage } from "../lib/server/packages";
+import { createPackage, updatePackage } from "../lib/server/packages";
 
 export type PackageFormState = { error?: string };
 
@@ -11,10 +11,16 @@ function positiveNumber(value: FormDataEntryValue | null) {
 	return Number.isFinite(n) && n > 0 ? n : null;
 }
 
-export async function createPackageAction(
-	_prevState: PackageFormState,
+type ParsedPackageForm = {
+	name: string;
+	durationHours: number;
+	basePrice: number;
+	items: { catalogItemId: string; quantity: number }[];
+};
+
+function parsePackageForm(
 	formData: FormData,
-): Promise<PackageFormState> {
+): { data: ParsedPackageForm } | { error: string } {
 	const name = String(formData.get("name") ?? "").trim();
 	const durationHours = positiveNumber(formData.get("durationHours"));
 	const basePrice = positiveNumber(formData.get("basePrice"));
@@ -32,19 +38,40 @@ export async function createPackageAction(
 
 	if (!name) return { error: "El paquete necesita un nombre." };
 	if (!durationHours) return { error: "Definí la duración incluida." };
-	if (!basePrice) {
-		return { error: "Definí el precio base del paquete." };
-	}
+	if (!basePrice) return { error: "Definí el precio base del paquete." };
 	if (items.length === 0) {
 		return { error: "Agregá al menos un ítem del catálogo." };
 	}
 
-	await createPackage({
-		name,
-		durationHours,
-		basePrice,
-		items,
-	});
+	return { data: { name, durationHours, basePrice, items } };
+}
+
+export async function createPackageAction(
+	_prevState: PackageFormState,
+	formData: FormData,
+): Promise<PackageFormState> {
+	const parsed = parsePackageForm(formData);
+	if ("error" in parsed) return parsed;
+
+	await createPackage(parsed.data);
+
+	revalidatePath("/paquetes");
+	redirect("/paquetes");
+}
+
+export async function updatePackageAction(
+	_prevState: PackageFormState,
+	formData: FormData,
+): Promise<PackageFormState> {
+	const id = String(formData.get("packageId") ?? "").trim();
+	if (!id) return { error: "No se pudo identificar el paquete a editar." };
+
+	const parsed = parsePackageForm(formData);
+	if ("error" in parsed) return parsed;
+
+	const active = formData.get("active") === "on";
+
+	await updatePackage({ id, active, ...parsed.data });
 
 	revalidatePath("/paquetes");
 	redirect("/paquetes");

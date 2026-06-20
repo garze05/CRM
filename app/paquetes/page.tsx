@@ -136,6 +136,15 @@ export default async function PackagesPage({
 												))}
 											</dl>
 										</div>
+										<Link
+											href={`/paquetes/${item.id}/editar`}
+											className='secondary-action mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-full px-4 py-2 text-base font-black transition'
+										>
+											<IconLabel
+												icon='material-symbols:edit-rounded'
+												label='Editar paquete'
+											/>
+										</Link>
 									</li>
 								))}
 							</ul>
