@@ -98,6 +98,52 @@ export async function listAllTasks(): Promise<TaskItem[]> {
 	return tasks.map(t => toTaskItem(t as unknown as TaskRow));
 }
 
+/**
+ * Tareas de mayor prioridad para el tablero de Inicio: pendientes/en progreso
+ * de cualquier tipo (asociadas o no), ordenadas por vencimiento más próximo
+ * (las sin fecha al final). Acotadas para una vista rápida del operador.
+ */
+export async function listPriorityTasks(limit = 6): Promise<TaskItem[]> {
+	const tasks = await prisma.task.findMany({
+		where: {
+			deletedAt: null,
+			status: { in: ["PENDING", "IN_PROGRESS"] },
+		},
+		orderBy: [
+			{ dueAt: { sort: "asc", nulls: "last" } },
+			{ createdAt: "desc" },
+		],
+		take: limit,
+		include: entityInclude,
+	});
+	return tasks.map(t => toTaskItem(t as unknown as TaskRow));
+}
+
+/** Una tarea editable por id (incluye el valor de asociación para el formulario). */
+export async function getTask(
+	id: string,
+): Promise<(TaskItem & { entityValue: string }) | null> {
+	const task = await prisma.task.findFirst({
+		where: { id, deletedAt: null },
+		include: entityInclude,
+	});
+	if (!task) return null;
+	const item = toTaskItem(task as unknown as TaskRow);
+	let entityValue = "";
+	if (task.clientId) entityValue = `client:${task.clientId}`;
+	else if (task.eventId) entityValue = `event:${task.eventId}`;
+	else if (task.collaboratorId) entityValue = `collaborator:${task.collaboratorId}`;
+	return { ...item, entityValue };
+}
+
+/** Borrado lógico (conserva el registro con deletedAt). */
+export async function softDeleteTask(id: string): Promise<void> {
+	await prisma.task.update({
+		where: { id },
+		data: { deletedAt: new Date() },
+	});
+}
+
 /** Tareas generales: no están asociadas a cliente, evento ni colaborador. */
 export async function listGeneralTasks(): Promise<TaskItem[]> {
 	const tasks = await prisma.task.findMany({

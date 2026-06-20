@@ -36,6 +36,8 @@ export type DataTableColumn<Row> = {
 	filterValue?: (row: Row) => string;
 	/** Etiqueta visible para cada valor del filtro (por defecto: reemplaza "_"). */
 	filterLabel?: (value: string) => string;
+	/** Celda interactiva (botones): recibe clics aunque la fila sea un enlace. */
+	interactive?: boolean;
 };
 
 type PersistedState = {
@@ -319,7 +321,7 @@ export function DataTable<Row extends { id: string }>({
 										key={column.key}
 										role='cell'
 										className={`relative z-10 ${
-											column.key === "action"
+											column.interactive || column.key === "action"
 												? "pointer-events-auto"
 												: rowHref
 													? "pointer-events-none"

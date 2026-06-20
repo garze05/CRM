@@ -158,10 +158,11 @@ export default async function Home() {
 
 				<aside className='min-w-0 space-y-5'>
 					<TaskPanel
-						title='Tareas pendientes'
+						title='Tareas prioritarias'
 						tasks={openTasks}
 						revalidatePath='/'
 						viewAllHref='/tareas'
+						showEntity
 					/>
 				</aside>
 			</div>

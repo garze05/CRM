@@ -43,7 +43,9 @@ export default async function EventDetailPage({
 				? Number(event.quotes[0].total)
 				: null;
 	const characters = event.characters.map(c => c.catalogItem.name);
-	const dateKey = event.eventDate ? event.eventDate.toISOString().slice(0, 10) : "";
+	const dateKey = event.eventDate
+		? event.eventDate.toISOString().slice(0, 10)
+		: "";
 
 	const assignmentRows: AssignmentRow[] = event.assignments.map(a => ({
 		id: a.id,
@@ -166,7 +168,9 @@ export default async function EventDetailPage({
 						</h2>
 						<dl className='mt-5 space-y-4 text-lg'>
 							<div className='border-t border-[color:var(--border-color)] pt-4'>
-								<dt className='font-bold text-[var(--text-secondary)]'>Fecha</dt>
+								<dt className='font-bold text-[var(--text-secondary)]'>
+									Fecha
+								</dt>
 								<dd className='mt-1 font-black text-[var(--text-primary)]'>
 									{formatDateKey(dateKey || null)}
 									{event.startTime ? ` · ${event.startTime}` : ""}
@@ -177,7 +181,9 @@ export default async function EventDetailPage({
 									Personajes y servicios
 								</dt>
 								<dd className='mt-1 font-black text-[var(--text-primary)]'>
-									{characters.length > 0 ? characters.join(", ") : "Por definir"}
+									{characters.length > 0
+										? characters.join(", ")
+										: "Por definir"}
 								</dd>
 							</div>
 							<div className='border-t border-[color:var(--border-color)] pt-4'>
@@ -196,7 +202,9 @@ export default async function EventDetailPage({
 								</dd>
 							</div>
 							<div className='border-t border-[color:var(--border-color)] pt-4'>
-								<dt className='font-bold text-[var(--text-secondary)]'>Total</dt>
+								<dt className='font-bold text-[var(--text-secondary)]'>
+									Total
+								</dt>
 								<dd className='mt-1 font-black text-[var(--text-primary)]'>
 									{total !== null ? formatCrc(total) : "Por cotizar"}
 								</dd>

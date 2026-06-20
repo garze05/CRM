@@ -88,7 +88,11 @@ export default async function ClientDetailPage({
 				}
 				actions={
 					<div className='grid grid-cols-2 gap-3 sm:flex'>
-						<TrashButton entityType='Client' id={client.id} returnTo='/clientes' />
+						<TrashButton
+							entityType='Client'
+							id={client.id}
+							returnTo='/clientes'
+						/>
 						<Link
 							href={`/eventos/nuevo?cliente=${client.id}`}
 							className='primary-action flex min-h-12 items-center justify-center rounded-full px-5 py-3 text-base font-black transition'
@@ -115,7 +119,10 @@ export default async function ClientDetailPage({
 							<StatusBadge value={client.type} label={typeLabel} />
 						</div>
 
-						<form action={updateClientDetailAction} className='grid gap-5 md:grid-cols-2'>
+						<form
+							action={updateClientDetailAction}
+							className='grid gap-5 md:grid-cols-2'
+						>
 							<input type='hidden' name='id' value={client.id} />
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 								<span>Nombre</span>

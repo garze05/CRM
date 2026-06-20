@@ -10,6 +10,7 @@ import {
 	createTask,
 	completeTask,
 	reopenTask,
+	softDeleteTask,
 	type EntityRef,
 } from "../server/tasks";
 import type { EntityType } from "../server/activity";
@@ -105,6 +106,7 @@ export async function createTaskAction(
 	if (explicitRevalidate) revalidatePath(explicitRevalidate);
 	else if (revalidate) revalidatePath(revalidate);
 	revalidatePath("/tareas");
+	revalidatePath("/");
 	return { ok: true };
 }
 
@@ -142,6 +144,7 @@ export async function createStandaloneTaskAction(formData: FormData): Promise<vo
 	});
 
 	revalidatePath("/tareas");
+	revalidatePath("/");
 	redirect("/tareas");
 }
 
@@ -165,13 +168,27 @@ export async function updateTaskAction(formData: FormData): Promise<void> {
 	});
 	if (!task) return;
 
+	// La asociación solo se reasigna si el formulario incluye `entity`
+	// (la edición en línea del tablero la omite y la conserva intacta).
+	const hasEntityField = formData.has("entity");
+	const newRef = hasEntityField
+		? refFromValue(String(formData.get("entity") ?? ""))
+		: null;
+	const associationData = newRef
+		? {
+				clientId: newRef.clientId ?? null,
+				eventId: newRef.eventId ?? null,
+				collaboratorId: newRef.collaboratorId ?? null,
+			}
+		: {};
+
 	await prisma.task.update({
 		where: { id },
-		data: { title, description, dueAt, dueHasTime },
+		data: { title, description, dueAt, dueHasTime, ...associationData },
 	});
 
 	const activityTarget = activityTargetFromRef(
-		{
+		newRef ?? {
 			clientId: task.clientId ?? undefined,
 			eventId: task.eventId ?? undefined,
 			collaboratorId: task.collaboratorId ?? undefined,
@@ -187,6 +204,9 @@ export async function updateTaskAction(formData: FormData): Promise<void> {
 	const revalidate = String(formData.get("revalidate") ?? "");
 	if (revalidate) revalidatePath(revalidate);
 	revalidatePath("/tareas");
+	revalidatePath("/");
+	// La pantalla de edición vuelve al listado tras guardar.
+	if (formData.get("redirectToList")) redirect("/tareas");
 }
 
 export async function reopenTaskAction(formData: FormData): Promise<void> {
@@ -216,6 +236,7 @@ export async function reopenTaskAction(formData: FormData): Promise<void> {
 	const revalidate = String(formData.get("revalidate") ?? "");
 	if (revalidate) revalidatePath(revalidate);
 	revalidatePath("/tareas");
+	revalidatePath("/");
 }
 
 export async function completeTaskAction(formData: FormData): Promise<void> {
@@ -245,4 +266,37 @@ export async function completeTaskAction(formData: FormData): Promise<void> {
 	const revalidate = String(formData.get("revalidate") ?? "");
 	if (revalidate) revalidatePath(revalidate);
 	revalidatePath("/tareas");
+	revalidatePath("/");
+}
+
+export async function deleteTaskAction(formData: FormData): Promise<void> {
+	const id = String(formData.get("taskId") ?? "");
+	if (!id) return;
+	const task = await prisma.task.findUnique({
+		where: { id },
+		select: { title: true, clientId: true, eventId: true, collaboratorId: true },
+	});
+	await softDeleteTask(id);
+	if (task) {
+		const activityTarget = activityTargetFromRef(
+			{
+				clientId: task.clientId ?? undefined,
+				eventId: task.eventId ?? undefined,
+				collaboratorId: task.collaboratorId ?? undefined,
+			},
+			id,
+		);
+		await recordActivity({
+			action: "task.deleted",
+			...activityTarget,
+			summary: `eliminó tarea ${task.title}`,
+		});
+	}
+
+	const revalidate = String(formData.get("revalidate") ?? "");
+	if (revalidate) revalidatePath(revalidate);
+	revalidatePath("/tareas");
+	revalidatePath("/");
+	// Si la eliminación viene de la pantalla de edición, volver al listado.
+	if (formData.get("redirectToList")) redirect("/tareas");
 }

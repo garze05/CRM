@@ -29,7 +29,9 @@ export default async function CollaboratorDetailPage({
 	if (!collaborator) {
 		notFound();
 	}
-	const collaboratorTasks = await listTasksForEntity({ collaboratorId: collaborator.id });
+	const collaboratorTasks = await listTasksForEntity({
+		collaboratorId: collaborator.id,
+	});
 
 	const fullName = `${collaborator.firstName} ${collaborator.lastName}`;
 	const initials = `${collaborator.firstName[0]}${collaborator.lastName[0]}`;
@@ -68,7 +70,11 @@ export default async function CollaboratorDetailPage({
 					/>
 				}
 				actions={
-					<TrashButton entityType='Collaborator' id={collaborator.id} returnTo='/colaboradores' />
+					<TrashButton
+						entityType='Collaborator'
+						id={collaborator.id}
+						returnTo='/colaboradores'
+					/>
 				}
 			/>
 
@@ -83,7 +89,10 @@ export default async function CollaboratorDetailPage({
 								Perfil operativo para asignación a eventos y disponibilidad.
 							</p>
 						</div>
-						<form action={updateCollaboratorDetailAction} className='grid gap-5 md:grid-cols-2'>
+						<form
+							action={updateCollaboratorDetailAction}
+							className='grid gap-5 md:grid-cols-2'
+						>
 							<input type='hidden' name='id' value={collaborator.id} />
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 								<span>Nombre</span>
@@ -108,7 +117,11 @@ export default async function CollaboratorDetailPage({
 							/>
 							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 								<span>Rol base</span>
-								<select name='role' defaultValue={collaborator.role} className='form-control'>
+								<select
+									name='role'
+									defaultValue={collaborator.role}
+									className='form-control'
+								>
 									<option value='MASCOT_COSTUME'>Botarga</option>
 									<option value='ENTERTAINER'>Animador</option>
 									<option value='LOGISTICS'>Logística</option>
@@ -183,8 +196,8 @@ export default async function CollaboratorDetailPage({
 							Eventos pasados y calificaciones
 						</h2>
 						<p className='mt-1 text-lg text-[var(--text-secondary)]'>
-							La calificación se registra por evento; el promedio se calcula solo
-							con eventos calificados.
+							La calificación se registra por evento; el promedio se calcula
+							solo con eventos calificados.
 						</p>
 						{past.length === 0 ? (
 							<p className='mt-4 rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
@@ -204,7 +217,11 @@ export default async function CollaboratorDetailPage({
 											>
 												{event.name}
 											</Link>
-											<StarRating value={assignment.rating} readOnly size='sm' />
+											<StarRating
+												value={assignment.rating}
+												readOnly
+												size='sm'
+											/>
 										</div>
 										<p className='mt-1 text-base font-semibold text-[var(--text-secondary)]'>
 											{formatDateKey(event.eventDate)} ·{" "}

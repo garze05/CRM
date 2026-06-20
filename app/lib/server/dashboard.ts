@@ -1,7 +1,7 @@
 import "server-only";
 import { FUNNEL_STAGES } from "../domain/funnel";
 import { listEvents } from "./events";
-import { listGeneralTasks } from "./tasks";
+import { listPriorityTasks } from "./tasks";
 import { prisma } from "../db";
 import type { ActivityEntry } from "@/app/components/activity-feed";
 
@@ -24,7 +24,7 @@ export async function getDashboardData() {
 		pendingDeposits,
 	] = await Promise.all([
 		listEvents(),
-		listGeneralTasks(),
+		listPriorityTasks(),
 		prisma.interaction.findMany({
 			orderBy: { occurredAt: "desc" },
 			take: 50,
