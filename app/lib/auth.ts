@@ -9,10 +9,24 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./db";
 import { authConfig } from "./auth.config";
+import { bypassUser, isAuthBypassEnabled } from "./auth-bypass";
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+const nextAuth = NextAuth({
 	...authConfig,
 	// El cliente generado por el provider `prisma-client` no coincide nominalmente
 	// con el tipo que espera el adaptador; el contrato de delegados es el mismo.
 	adapter: PrismaAdapter(prisma as never),
 });
+
+export const { handlers, signIn, signOut } = nextAuth;
+
+export async function auth() {
+	if (isAuthBypassEnabled()) {
+		return {
+			user: bypassUser,
+			expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+		};
+	}
+
+	return nextAuth.auth();
+}

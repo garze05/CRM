@@ -17,9 +17,7 @@ export async function createPackageAction(
 ): Promise<PackageFormState> {
 	const name = String(formData.get("name") ?? "").trim();
 	const durationHours = positiveNumber(formData.get("durationHours"));
-	const priceFamily = positiveNumber(formData.get("priceFamily"));
-	const priceEducational = positiveNumber(formData.get("priceEducational"));
-	const priceCorporate = positiveNumber(formData.get("priceCorporate"));
+	const basePrice = positiveNumber(formData.get("basePrice"));
 	const rawItems = formData.getAll("catalogItemId").map(String);
 
 	const items = rawItems
@@ -34,8 +32,8 @@ export async function createPackageAction(
 
 	if (!name) return { error: "El paquete necesita un nombre." };
 	if (!durationHours) return { error: "Definí la duración incluida." };
-	if (!priceFamily || !priceEducational || !priceCorporate) {
-		return { error: "Definí los tres precios." };
+	if (!basePrice) {
+		return { error: "Definí el precio base del paquete." };
 	}
 	if (items.length === 0) {
 		return { error: "Agregá al menos un ítem del catálogo." };
@@ -44,9 +42,7 @@ export async function createPackageAction(
 	await createPackage({
 		name,
 		durationHours,
-		priceFamily,
-		priceEducational,
-		priceCorporate,
+		basePrice,
 		items,
 	});
 

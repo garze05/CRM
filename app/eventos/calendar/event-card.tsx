@@ -52,7 +52,7 @@ export function EventCard({
 						label={FUNNEL_STAGE_LABELS[event.pipelineStatus]}
 					/>
 					{event.alerts.length > 0 ? (
-						<span className='inline-flex min-h-8 items-center gap-1 rounded-full bg-[#ffe0e3] px-2 py-1 text-sm font-black text-[var(--error-color)]'>
+						<span className='inline-flex min-h-8 items-center gap-1 rounded-full bg-[color-mix(in_srgb,var(--error-color)_16%,transparent)] px-2 py-1 text-sm font-black text-[var(--error-color)]'>
 							<Icon
 								icon='material-symbols:warning-rounded'
 								className='h-4 w-4'
@@ -104,7 +104,7 @@ export function EventCard({
 					{event.alerts.map(alert => (
 						<li
 							key={alert}
-							className='flex items-center gap-2 rounded-lg bg-[#ffe0e3] px-3 py-2 text-base font-black text-[var(--error-color)]'
+							className='flex items-center gap-2 rounded-lg bg-[color-mix(in_srgb,var(--error-color)_16%,transparent)] px-3 py-2 text-base font-black text-[var(--error-color)]'
 						>
 							<Icon
 								icon='material-symbols:warning-rounded'

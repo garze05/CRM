@@ -2,9 +2,11 @@
 
 import {
 	type ColumnFiltersState,
+	type PaginationState,
 	type SortingState,
 	getCoreRowModel,
 	getFilteredRowModel,
+	getPaginationRowModel,
 	getSortedRowModel,
 	useReactTable,
 	type ColumnDef,
@@ -82,6 +84,7 @@ export function DataTable<Row extends { id: string }>({
 	emptyTitle = "Sin registros todavía",
 	emptyDescription,
 	initialFilters,
+	pageSize = 12,
 }: {
 	/** Identificador estable; clave de persistencia de filtros por usuario. */
 	tableId: string;
@@ -96,6 +99,8 @@ export function DataTable<Row extends { id: string }>({
 	emptyDescription?: string;
 	/** Filtros iniciales (ej. desde query params); tienen prioridad sobre los guardados. */
 	initialFilters?: Record<string, string[]>;
+	/** Filas por página. Por defecto 12 para mantener la tabla legible. */
+	pageSize?: number;
 }) {
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(() =>
@@ -104,8 +109,18 @@ export function DataTable<Row extends { id: string }>({
 			: [],
 	);
 	const [globalFilter, setGlobalFilter] = useState("");
+	const [pagination, setPagination] = useState<PaginationState>({
+		pageIndex: 0,
+		pageSize,
+	});
 	const [openMenuKey, setOpenMenuKey] = useState<string | null>(null);
 	const hydratedRef = useRef(false);
+
+	// Al cambiar búsqueda o filtros, volver a la primera página para no quedar
+	// en una página vacía.
+	useEffect(() => {
+		setPagination(current => ({ ...current, pageIndex: 0 }));
+	}, [globalFilter, columnFilters]);
 
 	// Cargar estado guardado tras montar (evita desajustes de hidratación).
 	useEffect(() => {
@@ -146,13 +161,16 @@ export function DataTable<Row extends { id: string }>({
 		[columns],
 	);
 
+	// TanStack Table returns function-bearing objects; React Compiler cannot safely memoize them.
+	// eslint-disable-next-line react-hooks/incompatible-library
 	const table = useReactTable({
 		data: rows,
 		columns: tanstackColumns,
-		state: { sorting, columnFilters, globalFilter },
+		state: { sorting, columnFilters, globalFilter, pagination },
 		onSortingChange: setSorting,
 		onColumnFiltersChange: setColumnFilters,
 		onGlobalFilterChange: setGlobalFilter,
+		onPaginationChange: setPagination,
 		globalFilterFn: (row, _columnId, query: string) => {
 			const text = searchText?.(row.original) ?? "";
 			return text.toLowerCase().includes(query.toLowerCase().trim());
@@ -160,9 +178,14 @@ export function DataTable<Row extends { id: string }>({
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
 	});
 
 	const visibleRows = table.getRowModel().rows;
+	const filteredCount = table.getFilteredRowModel().rows.length;
+	const pageStart =
+		filteredCount === 0 ? 0 : pagination.pageIndex * pagination.pageSize + 1;
+	const pageEnd = pagination.pageIndex * pagination.pageSize + visibleRows.length;
 	const hasActiveFilters = columnFilters.length > 0 || globalFilter.trim() !== "";
 	const gridTemplateColumns = columns
 		.map(column => column.width ?? "minmax(0, 1fr)")
@@ -176,7 +199,7 @@ export function DataTable<Row extends { id: string }>({
 
 	if (rows.length === 0) {
 		return (
-			<div className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-10 text-center'>
+			<div className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-10 text-center'>
 				<p className='text-2xl font-black text-[var(--text-primary)]'>
 					{emptyTitle}
 				</p>
@@ -214,13 +237,15 @@ export function DataTable<Row extends { id: string }>({
 
 				<div className='flex items-center gap-3 pb-3 text-base font-bold text-[var(--text-secondary)]'>
 					<span>
-						Mostrando {visibleRows.length} de {rows.length}
+						{filteredCount === 0
+							? "Sin resultados"
+							: `Mostrando ${pageStart}–${pageEnd} de ${filteredCount}`}
 					</span>
 					{hasActiveFilters ? (
 						<button
 							type='button'
 							onClick={clearAll}
-							className='flex min-h-10 items-center gap-1 rounded-full border border-[color:var(--border-color)] bg-[var(--surface-color)] px-3 text-[var(--primary-color)] transition hover:bg-[#f0ebe4]'
+							className='flex min-h-10 items-center gap-1 rounded-full border border-[color:var(--border-color)] bg-[var(--surface-color)] px-3 text-[var(--primary-color)] transition hover:bg-muted'
 						>
 							<Icon
 								icon='material-symbols:filter-alt-off-rounded'
@@ -242,7 +267,7 @@ export function DataTable<Row extends { id: string }>({
 			>
 				<div
 					role='row'
-					className='grid min-w-[860px] bg-[#f0ebe4] px-5 py-2 text-sm font-black text-[var(--text-secondary)]'
+					className='grid min-w-[860px] bg-muted px-4 py-2.5 text-sm font-black text-[var(--text-secondary)]'
 					style={{ gridTemplateColumns }}
 				>
 					{columns.map(column => (
@@ -286,7 +311,7 @@ export function DataTable<Row extends { id: string }>({
 						const content = (
 							<div
 								role='row'
-								className='grid min-w-[860px] items-center px-5 py-5 text-lg text-[var(--text-secondary)]'
+								className='grid min-w-[860px] items-center px-4 py-2.5 text-base text-[var(--text-secondary)]'
 								style={{ gridTemplateColumns }}
 							>
 								{columns.map(column => (
@@ -311,7 +336,7 @@ export function DataTable<Row extends { id: string }>({
 							return (
 								<div
 									key={row.id}
-									className='border-t border-[color:var(--border-color)] transition hover:bg-[#f7f2ec]'
+									className='border-t border-[color:var(--border-color)] transition hover:bg-muted'
 								>
 									{content}
 								</div>
@@ -321,7 +346,7 @@ export function DataTable<Row extends { id: string }>({
 						return (
 							<div
 								key={row.id}
-								className='relative border-t border-[color:var(--border-color)] transition hover:bg-[#f7f2ec]'
+								className='relative border-t border-[color:var(--border-color)] transition hover:bg-muted'
 							>
 								<Link
 									href={rowHref(row)}
@@ -334,6 +359,44 @@ export function DataTable<Row extends { id: string }>({
 					})
 				)}
 			</div>
+				{table.getPageCount() > 1 ? (
+					<nav
+						aria-label='Paginación'
+						className='flex flex-wrap items-center justify-between gap-3'
+					>
+						<p className='text-base font-bold text-[var(--text-secondary)]'>
+							Página {pagination.pageIndex + 1} de {table.getPageCount()}
+						</p>
+						<div className='flex items-center gap-2'>
+							<button
+								type='button'
+								onClick={() => table.previousPage()}
+								disabled={!table.getCanPreviousPage()}
+								className='flex min-h-11 items-center gap-1 rounded-lg border border-[color:var(--border-color)] bg-[var(--surface-color)] px-4 text-base font-black text-[var(--primary-color)] transition hover:bg-muted disabled:pointer-events-none disabled:opacity-40'
+							>
+								<Icon
+									icon='material-symbols:chevron-left-rounded'
+									className='h-5 w-5'
+									aria-hidden='true'
+								/>
+								<span>Anterior</span>
+							</button>
+							<button
+								type='button'
+								onClick={() => table.nextPage()}
+								disabled={!table.getCanNextPage()}
+								className='flex min-h-11 items-center gap-1 rounded-lg border border-[color:var(--border-color)] bg-[var(--surface-color)] px-4 text-base font-black text-[var(--primary-color)] transition hover:bg-muted disabled:pointer-events-none disabled:opacity-40'
+							>
+								<span>Siguiente</span>
+								<Icon
+									icon='material-symbols:chevron-right-rounded'
+									className='h-5 w-5'
+									aria-hidden='true'
+								/>
+							</button>
+						</div>
+					</nav>
+				) : null}
 		</div>
 	);
 }
@@ -502,7 +565,7 @@ function HeaderCell<Row extends { id: string }>({
 									return (
 										<label
 											key={value}
-											className='flex min-h-10 cursor-pointer items-center gap-2 rounded-lg px-2 text-base font-bold text-[var(--text-primary)] transition hover:bg-[#f0ebe4]'
+											className='flex min-h-10 cursor-pointer items-center gap-2 rounded-lg px-2 text-base font-bold text-[var(--text-primary)] transition hover:bg-muted'
 										>
 											<input
 												type='checkbox'
@@ -560,7 +623,7 @@ function MenuButton({
 		<button
 			type='button'
 			onClick={onClick}
-			className={`flex min-h-10 w-full items-center gap-2 rounded-lg px-2 text-left text-base font-bold transition hover:bg-[#f0ebe4] ${
+			className={`flex min-h-10 w-full items-center gap-2 rounded-lg px-2 text-left text-base font-bold transition hover:bg-muted ${
 				active
 					? "text-[var(--primary-color)]"
 					: "text-[var(--text-primary)]"

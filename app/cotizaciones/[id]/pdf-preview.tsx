@@ -91,7 +91,7 @@ export function PdfPreview({ quoteId }: { quoteId: string }) {
 			</div>
 
 			{state.kind === "loading" ? (
-				<div className='grid h-96 place-items-center rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec]'>
+				<div className='grid h-96 place-items-center rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted'>
 					<p className='flex items-center gap-2 text-lg font-bold text-[var(--text-secondary)]'>
 						<Icon
 							icon='material-symbols:progress-activity'
@@ -105,10 +105,10 @@ export function PdfPreview({ quoteId }: { quoteId: string }) {
 
 			{state.kind === "error" ? (
 				<div
-					className='grid min-h-40 place-items-center rounded-lg bg-[#fff0cf] p-6 text-center'
+					className='grid min-h-40 place-items-center rounded-lg bg-[color-mix(in_srgb,var(--tertiary-color)_30%,transparent)] p-6 text-center'
 					role='alert'
 				>
-					<p className='text-lg font-black text-[#6f5600]'>{state.message}</p>
+					<p className='text-lg font-black text-[var(--warning-color)]'>{state.message}</p>
 				</div>
 			) : null}
 

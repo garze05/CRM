@@ -26,7 +26,7 @@ export default async function InventoryPage() {
 
 			<div className='space-y-5 px-5 pb-28 md:px-8 md:pb-8'>
 				<SectionCard>
-					<div className='mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f0ebe4] p-4 text-lg text-[var(--text-secondary)]'>
+					<div className='mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-4 text-lg text-[var(--text-secondary)]'>
 						<span>
 							Este catálogo se comparte con clientes mediante la vista pública
 							(sin precios).

@@ -134,7 +134,7 @@ export function ClientCombobox({
 								className={`cursor-pointer px-4 py-2 text-base font-bold ${
 									index === highlight
 										? "bg-[var(--accent-color)] text-[var(--on-accent)]"
-										: "text-[var(--text-primary)] hover:bg-[#f0ebe4]"
+										: "text-[var(--text-primary)] hover:bg-muted"
 								}`}
 							>
 								{option.label}

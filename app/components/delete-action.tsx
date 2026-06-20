@@ -51,7 +51,7 @@ export function DeleteAction({
 			type='button'
 			onClick={handleConfirm}
 			disabled={disabled || pending}
-			className='flex min-h-11 cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-base font-black text-[var(--primary-color)] transition hover:bg-[#ffe2cf] disabled:cursor-not-allowed disabled:opacity-60'
+			className='flex min-h-11 cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-base font-black text-[var(--primary-color)] transition hover:bg-[color-mix(in_srgb,var(--accent-color)_22%,transparent)] disabled:cursor-not-allowed disabled:opacity-60'
 		>
 			<Icon icon={icon} className='h-5 w-5 shrink-0' aria-hidden='true' />
 			<span>{pending ? "Eliminando…" : label}</span>

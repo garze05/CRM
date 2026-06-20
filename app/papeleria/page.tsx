@@ -129,12 +129,12 @@ export default async function PaperworkPage() {
 				<SectionCard
 					title='Recursos eliminados'
 				>
-					<p className='mb-4 rounded-lg border border-[#f0d6c8] bg-[#fff8ef] px-4 py-3 text-sm font-bold text-[var(--text-secondary)]'>
+					<p className='mb-4 rounded-lg border border-[color:var(--border-color)] bg-[color-mix(in_srgb,var(--accent-color)_12%,transparent)] px-4 py-3 text-sm font-bold text-[var(--text-secondary)]'>
 						Los registros permanecen 30 días en Papelería. Después se eliminan
 						definitivamente de forma automática.
 					</p>
 					{rows.length === 0 ? (
-						<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-8 text-center text-lg font-bold text-[var(--text-secondary)]'>
+						<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-8 text-center text-lg font-bold text-[var(--text-secondary)]'>
 							La papelera está vacía.
 						</p>
 					) : (

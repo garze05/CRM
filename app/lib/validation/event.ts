@@ -32,6 +32,10 @@ export const eventSchema = z.object({
 		.string()
 		.optional()
 		.or(z.literal("")),
+	guestCount: z.string().optional().or(z.literal("")),
+	honoreeName: z.string().trim().optional(),
+	honoreeAge: z.string().optional().or(z.literal("")),
+	partyTheme: z.string().trim().optional(),
 	venueName: z.string().trim().optional(),
 	venueAddress: z.string().trim().optional(),
 	venueType: z.enum(VENUE_TYPES).optional().or(z.literal("")),

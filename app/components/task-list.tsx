@@ -43,7 +43,7 @@ export function TaskList({
 
 	if (tasks.length === 0) {
 		return (
-			<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-4 text-center text-sm font-bold text-[var(--text-secondary)]'>
+			<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-4 text-center text-sm font-bold text-[var(--text-secondary)]'>
 				Todo al día. Sin tareas pendientes.
 			</p>
 		);

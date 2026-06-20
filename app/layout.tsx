@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { CrmShell, type ShellUser } from "./components/crm-shell";
+import { ThemeProvider } from "./components/theme-provider";
 import { ToastProvider } from "./components/toast";
+import { bypassUser, isAuthBypassEnabled } from "./lib/auth-bypass";
 import { auth } from "./lib/auth";
 import { purgeExpiredTrashIfDue } from "./lib/server/trash";
 import "./globals.css";
@@ -32,21 +34,30 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
-  const user = toShellUser(session?.user);
+  const bypassAuth = isAuthBypassEnabled();
+  const session = bypassAuth ? null : await auth();
+  const user = toShellUser(bypassAuth ? bypassUser : session?.user);
   if (user) {
     await purgeExpiredTrashIfDue();
   }
 
   return (
     <html
-      lang="es"
+      lang="es-CR"
       className="h-full antialiased"
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
-        <ToastProvider>
-          <CrmShell user={user}>{children}</CrmShell>
-        </ToastProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ToastProvider>
+            <CrmShell user={user}>{children}</CrmShell>
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

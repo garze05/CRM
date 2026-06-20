@@ -15,6 +15,9 @@ export type EventFormData = {
 	eventDate: string;
 	startTime: string;
 	guestCount: number | null;
+	honoreeName: string;
+	honoreeAge: number | null;
+	partyTheme: string;
 	venueAddress: string;
 	internalNotes: string;
 };
@@ -53,12 +56,12 @@ export function EventDetailForm({
 			</div>
 
 			{state.error ? (
-				<p className='mb-4 rounded-lg bg-[#ffe0e3] px-4 py-3 text-sm font-black text-[var(--error-color)]'>
+				<p className='mb-4 rounded-lg bg-[color-mix(in_srgb,var(--error-color)_16%,transparent)] px-4 py-3 text-sm font-black text-[var(--error-color)]'>
 					{state.error}
 				</p>
 			) : null}
 			{state.ok ? (
-				<p className='mb-4 rounded-lg bg-[#d8f5f2] px-4 py-3 text-sm font-black text-[var(--secondary-color)]'>
+				<p className='mb-4 rounded-lg bg-[color-mix(in_srgb,var(--secondary-color)_20%,transparent)] px-4 py-3 text-sm font-black text-[var(--secondary-color)]'>
 					Cambios guardados.
 				</p>
 			) : null}
@@ -124,12 +127,41 @@ export function EventDetailForm({
 					/>
 				</label>
 				<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-					<span>Invitados</span>
+					<span>Cantidad de chiquitos</span>
 					<input
 						type='number'
 						name='guestCount'
+						min='0'
 						defaultValue={event.guestCount ?? undefined}
 						className='form-control'
+					/>
+				</label>
+				<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
+					<span>Nombre del festejado/a</span>
+					<input
+						name='honoreeName'
+						defaultValue={event.honoreeName}
+						className='form-control'
+					/>
+				</label>
+				<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
+					<span>Edad del festejado/a</span>
+					<input
+						type='number'
+						name='honoreeAge'
+						min='0'
+						defaultValue={event.honoreeAge ?? undefined}
+						className='form-control'
+						placeholder='Solo para fiestas infantiles'
+					/>
+				</label>
+				<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
+					<span>Tema o personaje solicitado</span>
+					<input
+						name='partyTheme'
+						defaultValue={event.partyTheme}
+						className='form-control'
+						placeholder='Ej. Mario Bros, princesas, dinosaurios…'
 					/>
 				</label>
 				<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>

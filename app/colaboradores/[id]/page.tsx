@@ -148,7 +148,7 @@ export default async function CollaboratorDetailPage({
 							Próximos eventos asignados
 						</h2>
 						{upcoming.length === 0 ? (
-							<p className='mt-4 rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
+							<p className='mt-4 rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
 								Sin eventos asignados todavía.
 							</p>
 						) : (
@@ -187,7 +187,7 @@ export default async function CollaboratorDetailPage({
 							con eventos calificados.
 						</p>
 						{past.length === 0 ? (
-							<p className='mt-4 rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
+							<p className='mt-4 rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
 								Sin eventos realizados todavía.
 							</p>
 						) : (

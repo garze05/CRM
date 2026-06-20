@@ -1,6 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
+import {
+	DEFAULT_QUOTE_AI_MODEL,
+	QUOTE_AI_MODELS,
+	estimateQuoteAiCostUsd,
+	formatUsdEstimate,
+	type QuoteAiModelId,
+} from "../../lib/domain/ai-models";
 import { generateQuoteAction, type NewQuoteState } from "../actions";
 
 const initialState: NewQuoteState = {};
@@ -23,6 +30,9 @@ export function NewQuoteForm({
 		selectedEventId && events.some(e => e.id === selectedEventId)
 			? selectedEventId
 			: events[0]?.id ?? "";
+	const [aiModel, setAiModel] = useState<QuoteAiModelId>(
+		DEFAULT_QUOTE_AI_MODEL,
+	);
 
 	return (
 		<form action={formAction} className='contents'>
@@ -70,7 +80,7 @@ export function NewQuoteForm({
 						{Array.from({ length: ITEM_ROWS }).map((_, i) => (
 							<div
 								key={i}
-								className='grid gap-2 rounded-lg border border-[color:var(--border-color)] bg-[#f0ebe4] p-3 md:grid-cols-[150px_1fr_90px_90px]'
+								className='grid gap-2 rounded-lg border border-[color:var(--border-color)] bg-muted p-3 md:grid-cols-[150px_1fr_90px_90px]'
 							>
 								<select
 									name={`item-${i}-tipo`}
@@ -108,6 +118,58 @@ export function NewQuoteForm({
 						))}
 					</div>
 				</section>
+
+				<section className='surface-card p-5 md:p-7'>
+					<div className='mb-4'>
+						<h2 className='text-2xl font-black text-[var(--text-primary)]'>
+							Descripción de la cotización
+						</h2>
+						<p className='mt-1 text-lg text-[var(--text-secondary)]'>
+							Este texto abre el documento. Si activás IA, se genera de una vez
+							con el modelo elegido.
+						</p>
+					</div>
+					<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
+						<span>Descripción</span>
+						<textarea
+							name='description'
+							className='form-control min-h-32 resize-none py-3 leading-7'
+							placeholder='Ej. Preparamos una experiencia alegre y puntual para que la celebración fluya sin estrés.'
+						/>
+					</label>
+					<div className='mt-4 grid gap-3 rounded-lg border border-[color:var(--border-color)] bg-muted p-4'>
+						<label className='flex min-h-11 items-center gap-3 text-lg font-bold text-[var(--text-primary)]'>
+							<input
+								type='checkbox'
+								name='useAiDescription'
+								className='h-5 w-5 accent-[var(--accent-color)]'
+							/>
+							<span>Generar descripción con IA al crear</span>
+						</label>
+						<label className='space-y-2 text-base font-bold text-[var(--text-primary)]'>
+							<span>Modelo IA</span>
+							<select
+								name='aiModel'
+								value={aiModel}
+								onChange={event =>
+									setAiModel(event.target.value as QuoteAiModelId)
+								}
+								className='form-control'
+							>
+								{QUOTE_AI_MODELS.map(model => (
+									<option key={model.id} value={model.id}>
+										{model.label} · aprox.{" "}
+										{formatUsdEstimate(estimateQuoteAiCostUsd(model.id))}
+									</option>
+								))}
+							</select>
+						</label>
+						<p className='text-sm font-semibold text-[var(--text-secondary)]'>
+							Estimación por una descripción corta; el costo real depende de
+							tokens usados por OpenRouter.
+						</p>
+					</div>
+				</section>
 			</div>
 
 			<aside className='min-w-0 space-y-5'>
@@ -116,15 +178,9 @@ export function NewQuoteForm({
 						Opciones
 					</h2>
 					<div className='mt-4 space-y-3'>
-						<label className='flex items-center gap-3 text-lg font-bold text-[var(--text-primary)]'>
-							<input
-								type='checkbox'
-								name='includeTransport'
-								defaultChecked
-								className='h-5 w-5 accent-[var(--accent-color)]'
-							/>
-							<span>Incluir transporte (Google Maps)</span>
-						</label>
+						<p className='rounded-lg bg-muted p-4 text-base font-bold text-[var(--text-secondary)]'>
+							Transporte incluido automáticamente por Google Maps.
+						</p>
 						<label className='flex items-center gap-3 text-lg font-bold text-[var(--text-primary)]'>
 							<input
 								type='checkbox'
@@ -139,8 +195,8 @@ export function NewQuoteForm({
 						<div
 							className={`mt-5 rounded-lg px-4 py-3 text-sm font-black ${
 								state.unavailable
-									? "bg-[#fff0cf] text-[#6f5600]"
-									: "bg-[#ffe0e3] text-[var(--error-color)]"
+									? "bg-[color-mix(in_srgb,var(--tertiary-color)_30%,transparent)] text-[var(--warning-color)]"
+									: "bg-[color-mix(in_srgb,var(--error-color)_16%,transparent)] text-[var(--error-color)]"
 							}`}
 							role='alert'
 						>

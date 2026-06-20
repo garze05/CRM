@@ -46,7 +46,7 @@ export function PermanentDeleteAction({
 					className='w-full max-w-md rounded-lg border border-[color:var(--border-color)] bg-[var(--card-color)] p-5 shadow-[var(--soft-shadow)]'
 				>
 					<div className='flex items-start gap-3'>
-						<div className='flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#ffe0e3] text-[var(--error-color)]'>
+						<div className='flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--error-color)_16%,transparent)] text-[var(--error-color)]'>
 							<Icon
 								icon='material-symbols:warning-rounded'
 								className='h-6 w-6'
@@ -79,7 +79,7 @@ export function PermanentDeleteAction({
 							type='button'
 							onClick={handleConfirm}
 							disabled={pending}
-							className='min-h-11 rounded-full bg-[var(--error-color)] px-4 py-2 text-base font-black text-white transition hover:brightness-95 disabled:opacity-60'
+							className='min-h-11 rounded-full bg-[var(--error-color)] px-4 py-2 text-base font-black text-destructive-foreground transition hover:brightness-95 disabled:opacity-60'
 						>
 							{pending ? "Eliminando…" : "Eliminar definitivamente"}
 						</button>
@@ -93,7 +93,7 @@ export function PermanentDeleteAction({
 			<button
 				type='button'
 				onClick={() => setOpen(true)}
-				className='flex min-h-10 items-center justify-center gap-2 rounded-full border border-[#f0b4aa] bg-[#fff4f0] px-3 py-2 text-sm font-black text-[var(--error-color)] transition hover:bg-[#ffe0e3]'
+				className='flex min-h-10 items-center justify-center gap-2 rounded-full border border-[color-mix(in_srgb,var(--error-color)_38%,var(--border-color))] bg-[color-mix(in_srgb,var(--accent-color)_12%,transparent)] px-3 py-2 text-sm font-black text-[var(--error-color)] transition hover:bg-[color-mix(in_srgb,var(--error-color)_16%,transparent)]'
 			>
 				<Icon
 					icon='material-symbols:delete-forever-outline-rounded'

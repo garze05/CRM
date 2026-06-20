@@ -228,12 +228,12 @@ export function SettingsForm({ values }: { values: SettingsFormValues }) {
 						Estos valores se usan al generar cotizaciones y reservaciones.
 					</p>
 					{state.ok ? (
-						<p className='mt-4 rounded-lg bg-[#dff5e3] px-4 py-3 text-base font-black text-[#1f7a3d]'>
+						<p className='mt-4 rounded-lg bg-[color-mix(in_srgb,var(--success-color)_18%,transparent)] px-4 py-3 text-base font-black text-[var(--success-color)]'>
 							Ajustes guardados.
 						</p>
 					) : null}
 					{state.error ? (
-						<p className='mt-4 rounded-lg bg-[#ffe0e3] px-4 py-3 text-base font-black text-[var(--error-color)]'>
+						<p className='mt-4 rounded-lg bg-[color-mix(in_srgb,var(--error-color)_16%,transparent)] px-4 py-3 text-base font-black text-[var(--error-color)]'>
 							{state.error}
 						</p>
 					) : null}

@@ -46,7 +46,7 @@ export default async function ReservationsPage() {
 					description='El anticipo confirma el evento y el saldo cierra el cobro operativo.'
 				>
 					<div className='mb-5 grid gap-4 md:grid-cols-3'>
-						<div className='rounded-lg border border-[color:var(--border-color)] bg-[#f0ebe4] p-4'>
+						<div className='rounded-lg border border-[color:var(--border-color)] bg-muted p-4'>
 							<p className='text-base font-black text-[var(--text-muted)]'>
 								Pendientes de anticipo
 							</p>
@@ -54,7 +54,7 @@ export default async function ReservationsPage() {
 								{pendingDeposit}
 							</p>
 						</div>
-						<div className='rounded-lg border border-[color:var(--border-color)] bg-[#f0ebe4] p-4'>
+						<div className='rounded-lg border border-[color:var(--border-color)] bg-muted p-4'>
 							<p className='text-base font-black text-[var(--text-muted)]'>
 								Anticipos recibidos
 							</p>
@@ -62,7 +62,7 @@ export default async function ReservationsPage() {
 								{depositsReceived}
 							</p>
 						</div>
-						<div className='rounded-lg border border-[color:var(--border-color)] bg-[#f0ebe4] p-4'>
+						<div className='rounded-lg border border-[color:var(--border-color)] bg-muted p-4'>
 							<p className='text-base font-black text-[var(--text-muted)]'>
 								Total reservado
 							</p>

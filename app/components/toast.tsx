@@ -45,7 +45,7 @@ function ToastCard({
 			: "material-symbols:check-circle-outline-rounded";
 
 	const iconColorClass = isTrash || isError ? "text-[var(--error-color)]" : "text-[var(--success-color)]";
-	const iconBgClass = isTrash || isError ? "bg-[#ffe0e3]" : "bg-[#e0f5f4]";
+	const iconBgClass = isTrash || isError ? "bg-[color-mix(in_srgb,var(--error-color)_16%,transparent)]" : "bg-[color-mix(in_srgb,var(--secondary-color)_18%,transparent)]";
 	const timerColorClass = isTrash || isError ? "bg-[var(--error-color)]" : isSuccess ? "bg-[var(--success-color)]" : "bg-[var(--primary-color)]";
 
 	async function handleUndo() {

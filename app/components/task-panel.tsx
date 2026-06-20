@@ -71,6 +71,14 @@ export function TaskPanel({
 						/>
 						<span>{open ? "Cerrar" : "Agregar"}</span>
 					</button>
+					{viewAllHref ? (
+						<Link
+							href={viewAllHref}
+							className='secondary-action flex min-h-11 items-center justify-center rounded-full px-4 py-2 text-sm font-black transition sm:text-base'
+						>
+							Ver todas
+						</Link>
+					) : null}
 				</div>
 			</div>
 
@@ -78,7 +86,7 @@ export function TaskPanel({
 				<form
 					ref={formRef}
 					action={formAction}
-					className='mb-4 space-y-3 rounded-lg border border-[color:var(--border-color)] bg-[#f7f2ec] p-4'
+					className='mb-4 space-y-3 rounded-lg border border-[color:var(--border-color)] bg-muted p-4'
 				>
 					<input type='hidden' name='revalidate' value={revalidatePath} />
 					{entityType && entityId ? (

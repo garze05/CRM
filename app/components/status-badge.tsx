@@ -1,109 +1,125 @@
-const badgeStyles: Record<string, string> = {
-	LEAD: "bg-[#fff0cf] text-[#6f5600]",
-	CONTACTADO: "bg-[#ffe2cf] text-[var(--primary-active)]",
-	COTIZADO: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
-	RESERVADO: "bg-[#ffe2cf] text-[var(--primary-color)]",
-	CONFIRMADO: "bg-[#d8f5f2] text-[var(--secondary-color)]",
-	REALIZADO: "bg-[#eee8e1] text-[var(--text-secondary)]",
-	RECURRENTE: "bg-[#f5ddc8] text-[var(--primary-active)]",
-	CANCELADO: "bg-[#ffe0e3] text-[var(--error-color)]",
-	FAMILIAR: "bg-[#fff0cf] text-[#6f5600]",
-	EDUCATIVO: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
-	CORPORATIVO: "bg-[#f5ddc8] text-[var(--primary-active)]",
-	INSTITUCIONAL: "bg-[#d8f5f2] text-[var(--secondary-color)]",
-	INFANTIL: "bg-[#ffe2cf] text-[var(--primary-color)]",
-	PENDIENTE_ANTICIPO: "bg-[#fff0cf] text-[#6f5600]",
-	ANTICIPO_RECIBIDO: "bg-[#d8f5f2] text-[var(--secondary-color)]",
-	SALDO_PENDIENTE: "bg-[#ffe2cf] text-[var(--primary-color)]",
-	PAGADO_COMPLETO: "bg-[#f5ddc8] text-[var(--primary-active)]",
-	DISPONIBLE: "bg-[#d8f5f2] text-[var(--secondary-color)]",
-	ASIGNADO: "bg-[#fff0cf] text-[#6f5600]",
-	INACTIVO: "bg-[#eee8e1] text-[var(--text-secondary)]",
-	PERSONAJE: "bg-[#ffe2cf] text-[var(--primary-color)]",
-	INFLABLE: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
-	DECORACION: "bg-[#d8f5f2] text-[var(--secondary-color)]",
-	SERVICIO: "bg-[#fff0cf] text-[#6f5600]",
-	OTRO: "bg-[#eee8e1] text-[var(--text-secondary)]",
-	RESERVADO_INVENTARIO: "bg-[#f5ddc8] text-[var(--primary-active)]",
-	MANTENIMIENTO_PENDIENTE: "bg-[#fff0cf] text-[#6f5600]",
-	ACTIVO: "bg-[#d8f5f2] text-[var(--secondary-color)]",
-	PAUSADO: "bg-[#eee8e1] text-[var(--text-secondary)]",
-	BORRADOR: "bg-[#eee8e1] text-[var(--text-secondary)]",
-	ENVIADA: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
-	ACEPTADA: "bg-[#d8f5f2] text-[var(--secondary-color)]",
-	VENCIDA: "bg-[#fff0cf] text-[#6f5600]",
-	RECHAZADA: "bg-[#ffe0e3] text-[var(--error-color)]",
-	// Tareas
-	PENDIENTE: "bg-[#fff0cf] text-[#6f5600]",
-	EN_PROGRESO: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
-	COMPLETADA: "bg-[#d8f5f2] text-[var(--secondary-color)]",
-	CANCELADA: "bg-[#eee8e1] text-[var(--text-secondary)]",
-	MANUAL: "bg-[#eee8e1] text-[var(--text-secondary)]",
-	AUTOMATICA: "bg-[#ffe2cf] text-[var(--primary-color)]",
-	SISTEMA: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
-	// Interacciones
-	WHATSAPP: "bg-[#d8f5f2] text-[var(--secondary-color)]",
-	LLAMADA: "bg-[#fff0cf] text-[#6f5600]",
-	ENTRANTE: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
-	SALIENTE: "bg-[#ffe2cf] text-[var(--primary-color)]",
+type Tone = "amber" | "orange" | "teal" | "neutral" | "red" | "purple" | "pink";
 
-	// --- Claves en inglés (enums de Prisma) — mismas paletas que sus
-	// equivalentes en español. Permiten pasar el valor real de la BD como
-	// `value` y la etiqueta en español como `label`.
+/**
+ * Cada tono usa tokens semánticos con valores en claro y oscuro, así que el
+ * badge mantiene contraste AA en ambos temas (DESIGN.md §3, §6.1). El fondo es
+ * una mezcla translúcida del color y el texto usa el color a plena intensidad.
+ */
+const toneClasses: Record<Tone, string> = {
+	amber:
+		"bg-[color-mix(in_srgb,var(--tertiary-color)_28%,transparent)] text-[var(--warning-color)]",
+	orange:
+		"bg-[color-mix(in_srgb,var(--accent-color)_22%,transparent)] text-[var(--primary-color)]",
+	teal: "bg-[color-mix(in_srgb,var(--secondary-color)_22%,transparent)] text-[var(--secondary-color)]",
+	neutral: "bg-muted text-muted-foreground",
+	red: "bg-[color-mix(in_srgb,var(--error-color)_18%,transparent)] text-[var(--error-color)]",
+	purple:
+		"bg-[color-mix(in_srgb,var(--badge-purple)_22%,transparent)] text-[var(--badge-purple)]",
+	pink: "bg-[color-mix(in_srgb,var(--badge-pink)_22%,transparent)] text-[var(--badge-pink)]",
+};
+
+/** Mapa estado → tono. Claves en español y en inglés (enums de Prisma). */
+const statusTones: Record<string, Tone> = {
+	// FunnelStage / pipeline (es + en)
+	LEAD: "amber",
+	PROSPECT: "amber",
+	CONTACTADO: "orange",
+	CONTACTED: "orange",
+	COTIZADO: "teal",
+	QUOTED: "teal",
+	RESERVADO: "orange",
+	RESERVED: "orange",
+	CONFIRMADO: "teal",
+	CONFIRMED: "teal",
+	REALIZADO: "neutral",
+	COMPLETED: "neutral",
+	CANCELADO: "red",
+	CANCELED: "red",
+	RECURRENTE: "orange",
+	RECURRING: "orange",
 	// ClientType
-	FAMILY: "bg-[#fff0cf] text-[#6f5600]",
-	EDUCATIONAL: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
-	CORPORATE: "bg-[#f5ddc8] text-[var(--primary-active)]",
-	SHOPPING_CENTER: "bg-[#e8e0f5] text-[#4a2e7a]",
-	ADVERTISING_AGENCY: "bg-[#f5d9e6] text-[#8a2356]",
-	// FunnelStage
-	PROSPECT: "bg-[#fff0cf] text-[#6f5600]",
-	CONTACTED: "bg-[#ffe2cf] text-[var(--primary-active)]",
-	QUOTED: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
-	RESERVED: "bg-[#ffe2cf] text-[var(--primary-color)]",
-	CONFIRMED: "bg-[#d8f5f2] text-[var(--secondary-color)]",
-	COMPLETED: "bg-[#eee8e1] text-[var(--text-secondary)]",
-	CANCELED: "bg-[#ffe0e3] text-[var(--error-color)]",
-	RECURRING: "bg-[#f5ddc8] text-[var(--primary-active)]",
+	FAMILIAR: "amber",
+	FAMILY: "amber",
+	EDUCATIVO: "teal",
+	EDUCATIONAL: "teal",
+	CORPORATIVO: "orange",
+	CORPORATE: "orange",
+	INSTITUCIONAL: "teal",
+	SHOPPING_CENTER: "purple",
+	ADVERTISING_AGENCY: "pink",
 	// EventType
-	CHILDREN: "bg-[#ffe2cf] text-[var(--primary-color)]",
-	INSTITUTIONAL: "bg-[#d8f5f2] text-[var(--secondary-color)]",
-	// CatalogCategory / availability
-	CHARACTER: "bg-[#ffe2cf] text-[var(--primary-color)]",
-	INFLATABLE: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
-	DECORATION: "bg-[#d8f5f2] text-[var(--secondary-color)]",
-	SERVICE: "bg-[#fff0cf] text-[#6f5600]",
-	AVAILABLE: "bg-[#d8f5f2] text-[var(--secondary-color)]",
-	RESERVED_INVENTORY: "bg-[#f5ddc8] text-[var(--primary-active)]",
-	MAINTENANCE_PENDING: "bg-[#fff0cf] text-[#6f5600]",
-	// VenueType
-	INDOOR: "bg-[#d8f5f2] text-[var(--secondary-color)]",
-	OUTDOOR: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
-	// InteractionChannel / Direction
-	PHONE_CALL: "bg-[#fff0cf] text-[#6f5600]",
-	IN_PERSON: "bg-[#eee8e1] text-[var(--text-secondary)]",
-	INBOUND: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
-	OUTBOUND: "bg-[#ffe2cf] text-[var(--primary-color)]",
+	INFANTIL: "orange",
+	CHILDREN: "orange",
+	INSTITUTIONAL: "teal",
 	// PaymentStatus
-	PENDING_DEPOSIT: "bg-[#fff0cf] text-[#6f5600]",
-	DEPOSIT_RECEIVED: "bg-[#d8f5f2] text-[var(--secondary-color)]",
-	BALANCE_PENDING: "bg-[#ffe2cf] text-[var(--primary-color)]",
-	FULLY_PAID: "bg-[#f5ddc8] text-[var(--primary-active)]",
+	PENDIENTE_ANTICIPO: "amber",
+	PENDING_DEPOSIT: "amber",
+	ANTICIPO_RECIBIDO: "teal",
+	DEPOSIT_RECEIVED: "teal",
+	SALDO_PENDIENTE: "orange",
+	BALANCE_PENDING: "orange",
+	PAGADO_COMPLETO: "orange",
+	FULLY_PAID: "orange",
+	// CatalogCategory / availability
+	PERSONAJE: "orange",
+	CHARACTER: "orange",
+	INFLABLE: "teal",
+	INFLATABLE: "teal",
+	DECORACION: "teal",
+	DECORATION: "teal",
+	SERVICIO: "amber",
+	SERVICE: "amber",
+	DISPONIBLE: "teal",
+	AVAILABLE: "teal",
+	ASIGNADO: "amber",
+	RESERVADO_INVENTARIO: "orange",
+	RESERVED_INVENTORY: "orange",
+	MANTENIMIENTO_PENDIENTE: "amber",
+	MAINTENANCE_PENDING: "amber",
+	INACTIVO: "neutral",
+	// VenueType
+	INDOOR: "teal",
+	OUTDOOR: "teal",
 	// QuoteStatus
-	DRAFT: "bg-[#eee8e1] text-[var(--text-secondary)]",
-	SENT: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
-	ACCEPTED: "bg-[#d8f5f2] text-[var(--secondary-color)]",
-	EXPIRED: "bg-[#fff0cf] text-[#6f5600]",
-	REJECTED: "bg-[#ffe0e3] text-[var(--error-color)]",
-	// TaskStatus (COMPLETED/CANCELED ya definidos arriba) + TaskOrigin
-	PENDING: "bg-[#fff0cf] text-[#6f5600]",
-	IN_PROGRESS: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
-	AUTOMATIC: "bg-[#ffe2cf] text-[var(--primary-color)]",
-	SYSTEM: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
-	// CollaboratorRole (OTHER ya definido arriba)
-	MASCOT_COSTUME: "bg-[#ffe2cf] text-[var(--primary-color)]",
-	ENTERTAINER: "bg-[#d9f8f5] text-[var(--secondary-hover)]",
-	LOGISTICS: "bg-[#d8f5f2] text-[var(--secondary-color)]",
+	BORRADOR: "neutral",
+	DRAFT: "neutral",
+	ENVIADA: "teal",
+	SENT: "teal",
+	ACEPTADA: "teal",
+	ACCEPTED: "teal",
+	VENCIDA: "amber",
+	EXPIRED: "amber",
+	RECHAZADA: "red",
+	REJECTED: "red",
+	// TaskStatus + TaskOrigin
+	PENDIENTE: "amber",
+	PENDING: "amber",
+	EN_PROGRESO: "teal",
+	IN_PROGRESS: "teal",
+	COMPLETADA: "teal",
+	CANCELADA: "neutral",
+	PAUSADO: "neutral",
+	ACTIVO: "teal",
+	MANUAL: "neutral",
+	AUTOMATICA: "orange",
+	AUTOMATIC: "orange",
+	SISTEMA: "teal",
+	SYSTEM: "teal",
+	// InteractionChannel / Direction
+	WHATSAPP: "teal",
+	LLAMADA: "amber",
+	PHONE_CALL: "amber",
+	IN_PERSON: "neutral",
+	ENTRANTE: "teal",
+	INBOUND: "teal",
+	SALIENTE: "orange",
+	OUTBOUND: "orange",
+	// CollaboratorRole
+	MASCOT_COSTUME: "orange",
+	ENTERTAINER: "teal",
+	LOGISTICS: "teal",
+	OTRO: "neutral",
+	OTHER: "neutral",
 };
 
 export function StatusBadge({
@@ -113,11 +129,11 @@ export function StatusBadge({
 	value: string;
 	label?: string;
 }) {
+	const tone = statusTones[value] ?? "neutral";
+
 	return (
 		<span
-			className={`inline-flex min-h-7 w-fit items-center rounded-full px-2.5 py-1 text-xs font-black ${
-				badgeStyles[value] ?? "bg-[var(--background-color)] text-[var(--text-primary)]"
-			}`}
+			className={`inline-flex min-h-7 w-fit items-center rounded-full px-2.5 py-1 text-xs font-black ${toneClasses[tone]}`}
 		>
 			{label ?? value.replaceAll("_", " ")}
 		</span>

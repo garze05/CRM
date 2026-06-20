@@ -93,6 +93,9 @@ export default async function EventDetailPage({
 							eventDate: dateKey,
 							startTime: event.startTime ?? "",
 							guestCount: event.guestCount,
+							honoreeName: event.honoreeName ?? "",
+							honoreeAge: event.honoreeAge,
+							partyTheme: event.partyTheme ?? "",
 							venueAddress: event.venueAddress ?? "",
 							internalNotes: event.internalNotes ?? "",
 						}}
@@ -119,7 +122,7 @@ export default async function EventDetailPage({
 							</Link>
 						</div>
 						{event.quotes.length === 0 ? (
-							<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
+							<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
 								Sin cotizaciones todavía. Solo puede haber una cotización
 								enviada activa; las demás quedan en historial.
 							</p>

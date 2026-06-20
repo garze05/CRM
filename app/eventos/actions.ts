@@ -20,7 +20,16 @@ const ALL_EVENT_TYPES = ["CHILDREN", "CORPORATE", "INSTITUTIONAL"];
 export type NewEventState = {
 	error?: string;
 	fieldErrors?: Partial<
-		Record<"clientId" | "name" | "eventType" | "funnelStage" | "eventDate", string>
+		Record<
+			| "clientId"
+			| "name"
+			| "eventType"
+			| "funnelStage"
+			| "eventDate"
+			| "guestCount"
+			| "honoreeAge",
+			string
+		>
 	>;
 	values?: Record<string, string>;
 };
@@ -34,12 +43,16 @@ export async function createEventAction(
 		name: String(formData.get("name") ?? ""),
 		eventType: String(formData.get("eventType") ?? ""),
 		funnelStage: String(formData.get("funnelStage") ?? ""),
-		eventDate: String(formData.get("eventDate") ?? ""),
-		startTime: String(formData.get("startTime") ?? ""),
-		durationHours: String(formData.get("durationHours") ?? ""),
-		venueName: String(formData.get("venueName") ?? ""),
-		venueAddress: String(formData.get("venueAddress") ?? ""),
-		venueType: String(formData.get("venueType") ?? ""),
+			eventDate: String(formData.get("eventDate") ?? ""),
+			startTime: String(formData.get("startTime") ?? ""),
+			durationHours: String(formData.get("durationHours") ?? ""),
+			guestCount: String(formData.get("guestCount") ?? ""),
+			honoreeName: String(formData.get("honoreeName") ?? ""),
+			honoreeAge: String(formData.get("honoreeAge") ?? ""),
+			partyTheme: String(formData.get("partyTheme") ?? ""),
+			venueName: String(formData.get("venueName") ?? ""),
+			venueAddress: String(formData.get("venueAddress") ?? ""),
+			venueType: String(formData.get("venueType") ?? ""),
 	};
 
 	const parsed = eventSchema.safeParse(raw);
@@ -50,12 +63,14 @@ export async function createEventAction(
 			if (
 				key === "clientId" ||
 				key === "name" ||
-				key === "eventType" ||
-				key === "funnelStage" ||
-				key === "eventDate"
-			) {
-				fieldErrors[key] = issue.message;
-			}
+					key === "eventType" ||
+					key === "funnelStage" ||
+					key === "eventDate" ||
+					key === "guestCount" ||
+					key === "honoreeAge"
+				) {
+					fieldErrors[key] = issue.message;
+				}
 		}
 		return { fieldErrors, values: raw };
 	}
@@ -67,21 +82,45 @@ export async function createEventAction(
 		return {
 			fieldErrors: undefined,
 			error: "La duración debe ser un número de horas positivo.",
-			values: raw,
-		};
-	}
+				values: raw,
+			};
+		}
+		const guestCount = parsed.data.guestCount
+			? Number(parsed.data.guestCount)
+			: null;
+		if (guestCount !== null && (Number.isNaN(guestCount) || guestCount < 0)) {
+			return {
+				fieldErrors: {
+					guestCount: "La cantidad de chiquitos debe ser positiva.",
+				},
+				values: raw,
+			};
+		}
+		const honoreeAge = parsed.data.honoreeAge
+			? Number(parsed.data.honoreeAge)
+			: null;
+		if (honoreeAge !== null && (Number.isNaN(honoreeAge) || honoreeAge < 0)) {
+			return {
+				fieldErrors: { honoreeAge: "La edad del festejado debe ser positiva." },
+				values: raw,
+			};
+		}
 
-	const result = await createEvent({
+		const result = await createEvent({
 		clientId: parsed.data.clientId,
 		name: parsed.data.name,
 		eventType: parsed.data.eventType,
 		funnelStage: parsed.data.funnelStage,
-		eventDate: parsed.data.eventDate || null,
-		startTime: parsed.data.startTime || null,
-		durationHours: duration,
-		venueName: parsed.data.venueName || null,
-		venueAddress: parsed.data.venueAddress || null,
-		venueType: parsed.data.venueType || null,
+			eventDate: parsed.data.eventDate || null,
+			startTime: parsed.data.startTime || null,
+			durationHours: duration,
+			guestCount,
+			honoreeName: parsed.data.honoreeName || null,
+			honoreeAge,
+			partyTheme: parsed.data.partyTheme || null,
+			venueName: parsed.data.venueName || null,
+			venueAddress: parsed.data.venueAddress || null,
+			venueType: parsed.data.venueType || null,
 	});
 
 	if (!result.ok) {
@@ -118,6 +157,11 @@ export async function updateEventAction(
 	if (guestCount !== null && (Number.isNaN(guestCount) || guestCount < 0)) {
 		return { error: "El número de invitados debe ser positivo." };
 	}
+	const honoreeAgeRaw = String(formData.get("honoreeAge") ?? "").trim();
+	const honoreeAge = honoreeAgeRaw ? Number(honoreeAgeRaw) : null;
+	if (honoreeAge !== null && (Number.isNaN(honoreeAge) || honoreeAge < 0)) {
+		return { error: "La edad del festejado debe ser un número positivo." };
+	}
 
 	const result = await updateEvent({
 		id,
@@ -126,8 +170,11 @@ export async function updateEventAction(
 		eventType,
 		funnelStage,
 		eventDate: String(formData.get("eventDate") ?? "") || null,
-		startTime: String(formData.get("startTime") ?? "") || null,
-		guestCount,
+			startTime: String(formData.get("startTime") ?? "") || null,
+			guestCount,
+			honoreeName: String(formData.get("honoreeName") ?? "").trim() || null,
+			honoreeAge,
+			partyTheme: String(formData.get("partyTheme") ?? "").trim() || null,
 		venueAddress: String(formData.get("venueAddress") ?? "") || null,
 		internalNotes: String(formData.get("internalNotes") ?? "") || null,
 	});

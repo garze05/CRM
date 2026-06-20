@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { auth } from "../auth";
+import { isAuthBypassEnabled } from "../auth-bypass";
 import { recordActivity } from "../server/activity";
 import { prisma } from "../db";
 import {
@@ -61,13 +62,14 @@ export async function createTaskAction(
 	const { ref, revalidate } = refFromForm(formData);
 	const explicitRevalidate = String(formData.get("revalidate") ?? "").trim();
 	const session = await auth();
+	const createdById = isAuthBypassEnabled() ? undefined : session?.user?.id;
 
 	const task = await createTask({
 		title,
 		description: String(formData.get("description") ?? "").trim() || null,
 		dueAt,
 		ref,
-		createdById: session?.user?.id,
+		createdById,
 	});
 	const activityTarget = activityTargetFromRef(ref, task.id);
 	await recordActivity({
@@ -98,6 +100,7 @@ export async function createStandaloneTaskAction(formData: FormData): Promise<vo
 	const dueDateRaw = String(formData.get("dueDate") ?? "").trim();
 	const dueAt = dueDateRaw ? new Date(`${dueDateRaw}T12:00:00Z`) : null;
 	const session = await auth();
+	const createdById = isAuthBypassEnabled() ? undefined : session?.user?.id;
 	const ref = refFromValue(String(formData.get("entity") ?? ""));
 
 	const task = await createTask({
@@ -105,7 +108,7 @@ export async function createStandaloneTaskAction(formData: FormData): Promise<vo
 		description: String(formData.get("description") ?? "").trim() || null,
 		dueAt,
 		ref,
-		createdById: session?.user?.id,
+		createdById,
 	});
 	const activityTarget = activityTargetFromRef(ref, task.id);
 	await recordActivity({

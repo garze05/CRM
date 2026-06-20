@@ -15,7 +15,14 @@ function activityKind(action: string): ActivityEntry["kind"] {
 }
 
 export async function getDashboardData() {
-	const [events, tasks, interactions, auditLogs] = await Promise.all([
+	const [
+		events,
+		tasks,
+		interactions,
+		auditLogs,
+		quotesAwaitingDecision,
+		pendingDeposits,
+	] = await Promise.all([
 		listEvents(),
 		listGeneralTasks(),
 		prisma.interaction.findMany({
@@ -30,6 +37,16 @@ export async function getDashboardData() {
 			orderBy: { createdAt: "desc" },
 			take: 50,
 			include: { actor: { select: { name: true, email: true } } },
+		}),
+		prisma.quote.count({
+			where: {
+				deletedAt: null,
+				status: { in: ["DRAFT", "SENT"] },
+				selectedOptionId: null,
+			},
+		}),
+		prisma.reservation.count({
+			where: { deletedAt: null, paymentStatus: "PENDING_DEPOSIT" },
 		}),
 	]);
 
@@ -102,6 +119,8 @@ export async function getDashboardData() {
 		confirmedIncome,
 		projectedIncome,
 		closeRate,
+		quotesAwaitingDecision,
+		pendingDeposits,
 		recentActivity,
 	};
 }

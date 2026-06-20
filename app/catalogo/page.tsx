@@ -102,7 +102,7 @@ export default async function PublicCatalogPage({
 								className={`min-h-11 rounded-full border px-5 py-2.5 text-base font-black transition ${
 									isActive
 										? "border-transparent bg-[var(--accent-color)] text-[var(--on-accent)]"
-										: "border-[color:var(--border-color)] bg-[var(--surface-color)] text-[var(--text-secondary)] hover:bg-[#f0ebe4]"
+										: "border-[color:var(--border-color)] bg-[var(--surface-color)] text-[var(--text-secondary)] hover:bg-muted"
 								}`}
 							>
 								{category.label}
@@ -112,7 +112,7 @@ export default async function PublicCatalogPage({
 				</nav>
 
 				{visibleItems.length === 0 ? (
-					<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-10 text-center text-xl font-bold text-[var(--text-secondary)]'>
+					<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-10 text-center text-xl font-bold text-[var(--text-secondary)]'>
 						Pronto agregaremos opciones en esta categoría. ¡Escribinos y te
 						contamos qué tenemos disponible!
 					</p>
@@ -162,7 +162,7 @@ export default async function PublicCatalogPage({
 					href={whatsappHref()}
 					target='_blank'
 					rel='noreferrer'
-					className='mt-3 inline-flex min-h-12 items-center gap-2 rounded-full bg-[var(--secondary-color)] px-6 py-3 text-base font-black text-white transition hover:bg-[var(--secondary-hover)]'
+					className='mt-3 inline-flex min-h-12 items-center gap-2 rounded-full bg-[var(--secondary-color)] px-6 py-3 text-base font-black text-secondary-foreground transition hover:bg-[var(--secondary-hover)]'
 				>
 					Cotizá tu evento por WhatsApp
 				</a>

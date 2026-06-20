@@ -5,6 +5,8 @@ import { SectionCard } from "../components/section-card";
 import { StatusBadge } from "../components/status-badge";
 import { formatCrc } from "../lib/format";
 import { listPackages, listServices } from "../lib/server/packages";
+import { getSettings } from "../lib/server/settings";
+import { packagePriceBreakdown } from "../lib/domain/pricing";
 
 export default async function PackagesPage({
 	searchParams,
@@ -13,10 +15,20 @@ export default async function PackagesPage({
 }) {
 	const { tab } = await searchParams;
 	const activeTab = tab === "servicios" ? "servicios" : "paquetes";
-	const [packages, services] = await Promise.all([
+	const [packages, services, settings] = await Promise.all([
 		listPackages(),
 		listServices(),
+		getSettings(),
 	]);
+	const pricingSettings = {
+		surchargeEducationalPercent: Number(settings.surchargeEducationalPercent),
+		surchargeCorporatePercent: Number(settings.surchargeCorporatePercent),
+		surchargeShoppingCenterPercent: Number(
+			settings.surchargeShoppingCenterPercent,
+		),
+		surchargeAgencyPercent: Number(settings.surchargeAgencyPercent),
+		priceRoundingTo: settings.priceRoundingTo,
+	};
 
 	return (
 		<>
@@ -49,7 +61,7 @@ export default async function PackagesPage({
 							className={`min-h-10 rounded-full px-5 py-2 text-base font-black transition ${
 								activeTab === "paquetes"
 									? "bg-[var(--accent-color)] text-[var(--on-accent)]"
-									: "text-[var(--text-secondary)] hover:bg-[#f0ebe4]"
+									: "text-[var(--text-secondary)] hover:bg-muted"
 							}`}
 						>
 							Paquetes
@@ -60,7 +72,7 @@ export default async function PackagesPage({
 							className={`min-h-10 rounded-full px-5 py-2 text-base font-black transition ${
 								activeTab === "servicios"
 									? "bg-[var(--accent-color)] text-[var(--on-accent)]"
-									: "text-[var(--text-secondary)] hover:bg-[#f0ebe4]"
+									: "text-[var(--text-secondary)] hover:bg-muted"
 							}`}
 						>
 							Servicios adicionales
@@ -69,7 +81,7 @@ export default async function PackagesPage({
 
 					{activeTab === "paquetes" ? (
 						packages.length === 0 ? (
-							<div className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-10 text-center'>
+							<div className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-10 text-center'>
 								<p className='text-2xl font-black text-[var(--text-primary)]'>
 									Sin paquetes todavía
 								</p>
@@ -103,17 +115,33 @@ export default async function PackagesPage({
 											</div>
 											<StatusBadge value={item.active ? "ACTIVO" : "PAUSADO"} />
 										</div>
-										<div className='mt-4 grid gap-2 text-base font-bold text-[var(--text-secondary)]'>
-											<span>Familiar: {formatCrc(item.priceFamily)}</span>
-											<span>Educativo: {formatCrc(item.priceEducational)}</span>
-											<span>Corporativo: {formatCrc(item.priceCorporate)}</span>
+										<div className='mt-4 space-y-2 text-base'>
+											<p className='font-black text-[var(--text-primary)]'>
+												Precio base: {formatCrc(item.basePrice)}
+											</p>
+											<dl className='grid gap-1 text-sm font-semibold text-[var(--text-secondary)]'>
+												{packagePriceBreakdown(
+													item.basePrice,
+													pricingSettings,
+												).map(row => (
+													<div
+														key={row.clientType}
+														className='flex items-center justify-between gap-2'
+													>
+														<dt>{row.label}</dt>
+														<dd className='font-black text-[var(--text-primary)]'>
+															{formatCrc(row.price)}
+														</dd>
+													</div>
+												))}
+											</dl>
 										</div>
 									</li>
 								))}
 							</ul>
 						)
 					) : services.length === 0 ? (
-						<div className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-10 text-center'>
+						<div className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-10 text-center'>
 							<p className='text-2xl font-black text-[var(--text-primary)]'>
 								Sin servicios adicionales todavía
 							</p>

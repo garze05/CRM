@@ -96,8 +96,8 @@ export function PhotoThumbnailControl(props: PhotoThumbnailControlProps) {
 				) : (
 					defaultThumbnail
 				)}
-				<span className='absolute inset-0 grid place-items-center bg-black/0 text-white opacity-0 transition group-hover:bg-black/45 group-hover:opacity-100'>
-					<span className='grid place-items-center rounded-lg bg-[#1f2d44] px-3 py-3 shadow-[var(--crisp-shadow)]'>
+				<span className='absolute inset-0 grid place-items-center bg-black/0 text-background opacity-0 transition group-hover:bg-black/45 group-hover:opacity-100'>
+					<span className='grid place-items-center rounded-lg bg-foreground px-3 py-3 shadow-[var(--crisp-shadow)]'>
 						<Icon
 							icon='material-symbols:photo-camera-rounded'
 							className='h-7 w-7'
@@ -118,7 +118,7 @@ export function PhotoThumbnailControl(props: PhotoThumbnailControlProps) {
 					<button
 						type='button'
 						onClick={openFilePicker}
-						className='flex min-h-12 w-full items-center gap-3 px-4 py-3 text-left text-lg font-bold text-[var(--text-primary)] transition hover:bg-[#f0ebe4]'
+						className='flex min-h-12 w-full items-center gap-3 px-4 py-3 text-left text-lg font-bold text-[var(--text-primary)] transition hover:bg-muted'
 						role='menuitem'
 					>
 						<Icon
@@ -132,7 +132,7 @@ export function PhotoThumbnailControl(props: PhotoThumbnailControlProps) {
 						<button
 							type='button'
 							onClick={removePhoto}
-							className='flex min-h-12 w-full items-center gap-3 px-4 py-3 text-left text-lg font-bold text-[var(--text-primary)] transition hover:bg-[#f0ebe4]'
+							className='flex min-h-12 w-full items-center gap-3 px-4 py-3 text-left text-lg font-bold text-[var(--text-primary)] transition hover:bg-muted'
 							role='menuitem'
 						>
 							<Icon

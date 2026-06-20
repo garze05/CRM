@@ -34,9 +34,7 @@ export function PackageBuilder({ catalog }: { catalog: CatalogListItem[] }) {
 	const [lines, setLines] = useState<BuilderLine[]>([]);
 	const [name, setName] = useState("");
 	const [durationHours, setDurationHours] = useState("");
-	const [priceFamily, setPriceFamily] = useState("");
-	const [priceEducational, setPriceEducational] = useState("");
-	const [priceCorporate, setPriceCorporate] = useState("");
+	const [basePrice, setBasePrice] = useState("");
 
 	const available = useMemo(() => {
 		const query = search.toLowerCase().trim();
@@ -85,13 +83,9 @@ export function PackageBuilder({ catalog }: { catalog: CatalogListItem[] }) {
 	if (lines.length === 0) {
 		validationIssues.push("Agregá al menos un ítem del catálogo.");
 	}
-	if (
-		[priceFamily, priceEducational, priceCorporate].some(
-			price => price.trim() === "" || Number(price) <= 0,
-		)
-	) {
+	if (basePrice.trim() === "" || Number(basePrice) <= 0) {
 		validationIssues.push(
-			"Definí los tres precios (familiar, educativo y corporativo).",
+			"Definí el precio base del paquete (el recargo por tipo de cliente se aplica automáticamente).",
 		);
 	}
 
@@ -134,7 +128,7 @@ export function PackageBuilder({ catalog }: { catalog: CatalogListItem[] }) {
 
 				<ul className='mt-4 list-none space-y-3 p-0'>
 					{available.length === 0 ? (
-						<li className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
+						<li className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
 							Sin resultados en el catálogo.
 						</li>
 					) : (
@@ -207,7 +201,7 @@ export function PackageBuilder({ catalog }: { catalog: CatalogListItem[] }) {
 							Ítems incluidos
 						</p>
 						{lines.length === 0 ? (
-							<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-5 text-center text-base font-bold text-[var(--text-secondary)]'>
+							<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-5 text-center text-base font-bold text-[var(--text-secondary)]'>
 								Todavía no hay ítems. Agregalos desde el catálogo.
 							</p>
 						) : (
@@ -224,7 +218,7 @@ export function PackageBuilder({ catalog }: { catalog: CatalogListItem[] }) {
 											<button
 												type='button'
 												onClick={() => changeQuantity(line.item.id, -1)}
-												className='grid h-9 w-9 place-items-center rounded-full border border-[color:var(--border-color)] text-lg font-black transition hover:bg-[#f0ebe4]'
+												className='grid h-9 w-9 place-items-center rounded-full border border-[color:var(--border-color)] text-lg font-black transition hover:bg-muted'
 												aria-label={`Quitar uno de ${line.item.name}`}
 											>
 												−
@@ -238,7 +232,7 @@ export function PackageBuilder({ catalog }: { catalog: CatalogListItem[] }) {
 											<button
 												type='button'
 												onClick={() => changeQuantity(line.item.id, 1)}
-												className='grid h-9 w-9 place-items-center rounded-full border border-[color:var(--border-color)] text-lg font-black transition hover:bg-[#f0ebe4]'
+												className='grid h-9 w-9 place-items-center rounded-full border border-[color:var(--border-color)] text-lg font-black transition hover:bg-muted'
 												aria-label={`Agregar uno de ${line.item.name}`}
 											>
 												+
@@ -250,48 +244,26 @@ export function PackageBuilder({ catalog }: { catalog: CatalogListItem[] }) {
 						)}
 					</div>
 
-					<div className='grid gap-4 sm:grid-cols-3'>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-							<span>Precio familiar (₡)</span>
-							<input
-								type='number'
-								name='priceFamily'
-								min='0'
-								value={priceFamily}
-								onChange={event => setPriceFamily(event.target.value)}
-								placeholder='150000'
-								className='form-control'
-							/>
-						</label>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-							<span>Precio educativo (₡)</span>
-							<input
-								type='number'
-								name='priceEducational'
-								min='0'
-								value={priceEducational}
-								onChange={event => setPriceEducational(event.target.value)}
-								placeholder='157500'
-								className='form-control'
-							/>
-						</label>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-							<span>Precio corporativo (₡)</span>
-							<input
-								type='number'
-								name='priceCorporate'
-								min='0'
-								value={priceCorporate}
-								onChange={event => setPriceCorporate(event.target.value)}
-								placeholder='165000'
-								className='form-control'
-							/>
-						</label>
-					</div>
+					<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
+						<span>Precio base (₡)</span>
+						<input
+							type='number'
+							name='basePrice'
+							min='0'
+							value={basePrice}
+							onChange={event => setBasePrice(event.target.value)}
+							placeholder='150000'
+							className='form-control'
+						/>
+						<span className='block text-sm font-semibold text-[var(--text-secondary)]'>
+							El recargo por tipo de cliente (escuela, empresa, agencia…) se
+							aplica automáticamente sobre este precio según los Ajustes.
+						</span>
+					</label>
 
 					{validationIssues.length > 0 ? (
 						<ul
-							className='list-none space-y-1 rounded-lg bg-[#fff0cf] p-4 text-base font-bold text-[#6f5600]'
+							className='list-none space-y-1 rounded-lg bg-[color-mix(in_srgb,var(--tertiary-color)_30%,transparent)] p-4 text-base font-bold text-[var(--warning-color)]'
 							aria-label='Pendientes para completar el paquete'
 						>
 							{validationIssues.map(issue => (
@@ -306,7 +278,7 @@ export function PackageBuilder({ catalog }: { catalog: CatalogListItem[] }) {
 							))}
 						</ul>
 					) : (
-						<p className='flex items-center gap-2 rounded-lg bg-[#d8f5f2] p-4 text-base font-black text-[var(--secondary-color)]'>
+						<p className='flex items-center gap-2 rounded-lg bg-[color-mix(in_srgb,var(--secondary-color)_20%,transparent)] p-4 text-base font-black text-[var(--secondary-color)]'>
 							<Icon
 								icon='material-symbols:check-circle-rounded'
 								className='h-5 w-5 shrink-0'
@@ -317,7 +289,7 @@ export function PackageBuilder({ catalog }: { catalog: CatalogListItem[] }) {
 					)}
 
 					{state.error ? (
-						<p className='rounded-lg bg-[#ffe0e3] p-4 text-base font-bold text-[var(--error-color)]'>
+						<p className='rounded-lg bg-[color-mix(in_srgb,var(--error-color)_16%,transparent)] p-4 text-base font-bold text-[var(--error-color)]'>
 							{state.error}
 						</p>
 					) : null}

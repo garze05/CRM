@@ -120,7 +120,7 @@ function MonthView({
 										<Link
 											key={event.id}
 											href={`/eventos/${event.id}`}
-											className='block truncate rounded bg-[#f0ebe4] px-1.5 py-1 text-sm font-bold text-[var(--text-primary)] transition hover:bg-[var(--accent-color)] hover:text-[var(--on-accent)]'
+											className='block truncate rounded bg-muted px-1.5 py-1 text-sm font-bold text-[var(--text-primary)] transition hover:bg-[var(--accent-color)] hover:text-[var(--on-accent)]'
 											title={`${event.startTime} · ${event.name} (${event.clientName})`}
 										>
 											{event.startTime} {event.clientName}
@@ -177,7 +177,7 @@ function WeekView({
 							className={`rounded-lg border p-2 ${
 								isToday
 									? "border-[color:var(--accent-color)] bg-[var(--surface-color)]"
-									: "border-[color:var(--border-color)] bg-[#faf7f1]"
+									: "border-[color:var(--border-color)] bg-card"
 							}`}
 						>
 							<p className='text-center text-sm font-black uppercase text-[var(--text-muted)]'>
@@ -234,7 +234,7 @@ function DayView({
 				</p>
 			))}
 			{dayEvents.length === 0 ? (
-				<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-8 text-center text-lg font-bold text-[var(--text-secondary)]'>
+				<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-8 text-center text-lg font-bold text-[var(--text-secondary)]'>
 					Sin eventos este día.
 				</p>
 			) : (
@@ -311,7 +311,7 @@ export function EventsCalendar({
 							className={`min-h-10 rounded-full px-4 py-2 text-base font-black transition ${
 								rango === tab.value
 									? "bg-[var(--accent-color)] text-[var(--on-accent)]"
-									: "text-[var(--text-secondary)] hover:bg-[#f0ebe4]"
+									: "text-[var(--text-secondary)] hover:bg-muted"
 							}`}
 						>
 							{tab.label}

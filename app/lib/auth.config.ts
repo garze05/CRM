@@ -9,6 +9,7 @@
 //      es la credencial que la API verifica — misma audiencia (AUTH_GOOGLE_ID).
 import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
+import { isAuthBypassEnabled } from "./auth-bypass";
 
 // Prefijos públicos: el catálogo es vista pública (sin login) y las rutas de
 // auth deben ser accesibles para poder iniciar sesión.
@@ -78,6 +79,7 @@ export const authConfig = {
 	callbacks: {
 		// Usado por el middleware para autorizar cada request.
 		authorized({ auth, request }) {
+			if (isAuthBypassEnabled()) return true;
 			const { pathname } = request.nextUrl;
 			if (isPublicPath(pathname)) return true;
 			return !!auth?.user;

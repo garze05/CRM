@@ -4,6 +4,7 @@
 // `codigo`. El CRM solo envía datos y persiste lo que devuelve.
 // Contrato y decisiones de mapeo: docs/integracion-db-auth-quotation.md.
 import "server-only";
+import type { QuoteAiModelId } from "../domain/ai-models";
 
 const BASE_URL = process.env.QUOTATION_API_URL ?? "http://localhost:8000";
 
@@ -31,10 +32,12 @@ export type ManualQuoteRequest = {
 	homenajeado?: string;
 	edad?: string;
 	invitados?: string;
+	detalle?: string;
 	tipo_cliente: string;
 	invoice?: boolean;
 	items: QuotationItem[];
 	use_ai?: boolean;
+	ai_model?: QuoteAiModelId;
 };
 
 // --- Contrato de response ---
@@ -75,6 +78,11 @@ export type DocumentRenderRequest = {
 export type DocumentRenderResponse = {
 	codigo: string;
 	files: { docx: string; pdf?: string };
+};
+
+export type DescriptionRequest = {
+	cotizacion: QuotationResponse;
+	ai_model?: QuoteAiModelId;
 };
 
 // --- Errores ---
@@ -157,6 +165,13 @@ export function renderDocument(
 	idToken: string | undefined,
 ): Promise<DocumentRenderResponse> {
 	return request<DocumentRenderResponse>("/documents/render", idToken, payload);
+}
+
+export function generateQuoteDescription(
+	payload: DescriptionRequest,
+	idToken: string | undefined,
+): Promise<{ descripcion: string }> {
+	return request<{ descripcion: string }>("/descriptions", idToken, payload);
 }
 
 /**

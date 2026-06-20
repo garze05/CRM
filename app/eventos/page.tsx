@@ -68,7 +68,7 @@ export default async function EventsPage({
 							className={`flex min-h-10 items-center gap-2 rounded-full px-4 py-2 text-base font-black transition ${
 								!isCalendar
 									? "bg-[var(--accent-color)] text-[var(--on-accent)]"
-									: "text-[var(--text-secondary)] hover:bg-[#f0ebe4]"
+									: "text-[var(--text-secondary)] hover:bg-muted"
 							}`}
 						>
 							<IconLabel
@@ -82,7 +82,7 @@ export default async function EventsPage({
 							className={`flex min-h-10 items-center gap-2 rounded-full px-4 py-2 text-base font-black transition ${
 								isCalendar
 									? "bg-[var(--accent-color)] text-[var(--on-accent)]"
-									: "text-[var(--text-secondary)] hover:bg-[#f0ebe4]"
+									: "text-[var(--text-secondary)] hover:bg-muted"
 							}`}
 						>
 							<IconLabel

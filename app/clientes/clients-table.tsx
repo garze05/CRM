@@ -40,13 +40,16 @@ const columns: DataTableColumn<ClientRow>[] = [
 		render: client => (
 			<div className='flex items-center gap-3'>
 				<InitialsThumbnail
+					size='xs'
 					initials={`${client.firstName[0]}${client.lastName[0]}`}
 				/>
-				<div>
-					<p className='font-black text-[var(--text-primary)]'>
+				<div className='min-w-0'>
+					<p className='truncate font-black text-[var(--text-primary)]'>
 						{fullName(client)}
 					</p>
-					<p className='mt-1 text-base'>{client.phoneFormatted}</p>
+					<p className='truncate text-sm text-[var(--text-muted)]'>
+						{client.phoneFormatted}
+					</p>
 				</div>
 			</div>
 		),

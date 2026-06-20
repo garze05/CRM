@@ -75,7 +75,7 @@ function SwipeActivityItem({ entry }: { entry: ActivityEntry }) {
 	if (dismissed) return null;
 
 	return (
-		<li className='relative overflow-hidden rounded-lg border border-[color:var(--border-color)] bg-[#fff4f0]'>
+		<li className='relative overflow-hidden rounded-lg border border-[color:var(--border-color)] bg-[color-mix(in_srgb,var(--accent-color)_12%,transparent)]'>
 			<div className='absolute inset-y-0 right-0 flex w-28 items-center justify-center gap-1.5 text-xs font-black text-[var(--error-color)]'>
 				<Icon
 					icon='material-symbols:delete-outline-rounded'
@@ -157,7 +157,7 @@ export function ActivityFeed({ entries }: { entries: ActivityEntry[] }) {
 							className={`min-h-8 rounded-lg border px-3 text-xs font-black transition ${
 								filter === item
 									? "border-transparent bg-[var(--accent-color)] text-[var(--on-accent)]"
-									: "border-[color:var(--border-color)] bg-[var(--surface-color)] text-[var(--text-secondary)] hover:bg-[#f0ebe4]"
+									: "border-[color:var(--border-color)] bg-[var(--surface-color)] text-[var(--text-secondary)] hover:bg-muted"
 							}`}
 						>
 							{item}
@@ -170,7 +170,7 @@ export function ActivityFeed({ entries }: { entries: ActivityEntry[] }) {
 			</div>
 
 			{pageEntries.length === 0 ? (
-				<p className='grid flex-1 place-items-center rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] text-sm font-bold text-[var(--text-secondary)]'>
+				<p className='grid flex-1 place-items-center rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted text-sm font-bold text-[var(--text-secondary)]'>
 					Sin actividad registrada.
 				</p>
 			) : (

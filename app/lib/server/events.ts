@@ -4,7 +4,11 @@
 // (enums de Prisma) y nullables donde el dato vive en Quote/Reservation.
 import "server-only";
 import { prisma } from "../db";
-import type { FunnelStage } from "../domain/funnel";
+import {
+	type FunnelStage,
+	QUALIFICATION_REQUIRED_STAGES,
+	qualificationError,
+} from "../domain/funnel";
 
 /** Fecha date-only (@db.Date) → "YYYY-MM-DD" en UTC (evita el corrimiento de día). */
 function toDateKey(date: Date | null): string {
@@ -243,6 +247,10 @@ export type CreateEventData = {
 	eventDate: string | null;
 	startTime: string | null;
 	durationHours: number | null;
+	guestCount: number | null;
+	honoreeName: string | null;
+	honoreeAge: number | null;
+	partyTheme: string | null;
 	venueName: string | null;
 	venueAddress: string | null;
 	venueType: string | null;
@@ -263,6 +271,20 @@ export async function createEvent(
 		return { ok: false, error: "El cliente seleccionado no existe." };
 	}
 
+	// No se puede crear un evento ya COTIZADO sin calificación: forzá arrancar en
+	// Prospecto/Contactado, calificar y luego avanzar (misma regla que updateEvent).
+	if (QUALIFICATION_REQUIRED_STAGES.includes(data.funnelStage as FunnelStage)) {
+		const reason = qualificationError({
+			isChildrenEvent: data.eventType === "CHILDREN",
+			hasEventDate: Boolean(data.eventDate),
+			hasGuestCount: data.guestCount != null,
+			hasVenueAddress: Boolean(data.venueAddress?.trim()),
+			hasHonoreeAge: data.honoreeAge != null,
+			hasTheme: Boolean(data.partyTheme?.trim()),
+		});
+		if (reason) return { ok: false, error: reason };
+	}
+
 	const event = await prisma.event.create({
 		data: {
 			clientId: data.clientId,
@@ -272,6 +294,10 @@ export async function createEvent(
 			eventDate: data.eventDate ? new Date(`${data.eventDate}T00:00:00Z`) : null,
 			startTime: data.startTime || null,
 			durationHours: data.durationHours ?? null,
+			guestCount: data.guestCount ?? null,
+			honoreeName: data.honoreeName || null,
+			honoreeAge: data.honoreeAge ?? null,
+			partyTheme: data.partyTheme || null,
 			venueName: data.venueName || null,
 			venueAddress: data.venueAddress || null,
 			venueType: (data.venueType || null) as never,
@@ -291,6 +317,9 @@ export type UpdateEventData = {
 	eventDate: string | null;
 	startTime: string | null;
 	guestCount: number | null;
+	honoreeName: string | null;
+	honoreeAge: number | null;
+	partyTheme: string | null;
 	venueAddress: string | null;
 	internalNotes: string | null;
 };
@@ -300,7 +329,7 @@ export async function updateEvent(
 ): Promise<CreateEventResult> {
 	const existing = await prisma.event.findFirst({
 		where: { id: data.id, deletedAt: null },
-		select: { id: true },
+		select: { id: true, funnelStage: true, requestedCharacterId: true },
 	});
 	if (!existing) return { ok: false, error: "El evento no existe." };
 
@@ -309,6 +338,27 @@ export async function updateEvent(
 		select: { id: true },
 	});
 	if (!client) return { ok: false, error: "El cliente seleccionado no existe." };
+
+	// Compuerta de calificación: bloquea avanzar a COTIZADO (o más allá) sin los
+	// datos de calificación. Solo aplica al cruzar la compuerta hacia adelante.
+	const fromStage = existing.funnelStage as FunnelStage;
+	const toStage = data.funnelStage as FunnelStage;
+	const crossingQualificationGate =
+		QUALIFICATION_REQUIRED_STAGES.includes(toStage) &&
+		!QUALIFICATION_REQUIRED_STAGES.includes(fromStage);
+	if (crossingQualificationGate) {
+		const reason = qualificationError({
+			isChildrenEvent: data.eventType === "CHILDREN",
+			hasEventDate: Boolean(data.eventDate),
+			hasGuestCount: data.guestCount != null,
+			hasVenueAddress: Boolean(data.venueAddress?.trim()),
+			hasHonoreeAge: data.honoreeAge != null,
+			hasTheme: Boolean(
+				existing.requestedCharacterId || data.partyTheme?.trim(),
+			),
+		});
+		if (reason) return { ok: false, error: reason };
+	}
 
 	await prisma.event.update({
 		where: { id: data.id },
@@ -320,6 +370,9 @@ export async function updateEvent(
 			eventDate: data.eventDate ? new Date(`${data.eventDate}T00:00:00Z`) : null,
 			startTime: data.startTime || null,
 			guestCount: data.guestCount ?? null,
+			honoreeName: data.honoreeName || null,
+			honoreeAge: data.honoreeAge ?? null,
+			partyTheme: data.partyTheme || null,
 			venueAddress: data.venueAddress || null,
 			internalNotes: data.internalNotes || null,
 		},

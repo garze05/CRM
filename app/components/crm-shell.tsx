@@ -7,6 +7,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { logout } from "../lib/actions/auth";
+import { ThemeToggle } from "./theme-toggle";
 
 addCollection(materialSymbolsIcons);
 
@@ -139,7 +140,7 @@ function NavigationLink({
 			className={`flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-[0.95rem] font-extrabold transition ${
 				isActive
 					? "bg-[var(--accent-color)] text-[var(--on-accent)] shadow-sm"
-					: "text-[var(--text-secondary)] hover:bg-[#f0ebe4] hover:text-[var(--primary-color)]"
+					: "text-[var(--text-secondary)] hover:bg-muted hover:text-[var(--primary-color)]"
 			}`}
 		>
 			<Icon icon={item.icon} className='h-5 w-5 shrink-0' aria-hidden='true' />
@@ -257,12 +258,12 @@ function GlobalSearch() {
 						<input
 							type='search'
 							placeholder='Buscar cliente o evento'
-							className='search-control h-11 min-h-11 bg-[#efede8] text-sm'
+							className='search-control h-11 min-h-11 bg-[var(--input-bg)] text-sm'
 						/>
 					</label>
 					<button
 						type='button'
-						className='flex h-11 shrink-0 items-center gap-2 rounded-lg bg-[var(--secondary-color)] px-4 text-sm font-black text-white shadow-[var(--crisp-shadow)] transition hover:bg-[var(--secondary-hover)]'
+						className='flex h-11 shrink-0 items-center gap-2 rounded-lg bg-[var(--secondary-color)] px-4 text-sm font-black text-secondary-foreground shadow-[var(--crisp-shadow)] transition hover:bg-[var(--secondary-hover)]'
 					>
 						<Icon
 							icon='material-symbols:mic-rounded'
@@ -272,19 +273,22 @@ function GlobalSearch() {
 						<span>Voz</span>
 					</button>
 				</div>
-				<form action={logout}>
-					<button
-						type='submit'
-						className='flex h-11 shrink-0 items-center gap-2 rounded-lg px-3 text-sm font-black text-[var(--text-secondary)] transition hover:bg-[#f0ebe4] hover:text-[var(--primary-color)]'
-					>
-						<Icon
-							icon='material-symbols:logout-rounded'
-							className='h-5 w-5 shrink-0'
-							aria-hidden='true'
-						/>
-						<span>Cerrar sesión</span>
-					</button>
-				</form>
+				<div className='flex shrink-0 items-center gap-2'>
+					<ThemeToggle />
+					<form action={logout}>
+						<button
+							type='submit'
+							className='flex h-11 shrink-0 items-center gap-2 rounded-lg px-3 text-sm font-black text-[var(--text-secondary)] transition hover:bg-[var(--muted)] hover:text-[var(--primary-color)]'
+						>
+							<Icon
+								icon='material-symbols:logout-rounded'
+								className='h-5 w-5 shrink-0'
+								aria-hidden='true'
+							/>
+							<span>Cerrar sesión</span>
+						</button>
+					</form>
+				</div>
 			</div>
 		</header>
 	);
@@ -314,7 +318,7 @@ function MobileNavigation() {
 						className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg px-1 text-xs font-black transition ${
 							isActive
 								? "bg-[var(--accent-color)] text-[var(--on-accent)]"
-								: "text-[var(--text-secondary)] hover:bg-[#f0ebe4]"
+								: "text-[var(--text-secondary)] hover:bg-muted"
 						}`}
 					>
 						<Icon
@@ -354,7 +358,7 @@ export function CrmShell({
 		<main className='min-h-screen bg-[var(--background-color)] text-[var(--text-primary)]'>
 			<a
 				href='#contenido-principal'
-				className='sr-only z-50 rounded-lg bg-[var(--primary-color)] px-4 py-3 text-base font-black text-white focus:not-sr-only focus:absolute focus:left-4 focus:top-4'
+				className='sr-only z-50 rounded-lg bg-[var(--primary-color)] px-4 py-3 text-base font-black text-primary-foreground focus:not-sr-only focus:absolute focus:left-4 focus:top-4'
 			>
 				Saltar al contenido principal
 			</a>

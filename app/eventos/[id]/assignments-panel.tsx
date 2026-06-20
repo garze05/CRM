@@ -94,7 +94,7 @@ export function AssignmentsPanel({
 				<form
 					ref={formRef}
 					action={formAction}
-					className='mb-5 space-y-3 rounded-lg border border-[color:var(--border-color)] bg-[#f7f2ec] p-4'
+					className='mb-5 space-y-3 rounded-lg border border-[color:var(--border-color)] bg-muted p-4'
 				>
 					<input type='hidden' name='eventId' value={eventId} />
 					<ClientCombobox
@@ -123,7 +123,7 @@ export function AssignmentsPanel({
 			) : null}
 
 			{assignments.length === 0 ? (
-				<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
+				<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
 					Sin colaboradores asignados todavía. El sistema validará conflictos de
 					fecha y hora al asignar.
 				</p>
@@ -174,7 +174,7 @@ export function AssignmentsPanel({
 									<input type='hidden' name='eventId' value={eventId} />
 									<button
 										type='submit'
-										className='min-h-11 rounded-full px-4 py-2 text-base font-black text-[var(--error-color)] transition hover:bg-[#ffe0e3]'
+										className='min-h-11 rounded-full px-4 py-2 text-base font-black text-[var(--error-color)] transition hover:bg-[color-mix(in_srgb,var(--error-color)_16%,transparent)]'
 									>
 										Quitar
 									</button>

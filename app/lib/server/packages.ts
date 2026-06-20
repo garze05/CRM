@@ -6,9 +6,7 @@ export type PackageListRow = {
 	name: string;
 	description: string | null;
 	durationHours: number;
-	priceFamily: number;
-	priceEducational: number;
-	priceCorporate: number;
+	basePrice: number;
 	active: boolean;
 	itemCount: number;
 };
@@ -33,9 +31,7 @@ export async function listPackages(): Promise<PackageListRow[]> {
 		name: item.name,
 		description: item.description,
 		durationHours: Number(item.durationHours),
-		priceFamily: Number(item.priceFamily),
-		priceEducational: Number(item.priceEducational),
-		priceCorporate: Number(item.priceCorporate),
+		basePrice: Number(item.basePrice),
 		active: item.active,
 		itemCount: item._count.items,
 	}));
@@ -60,9 +56,7 @@ export type CreatePackageInput = {
 	name: string;
 	description?: string | null;
 	durationHours: number;
-	priceFamily: number;
-	priceEducational: number;
-	priceCorporate: number;
+	basePrice: number;
 	items: { catalogItemId: string; quantity: number }[];
 };
 
@@ -72,9 +66,7 @@ export async function createPackage(input: CreatePackageInput): Promise<{ id: st
 			name: input.name,
 			description: input.description || null,
 			durationHours: input.durationHours,
-			priceFamily: input.priceFamily,
-			priceEducational: input.priceEducational,
-			priceCorporate: input.priceCorporate,
+			basePrice: input.basePrice,
 			items: {
 				create: input.items.map(item => ({
 					catalogItemId: item.catalogItemId,

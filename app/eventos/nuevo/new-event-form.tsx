@@ -136,6 +136,51 @@ export function NewEventForm({
 							/>
 						</label>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
+							<span>Cantidad de chiquitos</span>
+							<input
+								type='number'
+								name='guestCount'
+								min='0'
+								defaultValue={values?.guestCount}
+								className='form-control'
+								placeholder='25'
+							/>
+							<FieldError message={errors?.guestCount} />
+						</label>
+						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
+							<span>Nombre del festejado/a</span>
+							<input
+								name='honoreeName'
+								defaultValue={values?.honoreeName}
+								className='form-control'
+								placeholder='Emma'
+							/>
+						</label>
+						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
+							<span>Edad del festejado/a</span>
+							<input
+								type='number'
+								name='honoreeAge'
+								min='0'
+								defaultValue={values?.honoreeAge}
+								className='form-control'
+								placeholder='6'
+							/>
+							<FieldError message={errors?.honoreeAge} />
+						</label>
+						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
+							<span>Tema o personaje solicitado</span>
+							<input
+								name='partyTheme'
+								defaultValue={values?.partyTheme}
+								className='form-control'
+								placeholder='Ej. Mario Bros, princesas, dinosaurios…'
+							/>
+							<span className='block text-base font-semibold text-[var(--text-secondary)]'>
+								Este dato ayuda a recomendar el paquete antes de soltar precio.
+							</span>
+						</label>
+						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 							<span>Tipo de lugar</span>
 							<select
 								name='venueType'
@@ -169,7 +214,7 @@ export function NewEventForm({
 						servicios y transporte.
 					</p>
 					{state.error ? (
-						<p className='mt-4 rounded-lg bg-[#ffe0e3] px-4 py-3 text-sm font-black text-[var(--error-color)]'>
+						<p className='mt-4 rounded-lg bg-[color-mix(in_srgb,var(--error-color)_16%,transparent)] px-4 py-3 text-sm font-black text-[var(--error-color)]'>
 							{state.error}
 						</p>
 					) : null}

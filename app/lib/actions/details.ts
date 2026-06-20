@@ -136,18 +136,33 @@ export async function updateQuoteDetailAction(
 ): Promise<void> {
 	const id = text(formData, "id");
 	if (!id) return;
-	const quote = await prisma.quote.update({
+
+	const current = await prisma.quote.findUnique({
+		where: { id },
+		select: { quoteNumber: true, eventId: true, documentPayload: true },
+	});
+	if (!current) return;
+
+	const description = text(formData, "description") || null;
+	const documentPayload =
+		current.documentPayload &&
+		typeof current.documentPayload === "object" &&
+		!Array.isArray(current.documentPayload)
+			? { ...current.documentPayload, descripcion: description ?? "" }
+			: undefined;
+
+	await prisma.quote.update({
 		where: { id },
 		data: {
 			status: text(formData, "status") as never,
 			validUntil: dateOnly(text(formData, "validUntil")) ?? new Date(),
-			notes: text(formData, "notes") || null,
+			notes: description,
+			...(documentPayload ? { documentPayload } : {}),
 		},
-		select: { quoteNumber: true, eventId: true },
 	});
-	await touchActivity("quote.updated", "Quote", id, `actualizó cotización ${quote.quoteNumber}`);
+	await touchActivity("quote.updated", "Quote", id, `actualizó cotización ${current.quoteNumber}`);
 	revalidatePath(`/cotizaciones/${id}`);
-	revalidatePath(`/eventos/${quote.eventId}`);
+	revalidatePath(`/eventos/${current.eventId}`);
 	revalidatePath("/cotizaciones");
 }
 

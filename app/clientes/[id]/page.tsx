@@ -179,12 +179,12 @@ export default async function ClientDetailPage({
 						</div>
 
 						{client.events.length === 0 ? (
-							<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
+							<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
 								Sin eventos vinculados todavía.
 							</p>
 						) : (
 							<div className='max-w-full overflow-x-auto rounded-lg border border-[color:var(--border-color)]'>
-								<div className='grid min-w-[680px] grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr] bg-[#f0ebe4] px-5 py-4 text-base font-black text-[var(--text-secondary)]'>
+								<div className='grid min-w-[680px] grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr] bg-muted px-5 py-4 text-base font-black text-[var(--text-secondary)]'>
 									<span>Evento</span>
 									<span>Fecha</span>
 									<span>Tipo</span>
@@ -194,7 +194,7 @@ export default async function ClientDetailPage({
 									<Link
 										key={event.id}
 										href={`/eventos/${event.id}`}
-										className='grid min-w-[680px] grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr] items-center border-t border-[color:var(--border-color)] px-5 py-5 text-lg text-[var(--text-secondary)] transition hover:bg-[#f7f2ec]'
+										className='grid min-w-[680px] grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr] items-center border-t border-[color:var(--border-color)] px-5 py-5 text-lg text-[var(--text-secondary)] transition hover:bg-muted'
 									>
 										<span className='font-bold text-[var(--text-primary)]'>
 											{event.name}
@@ -234,7 +234,7 @@ export default async function ClientDetailPage({
 							</button>
 						</div>
 						{client.interactions.length === 0 ? (
-							<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
+							<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
 								Sin interacciones registradas todavía.
 							</p>
 						) : (

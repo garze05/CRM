@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "../db";
 import { auth } from "../auth";
+import { isAuthBypassEnabled } from "../auth-bypass";
 
 export type EntityType =
 	| "Client"
@@ -24,6 +25,7 @@ export async function recordActivity({
 	changes?: Record<string, unknown>;
 }) {
 	const session = await auth();
+	const actorId = isAuthBypassEnabled() ? null : (session?.user?.id ?? null);
 	await prisma.auditLog.create({
 		data: {
 			action,
@@ -31,7 +33,7 @@ export async function recordActivity({
 			entityId,
 			changes: (changes ?? undefined) as never,
 			context: { summary } as never,
-			actorId: session?.user?.id ?? null,
+			actorId,
 		},
 	});
 

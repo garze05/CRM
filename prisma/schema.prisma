@@ -290,11 +290,23 @@ model Event {
 
   venueName    String?
   venueAddress String?
+  /// Coordenadas del lugar (selector tipo mapa). Alimentan el cálculo de transporte
+  /// por km contra el origen en Settings (transportOriginLat/Lng).
+  venueLat     Decimal? @db.Decimal(10, 7)
+  venueLng     Decimal? @db.Decimal(10, 7)
   venueType    VenueType?
   guestCount   Int?
   /// Edad del festejado (eventos infantiles; orienta sugerencia de personaje).
   honoreeAge   Int?
   honoreeName  String?
+
+  /// Personaje/botarga ESPECÍFICO solicitado en la calificación (ej. "Mario Bros"),
+  /// aunque el paquete contratado sea genérico ("1 hora de personaje"). Es una
+  /// referencia al catálogo para poder buscar "todos los eventos que pidieron X".
+  requestedCharacterId String? @db.Uuid
+  /// Tema/ambientación de la fiesta cuando NO es un personaje del catálogo
+  /// (ej. "dinosaurios", "fútbol"). Texto libre, complementa requestedCharacterId.
+  partyTheme           String?
 
   packageId String? @db.Uuid
 
@@ -308,10 +320,11 @@ model Event {
   syncStatus              CalendarSyncStatus @default(NOT_SYNCED)
   lastSyncedAt            DateTime?
 
-  client       Client            @relation(fields: [clientId], references: [id])
-  package      Package?          @relation(fields: [packageId], references: [id])
-  services     EventService[]
-  characters   EventCatalogItem[]
+  client             Client            @relation(fields: [clientId], references: [id])
+  package            Package?          @relation(fields: [packageId], references: [id])
+  requestedCharacter CatalogItem?      @relation("EventRequestedCharacter", fields: [requestedCharacterId], references: [id])
+  services           EventService[]
+  characters         EventCatalogItem[]
   assignments  EventAssignment[]
   quotes       Quote[]
   reservation  Reservation?
@@ -327,6 +340,7 @@ model Event {
   @@index([funnelStage])
   @@index([eventDate])
   @@index([eventDate, funnelStage])
+  @@index([requestedCharacterId])
   @@index([deletedAt])
   @@map("events")
 }
@@ -371,15 +385,19 @@ model Package {
   description   String?
   durationHours Decimal @db.Decimal(4, 2)
 
-  priceFamily      Decimal @db.Decimal(12, 2)
-  priceEducational Decimal @db.Decimal(12, 2)
-  priceCorporate   Decimal @db.Decimal(12, 2)
+  /// Precio base único del paquete (equivale al precio FAMILIAR / sin recargo).
+  /// El precio efectivo por tipo de cliente lo calcula el motor aplicando el
+  /// recargo correspondiente de Settings (surcharge*Percent) y redondeando a
+  /// Settings.priceRoundingTo. Reemplaza los antiguos price{Family,Educational,Corporate}.
+  basePrice Decimal @db.Decimal(12, 2)
 
   active Boolean @default(true)
 
   /// Composición del paquete (creador de paquetes a partir del catálogo).
   items  PackageItem[]
   events Event[]
+  /// Opciones de cotización que ofrecen este paquete.
+  quoteOptions QuoteOption[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -416,9 +434,15 @@ model Service {
   unitPrice Decimal   @db.Decimal(12, 2)
   priceType PriceType @default(FIXED)
   active    Boolean   @default(true)
+  /// Por defecto FALSE: el servicio solo arma paquetes (es un componente).
+  /// Solo los marcados TRUE (ej. "Hora adicional", "Transporte", "Botarga extra")
+  /// pueden venderse sueltos como extra sobre el paquete elegido. Refuerza el
+  /// modelo paquete-based: evita volver a cotizar servicio por servicio por inercia.
+  standaloneSellable Boolean @default(false)
 
-  eventServices EventService[]
-  packageItems  PackageItem[]
+  eventServices     EventService[]
+  packageItems      PackageItem[]
+  quoteOptionExtras QuoteOptionExtra[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -448,6 +472,8 @@ model CatalogItem {
   eventLinks    EventCatalogItem[]
   packageItems  PackageItem[]
   collaborators CollaboratorCharacter[]
+  /// Eventos que solicitaron específicamente este personaje (calificación).
+  requestedByEvents Event[] @relation("EventRequestedCharacter")
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -498,8 +524,15 @@ model Quote {
   /// Notas visibles para el cliente en el documento.
   notes  String?
 
-  event       Event        @relation(fields: [eventId], references: [id])
-  reservation Reservation?
+  /// Opción de paquete que eligió el cliente (de entre las 1–3 ofrecidas).
+  /// Null mientras la cotización no tenga respuesta del cliente.
+  selectedOptionId String? @unique @db.Uuid
+
+  event          Event         @relation(fields: [eventId], references: [id])
+  reservation    Reservation?
+  /// Las 1–3 opciones de paquete ofrecidas en esta cotización.
+  options        QuoteOption[] @relation("QuoteOptions")
+  selectedOption QuoteOption?  @relation("QuoteSelectedOption", fields: [selectedOptionId], references: [id])
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -510,6 +543,55 @@ model Quote {
   @@index([eventId])
   @@index([status, validUntil])
   @@map("quotes")
+}
+
+/// Una opción de paquete dentro de una cotización. El cliente elige UNA.
+/// Refuerza el modelo paquete-based: la cotización ofrece paquetes preconfigurados,
+/// no ítems sueltos. El flujo por defecto siempre referencia un Package; packageId
+/// null queda reservado para un paquete "Custom" futuro (excepción, no la regla).
+model QuoteOption {
+  id            String  @id @default(uuid()) @db.Uuid
+  quoteId       String  @db.Uuid
+  packageId     String? @db.Uuid
+  /// Etiqueta mostrada al cliente (ej. "Paquete Completo", "Opción Sencilla").
+  label         String
+  /// Marca "el popular": ancla la opción recomendada en el guion de WhatsApp.
+  isRecommended Boolean @default(false)
+  /// Precio ofrecido para esta opción (basePrice del paquete + recargo redondeado).
+  quotedPrice   Decimal @db.Decimal(12, 2)
+  /// Orden de presentación (0 = primero).
+  sortOrder     Int     @default(0)
+
+  quote            Quote              @relation("QuoteOptions", fields: [quoteId], references: [id], onDelete: Cascade)
+  package          Package?           @relation(fields: [packageId], references: [id])
+  /// Cotización para la que esta opción fue la elegida (lado inverso de selectedOption).
+  selectedForQuote Quote?             @relation("QuoteSelectedOption")
+  /// Extras à la carte que cuelgan de esta opción (transporte, hora adicional…).
+  extras           QuoteOptionExtra[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([quoteId])
+  @@map("quote_options")
+}
+
+/// Extra sobre una opción de paquete (la excepción al modelo paquete-based).
+/// Ej. transporte por zona/km, hora adicional, botarga extra. Cuando referencia un
+/// Service debe ser uno con standaloneSellable = true; también admite líneas libres.
+model QuoteOptionExtra {
+  id        String  @id @default(uuid()) @db.Uuid
+  optionId  String  @db.Uuid
+  serviceId String? @db.Uuid
+  label     String
+  amount    Decimal @db.Decimal(12, 2)
+  quantity  Int     @default(1)
+
+  option  QuoteOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  service Service?    @relation(fields: [serviceId], references: [id])
+
+  @@index([optionId])
+  @@map("quote_option_extras")
 }
 
 // ---------------------------------------------------------------------------
@@ -530,6 +612,13 @@ model Reservation {
   depositAmount  Decimal  @db.Decimal(12, 2)
   /// 2 semanas antes del evento (calculada al crear; editable).
   depositDueDate DateTime @db.Date
+  /// Fecha en que se recibió el depósito. Es lo que mueve COTIZADO → RESERVADO:
+  /// sin depositPaidAt la fecha del evento NO queda apartada (regla de dominio).
+  depositPaidAt  DateTime?
+  /// Método del depósito (ej. "SINPE", "Transferencia", "Efectivo"). Campo de
+  /// primera clase para el depósito que dispara la reserva; el detalle completo
+  /// de pagos vive en Payment[].
+  depositMethod  String?
   balanceAmount  Decimal  @db.Decimal(12, 2)
   /// Antes de iniciar el evento.
   balanceDueDate DateTime @db.Date
@@ -759,7 +848,14 @@ model Settings {
   transportRatePerKm    Decimal @db.Decimal(12, 2) @default(400)
   transportFreeKm       Int     @default(15)
   transportOriginAddress String @default("Heredia Canton Central Ulloa Costa Rica")
+  /// Coordenadas del origen (selector tipo mapa en /ajustes); punto de partida del
+  /// cálculo de transporte por km hacia Event.venueLat/Lng.
+  transportOriginLat    Decimal? @db.Decimal(10, 7)
+  transportOriginLng    Decimal? @db.Decimal(10, 7)
   taxRate               Decimal @db.Decimal(5, 4) @default(0.13)
+  /// Múltiplo al que se redondea el precio efectivo del paquete tras aplicar el
+  /// recargo por tipo de cliente (ej. 1000 → ₡172.500 sube a ₡173.000).
+  priceRoundingTo       Int     @default(1000)
 
   // --- Reglas de descuento y recargo (defaults = valores actuales del Sheets) ---
   /// Descuento al 2.º+ ítem del mismo tipo.

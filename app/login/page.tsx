@@ -35,7 +35,7 @@ export default async function LoginPage({
 				</p>
 
 				{error ? (
-					<p className='mt-5 rounded-lg bg-[#ffe0e3] px-4 py-3 text-sm font-black text-[var(--error-color)]'>
+					<p className='mt-5 rounded-lg bg-[color-mix(in_srgb,var(--error-color)_16%,transparent)] px-4 py-3 text-sm font-black text-[var(--error-color)]'>
 						No se pudo iniciar sesión. Verificá que usás una cuenta autorizada
 						del equipo.
 					</p>
