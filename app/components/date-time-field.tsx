@@ -95,7 +95,6 @@ export function DateTimeField({
 						<Calendar
 							mode='single'
 							selected={date}
-							captionLayout='dropdown'
 							defaultMonth={date}
 							onSelect={value => {
 								setDate(value);
