@@ -2,12 +2,15 @@
 
 import { addCollection, Icon } from "@iconify/react";
 import { icons as materialSymbolsIcons } from "@iconify-json/material-symbols";
+import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "../components/ui/button";
+import { useToast } from "../components/toast";
 import {
-	completeTaskAction,
-	deleteTaskAction,
-	reopenTaskAction,
-} from "../lib/actions/tasks";
+	moveToTrashNoRedirect,
+	undoTrashAction,
+} from "../lib/actions/details";
+import { completeTaskAction, reopenTaskAction } from "../lib/actions/tasks";
 
 addCollection(materialSymbolsIcons);
 
@@ -52,46 +55,56 @@ export function TaskCheckButton({
 	);
 }
 
-/** Botón de eliminar (borrado lógico) con confirmación. */
+/**
+ * Botón de eliminar (borrado lógico → papelera) con aviso arriba a la derecha y
+ * opción de deshacer, igual que el resto de pantallas. No usa el confirm nativo.
+ */
 export function TaskDeleteButton({
 	taskId,
 	title,
-	revalidate = "/tareas",
 	redirectToList = false,
 }: {
 	taskId: string;
 	title: string;
-	revalidate?: string;
 	/** Tras eliminar, navegar al listado (para la pantalla de edición). */
 	redirectToList?: boolean;
 }) {
+	const [pending, startTransition] = useTransition();
+	const router = useRouter();
+	const { addToast } = useToast();
+
+	function handleDelete() {
+		startTransition(async () => {
+			const { label } = await moveToTrashNoRedirect("Task", taskId);
+			addToast({
+				message: `Tarea "${label}" enviada a la papelera`,
+				type: "trash",
+				onUndo: async () => {
+					await undoTrashAction("Task", taskId);
+					router.refresh();
+				},
+			});
+			if (redirectToList) router.push("/tareas");
+			else router.refresh();
+		});
+	}
+
 	return (
-		<form
-			action={deleteTaskAction}
-			onSubmit={event => {
-				if (!window.confirm(`¿Eliminar la tarea "${title}"?`)) {
-					event.preventDefault();
-				}
-			}}
+		<Button
+			type='button'
+			onClick={handleDelete}
+			disabled={pending}
+			variant='ghost'
+			size='sm'
+			aria-label={`Eliminar tarea: ${title}`}
+			className='gap-1 px-2.5 text-[var(--error-color)] hover:bg-[color-mix(in_srgb,var(--error-color)_12%,transparent)] hover:text-[var(--error-color)]'
 		>
-			<input type='hidden' name='taskId' value={taskId} />
-			<input type='hidden' name='revalidate' value={revalidate} />
-			{redirectToList ? (
-				<input type='hidden' name='redirectToList' value='1' />
-			) : null}
-			<Button
-				type='submit'
-				variant='ghost'
-				size='sm'
-				className='gap-1 px-2.5 text-[var(--error-color)] hover:bg-[color-mix(in_srgb,var(--error-color)_12%,transparent)] hover:text-[var(--error-color)]'
-			>
-				<Icon
-					icon='material-symbols:delete-outline-rounded'
-					className='h-4 w-4 shrink-0'
-					aria-hidden='true'
-				/>
-				Eliminar
-			</Button>
-		</form>
+			<Icon
+				icon='material-symbols:delete-outline-rounded'
+				className='h-4 w-4 shrink-0'
+				aria-hidden='true'
+			/>
+			{pending ? "Eliminando…" : "Eliminar"}
+		</Button>
 	);
 }

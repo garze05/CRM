@@ -213,6 +213,14 @@ export async function moveToTrashNoRedirect(
 		});
 		label = `${row.firstName} ${row.lastName}`;
 		revalidatePath("/colaboradores");
+	} else if (entityType === "Task") {
+		const row = await prisma.task.update({
+			where: { id },
+			data: { deletedAt: now },
+			select: { title: true },
+		});
+		label = row.title;
+		revalidatePath("/tareas");
 	}
 
 	await touchActivity(
@@ -248,6 +256,9 @@ export async function undoTrashAction(
 		await prisma.collaborator.update({ where: { id }, data: { deletedAt: null } });
 		revalidatePath("/colaboradores");
 		revalidatePath(`/colaboradores/${id}`);
+	} else if (entityType === "Task") {
+		await prisma.task.update({ where: { id }, data: { deletedAt: null } });
+		revalidatePath("/tareas");
 	} else {
 		return;
 	}
@@ -305,6 +316,14 @@ export async function restoreNoRedirect(
 		});
 		label = `${row.firstName} ${row.lastName}`;
 		revalidatePath("/colaboradores");
+	} else if (entityType === "Task") {
+		const row = await prisma.task.update({
+			where: { id },
+			data: { deletedAt: null },
+			select: { title: true },
+		});
+		label = row.title;
+		revalidatePath("/tareas");
 	}
 
 	await touchActivity(
@@ -381,6 +400,8 @@ export async function restoreFromTrashAction(formData: FormData): Promise<void> 
 		await prisma.catalogItem.update({ where: { id }, data: { deletedAt: null } });
 	} else if (entityType === "Collaborator") {
 		await prisma.collaborator.update({ where: { id }, data: { deletedAt: null } });
+	} else if (entityType === "Task") {
+		await prisma.task.update({ where: { id }, data: { deletedAt: null } });
 	} else {
 		return;
 	}

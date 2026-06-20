@@ -10,7 +10,6 @@ import {
 	createTask,
 	completeTask,
 	reopenTask,
-	softDeleteTask,
 	type EntityRef,
 } from "../server/tasks";
 import type { EntityType } from "../server/activity";
@@ -267,36 +266,4 @@ export async function completeTaskAction(formData: FormData): Promise<void> {
 	if (revalidate) revalidatePath(revalidate);
 	revalidatePath("/tareas");
 	revalidatePath("/");
-}
-
-export async function deleteTaskAction(formData: FormData): Promise<void> {
-	const id = String(formData.get("taskId") ?? "");
-	if (!id) return;
-	const task = await prisma.task.findUnique({
-		where: { id },
-		select: { title: true, clientId: true, eventId: true, collaboratorId: true },
-	});
-	await softDeleteTask(id);
-	if (task) {
-		const activityTarget = activityTargetFromRef(
-			{
-				clientId: task.clientId ?? undefined,
-				eventId: task.eventId ?? undefined,
-				collaboratorId: task.collaboratorId ?? undefined,
-			},
-			id,
-		);
-		await recordActivity({
-			action: "task.deleted",
-			...activityTarget,
-			summary: `eliminó tarea ${task.title}`,
-		});
-	}
-
-	const revalidate = String(formData.get("revalidate") ?? "");
-	if (revalidate) revalidatePath(revalidate);
-	revalidatePath("/tareas");
-	revalidatePath("/");
-	// Si la eliminación viene de la pantalla de edición, volver al listado.
-	if (formData.get("redirectToList")) redirect("/tareas");
 }

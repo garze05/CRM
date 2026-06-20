@@ -136,14 +136,6 @@ export async function getTask(
 	return { ...item, entityValue };
 }
 
-/** Borrado lógico (conserva el registro con deletedAt). */
-export async function softDeleteTask(id: string): Promise<void> {
-	await prisma.task.update({
-		where: { id },
-		data: { deletedAt: new Date() },
-	});
-}
-
 /** Tareas generales: no están asociadas a cliente, evento ni colaborador. */
 export async function listGeneralTasks(): Promise<TaskItem[]> {
 	const tasks = await prisma.task.findMany({

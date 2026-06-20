@@ -18,29 +18,26 @@ function Calendar({
 		<DayPicker
 			locale={es}
 			showOutsideDays={showOutsideDays}
+			// Siempre 6 semanas: el popover no cambia de alto entre meses, así las
+			// flechas no se mueven al navegar (UX consistente para el clic).
+			fixedWeeks
 			className={cn("p-1", className)}
 			classNames={{
-				months: "flex flex-col",
-				month: "space-y-3",
-				month_caption: "flex items-center justify-center h-9 relative",
+				months: "relative flex flex-col",
+				month: "space-y-2",
+				month_caption: "flex h-11 w-full items-center justify-center px-11",
 				caption_label: "text-sm font-black capitalize text-foreground",
-				nav: "flex items-center gap-1 absolute inset-x-0 top-0 justify-between px-1",
-				button_previous: cn(
-					buttonVariants({ variant: "ghost", size: "icon" }),
-					"h-8 w-8 p-0",
-				),
-				button_next: cn(
-					buttonVariants({ variant: "ghost", size: "icon" }),
-					"h-8 w-8 p-0",
-				),
+				nav: "absolute inset-x-0 top-0 flex h-11 items-center justify-between",
+				button_previous: buttonVariants({ variant: "ghost", size: "icon" }),
+				button_next: buttonVariants({ variant: "ghost", size: "icon" }),
 				month_grid: "w-full border-collapse",
 				weekdays: "flex",
-				weekday: "text-muted-foreground w-9 text-xs font-bold capitalize",
+				weekday: "text-muted-foreground w-11 text-xs font-bold capitalize",
 				week: "flex w-full mt-1",
-				day: "h-9 w-9 p-0 text-center text-sm",
+				day: "h-11 w-11 p-0 text-center text-sm",
 				day_button: cn(
 					buttonVariants({ variant: "ghost", size: "icon" }),
-					"h-9 w-9 p-0 font-bold aria-selected:opacity-100",
+					"h-11 w-11 p-0 font-bold aria-selected:opacity-100",
 				),
 				selected:
 					"[&>button]:bg-primary [&>button]:text-primary-foreground [&>button:hover]:bg-[var(--primary-hover)]",

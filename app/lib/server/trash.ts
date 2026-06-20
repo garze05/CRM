@@ -11,7 +11,8 @@ export type TrashEntityType =
 	| "Event"
 	| "Quote"
 	| "CatalogItem"
-	| "Collaborator";
+	| "Collaborator"
+	| "Task";
 
 export type TrashRow = {
 	id: string;
@@ -42,7 +43,7 @@ function withRetention(row: Omit<TrashRow, "expiresAt" | "daysUntilPermanentDele
 export async function listTrash(): Promise<TrashRow[]> {
 	await purgeExpiredTrash();
 	const now = new Date();
-	const [clients, events, quotes, catalogItems, collaborators] = await Promise.all([
+	const [clients, events, quotes, catalogItems, collaborators, tasks] = await Promise.all([
 		prisma.client.findMany({
 			where: { deletedAt: { not: null } },
 			select: { id: true, firstName: true, lastName: true, deletedAt: true, type: true },
@@ -62,6 +63,10 @@ export async function listTrash(): Promise<TrashRow[]> {
 		prisma.collaborator.findMany({
 			where: { deletedAt: { not: null } },
 			select: { id: true, firstName: true, lastName: true, deletedAt: true, active: true },
+		}),
+		prisma.task.findMany({
+			where: { deletedAt: { not: null } },
+			select: { id: true, title: true, deletedAt: true, status: true },
 		}),
 	]);
 
@@ -106,6 +111,14 @@ export async function listTrash(): Promise<TrashRow[]> {
 			deletedAt: row.deletedAt!,
 			status: row.active ? "ACTIVO" : "INACTIVO",
 		})),
+		...tasks.map(row => ({
+			id: row.id,
+			entityType: "Task" as const,
+			name: row.title,
+			module: "Tareas",
+			deletedAt: row.deletedAt!,
+			status: row.status,
+		})),
 	]
 		.map(row => withRetention(row, now))
 		.sort((a, b) => b.deletedAt.getTime() - a.deletedAt.getTime());
@@ -139,6 +152,13 @@ async function deletedLabel(entityType: TrashEntityType, id: string) {
 			select: { name: true },
 		});
 		return row?.name ?? null;
+	}
+	if (entityType === "Task") {
+		const row = await prisma.task.findFirst({
+			where: { id, deletedAt: { not: null } },
+			select: { title: true },
+		});
+		return row?.title ?? null;
 	}
 	const row = await prisma.collaborator.findFirst({
 		where: { id, deletedAt: { not: null } },
@@ -203,6 +223,8 @@ export async function deleteTrashItemPermanently(
 			await tx.task.deleteMany({ where: { collaboratorId: id } });
 			await tx.note.deleteMany({ where: { collaboratorId: id } });
 			await tx.collaborator.delete({ where: { id } });
+		} else if (entityType === "Task") {
+			await tx.task.delete({ where: { id } });
 		}
 	});
 
@@ -211,7 +233,7 @@ export async function deleteTrashItemPermanently(
 
 export async function purgeExpiredTrash(): Promise<number> {
 	const cutoff = new Date(Date.now() - TRASH_RETENTION_DAYS * DAY_MS);
-	const [clients, events, quotes, catalogItems, collaborators] = await Promise.all([
+	const [clients, events, quotes, catalogItems, collaborators, tasks] = await Promise.all([
 		prisma.client.findMany({
 			where: { deletedAt: { lte: cutoff } },
 			select: { id: true },
@@ -232,6 +254,10 @@ export async function purgeExpiredTrash(): Promise<number> {
 			where: { deletedAt: { lte: cutoff } },
 			select: { id: true },
 		}),
+		prisma.task.findMany({
+			where: { deletedAt: { lte: cutoff } },
+			select: { id: true },
+		}),
 	]);
 
 	let deleted = 0;
@@ -249,6 +275,9 @@ export async function purgeExpiredTrash(): Promise<number> {
 	}
 	for (const row of collaborators) {
 		if (await deleteTrashItemPermanently("Collaborator", row.id)) deleted += 1;
+	}
+	for (const row of tasks) {
+		if (await deleteTrashItemPermanently("Task", row.id)) deleted += 1;
 	}
 	return deleted;
 }
