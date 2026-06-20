@@ -735,6 +735,8 @@ model Task {
   title       String
   description String?
   dueAt       DateTime?
+  /// Si `dueAt` incluye una hora fijada por el usuario (vs. solo fecha).
+  dueHasTime  Boolean    @default(false)
   status      TaskStatus @default(PENDING)
   origin      TaskOrigin @default(MANUAL)
 

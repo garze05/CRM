@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { ClientCombobox, type ComboOption } from "../../components/client-combobox";
+import { DateTimeField } from "../../components/date-time-field";
 import { updateEventAction, type UpdateEventState } from "../actions";
 
 const initialState: UpdateEventState = {};
@@ -108,24 +109,16 @@ export function EventDetailForm({
 						<option value='CANCELED'>Cancelado</option>
 					</select>
 				</label>
-				<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-					<span>Fecha</span>
-					<input
-						type='date'
-						name='eventDate'
-						defaultValue={event.eventDate}
-						className='form-control'
+				<div className='md:col-span-2'>
+					<DateTimeField
+						dateName='eventDate'
+						timeName='startTime'
+						dateLabel='Fecha'
+						timeLabel='Hora inicio'
+						defaultDate={event.eventDate}
+						defaultTime={event.startTime}
 					/>
-				</label>
-				<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-					<span>Hora inicio</span>
-					<input
-						type='time'
-						name='startTime'
-						defaultValue={event.startTime}
-						className='form-control'
-					/>
-				</label>
+				</div>
 				<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 					<span>Cantidad de chiquitos</span>
 					<input

@@ -9,11 +9,35 @@ import { prisma } from "../db";
 import {
 	createTask,
 	completeTask,
+	reopenTask,
 	type EntityRef,
 } from "../server/tasks";
 import type { EntityType } from "../server/activity";
 
 export type QuickTaskState = { error?: string; ok?: boolean };
+
+/**
+ * Combina `dueDate` (YYYY-MM-DD) y `dueTime` (HH:mm, opcional) en un Date.
+ * `dueHasTime` indica si el usuario fijó una hora (vs. solo fecha), para no
+ * inventar una hora al releer la tarea.
+ */
+function parseDueAt(formData: FormData): {
+	dueAt: Date | null;
+	dueHasTime: boolean;
+} {
+	const dueDateRaw = String(formData.get("dueDate") ?? "").trim();
+	if (!dueDateRaw) return { dueAt: null, dueHasTime: false };
+	const dueTimeRaw = String(formData.get("dueTime") ?? "").trim();
+	if (/^\d{2}:\d{2}$/.test(dueTimeRaw)) {
+		// Hora local de Costa Rica (UTC-6, sin horario de verano).
+		return {
+			dueAt: new Date(`${dueDateRaw}T${dueTimeRaw}:00-06:00`),
+			dueHasTime: true,
+		};
+	}
+	// Solo fecha: mediodía UTC para que el día calendario no se corra.
+	return { dueAt: new Date(`${dueDateRaw}T12:00:00Z`), dueHasTime: false };
+}
 
 function refFromForm(formData: FormData): {
 	ref: EntityRef;
@@ -56,8 +80,7 @@ export async function createTaskAction(
 	if (!title) {
 		return { error: "El título es obligatorio." };
 	}
-	const dueDateRaw = String(formData.get("dueDate") ?? "").trim();
-	const dueAt = dueDateRaw ? new Date(`${dueDateRaw}T12:00:00Z`) : null;
+	const { dueAt, dueHasTime } = parseDueAt(formData);
 
 	const { ref, revalidate } = refFromForm(formData);
 	const explicitRevalidate = String(formData.get("revalidate") ?? "").trim();
@@ -68,6 +91,7 @@ export async function createTaskAction(
 		title,
 		description: String(formData.get("description") ?? "").trim() || null,
 		dueAt,
+		dueHasTime,
 		ref,
 		createdById,
 	});
@@ -97,8 +121,7 @@ export async function createStandaloneTaskAction(formData: FormData): Promise<vo
 	const title = String(formData.get("title") ?? "").trim();
 	if (!title) return;
 
-	const dueDateRaw = String(formData.get("dueDate") ?? "").trim();
-	const dueAt = dueDateRaw ? new Date(`${dueDateRaw}T12:00:00Z`) : null;
+	const { dueAt, dueHasTime } = parseDueAt(formData);
 	const session = await auth();
 	const createdById = isAuthBypassEnabled() ? undefined : session?.user?.id;
 	const ref = refFromValue(String(formData.get("entity") ?? ""));
@@ -107,6 +130,7 @@ export async function createStandaloneTaskAction(formData: FormData): Promise<vo
 		title,
 		description: String(formData.get("description") ?? "").trim() || null,
 		dueAt,
+		dueHasTime,
 		ref,
 		createdById,
 	});
@@ -128,8 +152,7 @@ export async function updateTaskAction(formData: FormData): Promise<void> {
 	const title = String(formData.get("title") ?? "").trim();
 	if (!title) return;
 
-	const dueDateRaw = String(formData.get("dueDate") ?? "").trim();
-	const dueAt = dueDateRaw ? new Date(`${dueDateRaw}T12:00:00Z`) : null;
+	const { dueAt, dueHasTime } = parseDueAt(formData);
 	const description = String(formData.get("description") ?? "").trim() || null;
 
 	const task = await prisma.task.findUnique({
@@ -144,7 +167,7 @@ export async function updateTaskAction(formData: FormData): Promise<void> {
 
 	await prisma.task.update({
 		where: { id },
-		data: { title, description, dueAt },
+		data: { title, description, dueAt, dueHasTime },
 	});
 
 	const activityTarget = activityTargetFromRef(
@@ -160,6 +183,35 @@ export async function updateTaskAction(formData: FormData): Promise<void> {
 		...activityTarget,
 		summary: `actualizó tarea ${title}`,
 	});
+
+	const revalidate = String(formData.get("revalidate") ?? "");
+	if (revalidate) revalidatePath(revalidate);
+	revalidatePath("/tareas");
+}
+
+export async function reopenTaskAction(formData: FormData): Promise<void> {
+	const id = String(formData.get("taskId") ?? "");
+	if (!id) return;
+	const task = await prisma.task.findUnique({
+		where: { id },
+		select: { title: true, clientId: true, eventId: true, collaboratorId: true },
+	});
+	await reopenTask(id);
+	if (task) {
+		const activityTarget = activityTargetFromRef(
+			{
+				clientId: task.clientId ?? undefined,
+				eventId: task.eventId ?? undefined,
+				collaboratorId: task.collaboratorId ?? undefined,
+			},
+			id,
+		);
+		await recordActivity({
+			action: "task.reopened",
+			...activityTarget,
+			summary: `reabrió tarea ${task.title}`,
+		});
+	}
 
 	const revalidate = String(formData.get("revalidate") ?? "");
 	if (revalidate) revalidatePath(revalidate);

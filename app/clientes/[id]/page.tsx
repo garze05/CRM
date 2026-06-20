@@ -99,7 +99,7 @@ export default async function ClientDetailPage({
 				}
 			/>
 
-			<div className='grid min-w-0 flex-1 gap-5 px-5 pb-28 md:px-8 md:pb-8 xl:grid-cols-[minmax(0,1fr)_360px]'>
+			<div className='grid min-w-0 flex-1 gap-5 px-5 pb-28 md:px-8 md:pb-8 xl:grid-cols-[minmax(0,1fr)_400px]'>
 				<div className='min-w-0 space-y-5'>
 					<section className='surface-card min-w-0 p-5 md:p-7'>
 						<div className='mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>

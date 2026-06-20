@@ -81,7 +81,7 @@ export default async function EventDetailPage({
 				}
 			/>
 
-			<div className='grid min-w-0 flex-1 gap-5 px-5 pb-28 md:px-8 md:pb-8 xl:grid-cols-[minmax(0,1fr)_360px]'>
+			<div className='grid min-w-0 flex-1 gap-5 px-5 pb-28 md:px-8 md:pb-8 xl:grid-cols-[minmax(0,1fr)_400px]'>
 				<div className='min-w-0 space-y-5'>
 					<EventDetailForm
 						event={{

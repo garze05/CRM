@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { SectionCard } from "../../components/section-card";
+import { DateTimeField } from "../../components/date-time-field";
 import {
 	ClientCombobox,
 	type ComboOption,
@@ -105,25 +106,17 @@ export function NewEventForm({
 							/>
 							<FieldError message={errors?.name} />
 						</label>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-							<span>Fecha</span>
-							<input
-								type='date'
-								name='eventDate'
-								defaultValue={values?.eventDate}
-								className='form-control'
+						<div className='md:col-span-2'>
+							<DateTimeField
+								dateName='eventDate'
+								timeName='startTime'
+								dateLabel='Fecha'
+								timeLabel='Hora inicio'
+								defaultDate={values?.eventDate}
+								defaultTime={values?.startTime}
 							/>
 							<FieldError message={errors?.eventDate} />
-						</label>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-							<span>Hora inicio</span>
-							<input
-								type='time'
-								name='startTime'
-								defaultValue={values?.startTime}
-								className='form-control'
-							/>
-						</label>
+						</div>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 							<span>Duración (horas)</span>
 							<input

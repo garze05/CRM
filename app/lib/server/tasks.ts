@@ -8,6 +8,7 @@ export type TaskItem = {
 	title: string;
 	description: string | null;
 	dueAt: Date | null;
+	dueHasTime: boolean;
 	status: string;
 	origin: string;
 	/** Enlace y etiqueta de la entidad asociada (cliente/evento/colaborador). */
@@ -26,6 +27,7 @@ type TaskRow = {
 	title: string;
 	description: string | null;
 	dueAt: Date | null;
+	dueHasTime: boolean;
 	status: string;
 	origin: string;
 	clientId: string | null;
@@ -54,6 +56,7 @@ function toTaskItem(task: TaskRow): TaskItem {
 		title: task.title,
 		description: task.description,
 		dueAt: task.dueAt,
+		dueHasTime: task.dueHasTime,
 		status: task.status,
 		origin: task.origin,
 		entityHref,
@@ -163,6 +166,7 @@ export type CreateTaskData = {
 	title: string;
 	description?: string | null;
 	dueAt?: Date | null;
+	dueHasTime?: boolean;
 	ref: EntityRef;
 	createdById?: string;
 };
@@ -173,6 +177,7 @@ export async function createTask(data: CreateTaskData): Promise<{ id: string }> 
 			title: data.title,
 			description: data.description || null,
 			dueAt: data.dueAt ?? null,
+			dueHasTime: data.dueHasTime ?? false,
 			status: "PENDING",
 			origin: "MANUAL",
 			clientId: data.ref.clientId ?? null,
@@ -189,5 +194,12 @@ export async function completeTask(id: string): Promise<void> {
 	await prisma.task.update({
 		where: { id },
 		data: { status: "COMPLETED", completedAt: new Date() },
+	});
+}
+
+export async function reopenTask(id: string): Promise<void> {
+	await prisma.task.update({
+		where: { id },
+		data: { status: "PENDING", completedAt: null },
 	});
 }

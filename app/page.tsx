@@ -52,7 +52,7 @@ export default async function Home() {
 				}
 			/>
 
-			<div className='grid min-w-0 flex-1 gap-4 px-5 pb-28 md:px-6 md:pb-6 xl:grid-cols-[minmax(0,1fr)_340px]'>
+			<div className='grid min-w-0 flex-1 gap-4 px-5 pb-28 md:px-6 md:pb-6 xl:grid-cols-[minmax(0,1fr)_400px]'>
 				<div className='min-w-0 space-y-5'>
 					<section
 						aria-label='Indicadores clave'

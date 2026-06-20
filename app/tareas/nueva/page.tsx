@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PageHeader } from "../../components/page-header";
 import { SectionCard } from "../../components/section-card";
+import { DateTimeField } from "../../components/date-time-field";
 import { createStandaloneTaskAction } from "../../lib/actions/tasks";
 import { listTaskEntityOptions } from "../../lib/server/tasks";
 
@@ -72,10 +73,15 @@ export default async function NewTaskPage({
 								))}
 							</select>
 						</label>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-							<span>Fecha límite</span>
-							<input type='date' name='dueDate' className='form-control' />
-						</label>
+						<div className='md:col-span-2'>
+							<DateTimeField
+								dateName='dueDate'
+								timeName='dueTime'
+								dateLabel='Fecha límite'
+								timeLabel='Hora'
+								optional
+							/>
+						</div>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
 							<span>Descripción</span>
 							<textarea

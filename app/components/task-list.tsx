@@ -4,8 +4,14 @@ import { useState } from "react";
 import Link from "next/link";
 import { addCollection, Icon } from "@iconify/react";
 import { icons as materialSymbolsIcons } from "@iconify-json/material-symbols";
+import { Button } from "./ui/button";
+import { DateTimeField } from "./date-time-field";
 import { StatusBadge } from "./status-badge";
-import { completeTaskAction, updateTaskAction } from "../lib/actions/tasks";
+import {
+	completeTaskAction,
+	reopenTaskAction,
+	updateTaskAction,
+} from "../lib/actions/tasks";
 import { TASK_ORIGIN_LABELS } from "../lib/domain/labels";
 import type { TaskItem } from "../lib/server/tasks";
 
@@ -15,9 +21,9 @@ type DueUrgency = "overdue" | "today" | "upcoming" | "none";
 
 function dueUrgency(due: Date | null): DueUrgency {
 	if (!due) return "none";
-	const dueKey = new Intl.DateTimeFormat("en-CA", { timeZone: "UTC" }).format(
-		due,
-	);
+	const dueKey = new Intl.DateTimeFormat("en-CA", {
+		timeZone: "America/Costa_Rica",
+	}).format(due);
 	const todayKey = new Intl.DateTimeFormat("en-CA", {
 		timeZone: "America/Costa_Rica",
 	}).format(new Date());
@@ -31,14 +37,11 @@ function formatDueDate(date: Date) {
 		day: "2-digit",
 		month: "short",
 		year: "numeric",
-		timeZone: "UTC",
+		timeZone: "America/Costa_Rica",
 	}).format(date);
 }
 
-const URGENCY_META: Record<
-	DueUrgency,
-	{ icon: string; className: string } | null
-> = {
+const URGENCY_META: Record<DueUrgency, { icon: string; className: string }> = {
 	overdue: {
 		icon: "material-symbols:history-rounded",
 		className: "text-[var(--error-color)]",
@@ -51,41 +54,110 @@ const URGENCY_META: Record<
 		icon: "material-symbols:event-rounded",
 		className: "text-[var(--text-muted)]",
 	},
-	none: null,
+	none: {
+		icon: "material-symbols:event-busy-rounded",
+		className: "text-[var(--text-muted)]",
+	},
 };
 
-function DueLine({ due }: { due: Date | null }) {
+/** Línea de fecha límite con color según urgencia (atenuada si `muted`). */
+function DueLine({
+	due,
+	hasTime = false,
+	muted = false,
+}: {
+	due: Date | null;
+	hasTime?: boolean;
+	muted?: boolean;
+}) {
 	const urgency = dueUrgency(due);
-	if (urgency === "none" || !due) {
-		return (
-			<span className='text-[var(--text-muted)]'>Sin fecha límite</span>
-		);
-	}
-	const meta = URGENCY_META[urgency]!;
+	const meta = URGENCY_META[urgency];
+	const timeSuffix = due && hasTime ? `, ${formatTime(due)}` : "";
 	const text =
-		urgency === "overdue"
-			? `Venció: ${formatDueDate(due)}`
-			: urgency === "today"
-				? "Vence hoy"
-				: `Vence: ${formatDueDate(due)}`;
+		urgency === "none" || !due
+			? "Sin fecha límite"
+			: urgency === "overdue"
+				? `Venció: ${formatDueDate(due)}${timeSuffix}`
+				: urgency === "today"
+					? `Vence hoy${timeSuffix}`
+					: `Vence: ${formatDueDate(due)}${timeSuffix}`;
 	return (
-		<span className={`inline-flex items-center gap-1 ${meta.className}`}>
+		<span
+			className={`inline-flex items-center gap-1 ${muted ? "text-[var(--text-muted)]" : meta.className}`}
+		>
 			<Icon icon={meta.icon} className='h-4 w-4 shrink-0' aria-hidden='true' />
 			{text}
 		</span>
 	);
 }
 
-function toDateInputValue(date: Date | null) {
-	if (!date) return "";
-	return new Date(date).toISOString().slice(0, 10);
+/** Metadatos comunes (fecha, entidad, origen) de una tarea. */
+function TaskMeta({
+	task,
+	showEntity,
+	muted = false,
+}: {
+	task: TaskItem;
+	showEntity: boolean;
+	muted?: boolean;
+}) {
+	return (
+		<div className='mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs font-bold'>
+			<DueLine due={task.dueAt} hasTime={task.dueHasTime} muted={muted} />
+			{showEntity && task.entityHref ? (
+				<Link
+					href={task.entityHref}
+					className={
+						muted
+							? "text-[var(--text-muted)] underline-offset-2 hover:underline"
+							: "text-[var(--secondary-color)] underline-offset-2 hover:underline"
+					}
+				>
+					{task.entityLabel}
+				</Link>
+			) : null}
+			<StatusBadge
+				value={task.origin}
+				label={TASK_ORIGIN_LABELS[task.origin] ?? task.origin}
+			/>
+		</div>
+	);
+}
+
+/** Día calendario en Costa Rica (YYYY-MM-DD) para precargar el campo de fecha. */
+function dueDateValue(date: Date | null) {
+	if (!date) return undefined;
+	return new Intl.DateTimeFormat("en-CA", {
+		timeZone: "America/Costa_Rica",
+	}).format(date);
+}
+
+/** Hora en Costa Rica (HH:mm) para precargar el campo de hora. */
+function crTimeValue(date: Date) {
+	return new Intl.DateTimeFormat("en-GB", {
+		timeZone: "America/Costa_Rica",
+		hour: "2-digit",
+		minute: "2-digit",
+		hour12: false,
+	}).format(date);
+}
+
+/** Hora legible (ej. "10:30 p. m.") en Costa Rica. */
+function formatTime(date: Date) {
+	return new Intl.DateTimeFormat("es-CR", {
+		timeZone: "America/Costa_Rica",
+		hour: "numeric",
+		minute: "2-digit",
+		hour12: true,
+	}).format(date);
 }
 
 /**
- * Lista de tareas con check circular para completar (sin texto), edición en
- * línea y una sección separada de "Tareas completadas". Al marcar una tarea no
- * desaparece: se tacha, se atenúa y baja a la sección de completadas (estado
- * optimista en el cliente mientras el server action revalida).
+ * Lista de tareas con check circular para completar/reabrir (sin texto),
+ * edición en línea y una sección separada de "Tareas completadas". Al marcar
+ * una tarea no desaparece: se tacha, se atenúa (conservando fecha y origen) y
+ * baja a completadas; el mismo check la devuelve a pendientes. El estado es
+ * optimista en el cliente mientras el server action revalida.
  */
 export function TaskList({
 	tasks,
@@ -97,13 +169,29 @@ export function TaskList({
 	completeRevalidate?: string;
 }) {
 	const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
-	// Tareas completadas en esta sesión (snapshot para que no desaparezcan al
-	// revalidar, que ya no las devuelve entre las pendientes).
+	// Overrides optimistas: completadas en esta sesión y reabiertas (snapshots,
+	// para que no desaparezcan en lo que el server action revalida).
 	const [completed, setCompleted] = useState<TaskItem[]>([]);
-	const completedIds = new Set(completed.map(task => task.id));
-	const pending = tasks.filter(task => !completedIds.has(task.id));
+	const [reopened, setReopened] = useState<TaskItem[]>([]);
 
-	if (tasks.length === 0 && completed.length === 0) {
+	const completedIds = new Set(completed.map(task => task.id));
+	const serverPending = tasks.filter(task => !completedIds.has(task.id));
+	const serverIds = new Set(serverPending.map(task => task.id));
+	const extraPending = reopened.filter(
+		task => !serverIds.has(task.id) && !completedIds.has(task.id),
+	);
+	const pending = [...serverPending, ...extraPending];
+
+	function markCompleted(task: TaskItem) {
+		setReopened(list => list.filter(item => item.id !== task.id));
+		setCompleted(list => [task, ...list.filter(item => item.id !== task.id)]);
+	}
+	function markReopened(task: TaskItem) {
+		setCompleted(list => list.filter(item => item.id !== task.id));
+		setReopened(list => [task, ...list.filter(item => item.id !== task.id)]);
+	}
+
+	if (pending.length === 0 && completed.length === 0) {
 		return (
 			<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-4 text-center text-sm font-bold text-[var(--text-secondary)]'>
 				Todo al día. Sin tareas pendientes.
@@ -151,38 +239,40 @@ export function TaskList({
 											className='form-control min-h-16 px-3 py-2 text-sm'
 										/>
 									</label>
-									<label className='block space-y-1 text-xs font-black text-[var(--text-primary)]'>
-										<span>Fecha límite</span>
-										<input
-											type='date'
-											name='dueDate'
-											defaultValue={toDateInputValue(task.dueAt)}
-											className='form-control min-h-10 px-3 py-2 text-sm'
-										/>
-									</label>
-									<div className='flex flex-wrap justify-end gap-2 text-xs font-black'>
-										<button
+									<DateTimeField
+										dateName='dueDate'
+										timeName='dueTime'
+										dateLabel='Fecha límite'
+										timeLabel='Hora'
+										optional
+										defaultDate={dueDateValue(task.dueAt)}
+										defaultTime={
+											task.dueHasTime && task.dueAt
+												? crTimeValue(task.dueAt)
+												: undefined
+										}
+									/>
+									<div className='flex flex-wrap justify-end gap-2'>
+										<Button
 											type='button'
+											variant='ghost'
+											size='sm'
 											onClick={() => setEditingTaskId(null)}
-											className='secondary-action min-h-9 rounded-full px-3 py-1.5'
 										>
 											Cancelar
-										</button>
-										<button
-											type='submit'
-											className='primary-action min-h-9 rounded-full px-3 py-1.5'
-										>
+										</Button>
+										<Button type='submit' size='sm'>
 											Guardar
-										</button>
+										</Button>
 									</div>
 								</form>
 							</li>
 						) : (
-							<li key={task.id} className='flex items-start gap-2.5 py-3'>
+							<li key={task.id} className='flex items-start gap-2 py-3'>
 								{completeRevalidate ? (
 									<form
 										action={async formData => {
-											setCompleted(current => [task, ...current]);
+											markCompleted(task);
 											await completeTaskAction(formData);
 										}}
 									>
@@ -192,10 +282,12 @@ export function TaskList({
 											name='revalidate'
 											value={completeRevalidate}
 										/>
-										<button
+										<Button
 											type='submit'
+											variant='ghost'
+											size='icon'
 											aria-label={`Marcar como completada: ${task.title}`}
-											className='group/check flex h-11 w-11 shrink-0 items-center justify-center'
+											className='group/check shrink-0 hover:bg-transparent'
 										>
 											<span className='grid h-6 w-6 place-items-center rounded-full border-2 border-[color:var(--border-color)] text-transparent transition group-hover/check:border-[var(--secondary-color)] group-hover/check:text-[var(--secondary-color)]'>
 												<Icon
@@ -204,7 +296,7 @@ export function TaskList({
 													aria-hidden='true'
 												/>
 											</span>
-										</button>
+										</Button>
 									</form>
 								) : null}
 
@@ -217,35 +309,23 @@ export function TaskList({
 											{task.description}
 										</p>
 									) : null}
-									<div className='mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs font-bold'>
-										<DueLine due={task.dueAt} />
-										{showEntity && task.entityHref ? (
-											<Link
-												href={task.entityHref}
-												className='text-[var(--secondary-color)] underline-offset-2 hover:underline'
-											>
-												{task.entityLabel}
-											</Link>
-										) : null}
-										<StatusBadge
-											value={task.origin}
-											label={TASK_ORIGIN_LABELS[task.origin] ?? task.origin}
-										/>
-									</div>
+									<TaskMeta task={task} showEntity={showEntity} />
 								</div>
 
-								<button
+								<Button
 									type='button'
+									variant='ghost'
+									size='sm'
 									onClick={() => setEditingTaskId(task.id)}
-									className='flex min-h-9 shrink-0 items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-black text-[var(--text-secondary)] transition hover:bg-muted hover:text-[var(--primary-color)]'
+									className='min-h-9 shrink-0 gap-1 px-2.5 py-1.5 text-xs text-[var(--text-secondary)] hover:text-[var(--primary-color)]'
 								>
 									<Icon
 										icon='material-symbols:edit-rounded'
 										className='h-4 w-4 shrink-0'
 										aria-hidden='true'
 									/>
-									<span>Editar</span>
-								</button>
+									Editar
+								</Button>
 							</li>
 						),
 					)}
@@ -259,25 +339,43 @@ export function TaskList({
 					</h3>
 					<ul className='list-none divide-y divide-[color:var(--border-color)] p-0'>
 						{completed.map(task => (
-							<li key={task.id} className='flex items-start gap-2.5 py-3'>
-								<span className='flex h-11 w-11 shrink-0 items-center justify-center'>
-									<span className='grid h-6 w-6 place-items-center rounded-full bg-[var(--secondary-color)] text-[var(--on-accent)]'>
-										<Icon
-											icon='material-symbols:check-rounded'
-											className='h-4 w-4'
-											aria-hidden='true'
+							<li key={task.id} className='flex items-start gap-2 py-3'>
+								{completeRevalidate ? (
+									<form
+										action={async formData => {
+											markReopened(task);
+											await reopenTaskAction(formData);
+										}}
+									>
+										<input type='hidden' name='taskId' value={task.id} />
+										<input
+											type='hidden'
+											name='revalidate'
+											value={completeRevalidate}
 										/>
-									</span>
-								</span>
+										<Button
+											type='submit'
+											variant='ghost'
+											size='icon'
+											aria-label={`Marcar como pendiente: ${task.title}`}
+											className='shrink-0 hover:bg-transparent'
+										>
+											<span className='grid h-6 w-6 place-items-center rounded-full bg-[var(--secondary-color)] text-[var(--secondary-foreground)]'>
+												<Icon
+													icon='material-symbols:check-rounded'
+													className='h-4 w-4'
+													aria-hidden='true'
+												/>
+											</span>
+										</Button>
+									</form>
+								) : null}
+
 								<div className='min-w-0 flex-1'>
 									<p className='text-sm font-bold leading-snug text-[var(--text-muted)] line-through'>
 										{task.title}
 									</p>
-									{task.entityLabel && showEntity ? (
-										<p className='mt-0.5 text-xs font-semibold text-[var(--text-muted)]'>
-											{task.entityLabel}
-										</p>
-									) : null}
+									<TaskMeta task={task} showEntity={showEntity} muted />
 								</div>
 							</li>
 						))}
