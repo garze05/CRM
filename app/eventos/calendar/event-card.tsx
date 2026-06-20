@@ -6,12 +6,14 @@ import Link from "next/link";
 
 addCollection(materialSymbolsIcons);
 import { StatusBadge } from "../../components/status-badge";
-import type { EventRow } from "../events-table";
+import {
+	EVENT_TYPE_LABELS,
+	FUNNEL_STAGE_LABELS,
+	PAYMENT_STATUS_LABELS,
+} from "../../lib/domain/labels";
+import type { EventListItem } from "../../lib/server/events";
 
-export type CalendarEvent = EventRow & {
-	collaboratorNames: string[];
-	alerts: string[];
-};
+export type CalendarEvent = EventListItem;
 
 function formatDuration(hours: number) {
 	return Number.isInteger(hours) ? `${hours} h` : `${hours} h`.replace(".", ",");
@@ -45,9 +47,12 @@ export function EventCard({
 					{event.clientName}
 				</p>
 				<div className='mt-2 flex flex-wrap gap-1'>
-					<StatusBadge value={event.pipelineStatus} />
+					<StatusBadge
+						value={event.pipelineStatus}
+						label={FUNNEL_STAGE_LABELS[event.pipelineStatus]}
+					/>
 					{event.alerts.length > 0 ? (
-						<span className='inline-flex min-h-8 items-center gap-1 rounded-full bg-[#ffe0e3] px-2 py-1 text-sm font-black text-[var(--error-color)]'>
+						<span className='inline-flex min-h-8 items-center gap-1 rounded-full bg-[color-mix(in_srgb,var(--error-color)_16%,transparent)] px-2 py-1 text-sm font-black text-[var(--error-color)]'>
 							<Icon
 								icon='material-symbols:warning-rounded'
 								className='h-4 w-4'
@@ -77,9 +82,20 @@ export function EventCard({
 					</Link>
 				</div>
 				<div className='flex flex-wrap gap-2'>
-					<StatusBadge value={event.type} />
-					<StatusBadge value={event.pipelineStatus} />
-					<StatusBadge value={event.paymentStatus} />
+					<StatusBadge
+						value={event.type}
+						label={EVENT_TYPE_LABELS[event.type]}
+					/>
+					<StatusBadge
+						value={event.pipelineStatus}
+						label={FUNNEL_STAGE_LABELS[event.pipelineStatus]}
+					/>
+					{event.paymentStatus ? (
+						<StatusBadge
+							value={event.paymentStatus}
+							label={PAYMENT_STATUS_LABELS[event.paymentStatus]}
+						/>
+					) : null}
 				</div>
 			</div>
 
@@ -88,7 +104,7 @@ export function EventCard({
 					{event.alerts.map(alert => (
 						<li
 							key={alert}
-							className='flex items-center gap-2 rounded-lg bg-[#ffe0e3] px-3 py-2 text-base font-black text-[var(--error-color)]'
+							className='flex items-center gap-2 rounded-lg bg-[color-mix(in_srgb,var(--error-color)_16%,transparent)] px-3 py-2 text-base font-black text-[var(--error-color)]'
 						>
 							<Icon
 								icon='material-symbols:warning-rounded'

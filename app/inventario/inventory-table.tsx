@@ -8,15 +8,19 @@ import {
 	type DataTableColumn,
 } from "../components/data-table/data-table";
 import { StatusBadge } from "../components/status-badge";
-import type { InventoryItem } from "../lib/mock-data";
+import {
+	CATALOG_AVAILABILITY_LABELS,
+	CATALOG_CATEGORY_LABELS,
+	type CatalogListItem,
+} from "../lib/domain/catalog";
 
-function getAvailabilityBadgeValue(item: InventoryItem) {
-	return item.availabilityStatus === "RESERVADO"
-		? "RESERVADO_INVENTARIO"
+function getAvailabilityBadgeValue(item: CatalogListItem) {
+	return item.availabilityStatus === "RESERVED"
+		? "RESERVED_INVENTORY"
 		: item.availabilityStatus;
 }
 
-const columns: DataTableColumn<InventoryItem>[] = [
+const columns: DataTableColumn<CatalogListItem>[] = [
 	{
 		key: "item",
 		header: "Ítem",
@@ -37,8 +41,13 @@ const columns: DataTableColumn<InventoryItem>[] = [
 		header: "Categoría",
 		width: "minmax(150px, 0.85fr)",
 		filterValue: item => item.category,
-		filterLabel: formatEnumLabel,
-		render: item => <StatusBadge value={item.category} />,
+		filterLabel: value => CATALOG_CATEGORY_LABELS[value] ?? value,
+		render: item => (
+			<StatusBadge
+				value={item.category}
+				label={CATALOG_CATEGORY_LABELS[item.category]}
+			/>
+		),
 	},
 	{
 		key: "active",
@@ -53,18 +62,11 @@ const columns: DataTableColumn<InventoryItem>[] = [
 		header: "Disponibilidad",
 		width: "minmax(180px, 1fr)",
 		filterValue: item => item.availabilityStatus,
-		filterLabel: value =>
-			value === "MANTENIMIENTO_PENDIENTE"
-				? "Mantenimiento"
-				: formatEnumLabel(value),
+		filterLabel: value => CATALOG_AVAILABILITY_LABELS[value] ?? value,
 		render: item => (
 			<StatusBadge
 				value={getAvailabilityBadgeValue(item)}
-				label={
-					item.availabilityStatus === "MANTENIMIENTO_PENDIENTE"
-						? "MANTENIMIENTO"
-						: item.availabilityStatus.replaceAll("_", " ")
-				}
+				label={CATALOG_AVAILABILITY_LABELS[item.availabilityStatus]}
 			/>
 		),
 	},
@@ -78,11 +80,13 @@ const columns: DataTableColumn<InventoryItem>[] = [
 		key: "action",
 		header: "Acción",
 		width: "minmax(130px, 0.75fr)",
-		render: () => <DeleteAction />,
+		render: item => (
+			<DeleteAction entityType='CatalogItem' id={item.id} returnTo='/inventario' />
+		),
 	},
 ];
 
-export function InventoryTable({ rows }: { rows: InventoryItem[] }) {
+export function InventoryTable({ rows }: { rows: CatalogListItem[] }) {
 	return (
 		<DataTable
 			tableId='inventario'
@@ -92,7 +96,7 @@ export function InventoryTable({ rows }: { rows: InventoryItem[] }) {
 			searchLabel='Buscar inventario'
 			searchPlaceholder='Nombre, categoría o etiqueta'
 			searchText={item =>
-				`${item.name} ${item.description} ${formatEnumLabel(item.category)} ${item.tags.join(" ")}`
+				`${item.name} ${item.description} ${CATALOG_CATEGORY_LABELS[item.category]} ${item.tags.join(" ")}`
 			}
 			emptyTitle='Sin ítems en el catálogo'
 			emptyDescription='Agregá personajes, inflables y servicios para alimentar cotizaciones y paquetes.'

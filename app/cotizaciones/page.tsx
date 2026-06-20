@@ -3,21 +3,10 @@ import { IconLabel } from "../components/icon-label";
 import { PageHeader } from "../components/page-header";
 import { SectionCard } from "../components/section-card";
 import { QuotesTable, type QuoteRow } from "./quotes-table";
-import { getEventClient, getQuoteEvent, quotes } from "../lib/mock-data";
+import { listQuotes } from "../lib/server/quotes";
 
-export default function QuotesPage() {
-	const rows: QuoteRow[] = quotes.map(quote => {
-		const event = getQuoteEvent(quote);
-		const client = event ? getEventClient(event) : undefined;
-
-		return {
-			...quote,
-			eventName: event?.name ?? "Sin evento",
-			clientName: client
-				? `${client.firstName} ${client.lastName}`
-				: "Sin cliente",
-		};
-	});
+export default async function QuotesPage() {
+	const rows: QuoteRow[] = await listQuotes();
 
 	return (
 		<>

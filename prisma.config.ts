@@ -5,18 +5,18 @@ import { loadEnvFile } from "node:process";
 import { defineConfig } from "prisma/config";
 
 try {
-  loadEnvFile();
+	loadEnvFile(".env.local");
 } catch {
-  // Sin .env (ej. CI con variables ya exportadas) — continuar.
+	// Sin .env (ej. CI con variables ya exportadas) — continuar.
 }
 
 export default defineConfig({
-  schema: "prisma/schema.prisma",
-  migrations: {
-    path: "prisma/migrations",
-    seed: "tsx prisma/seed.ts",
-  },
-  datasource: {
-    url: process.env.DATABASE_URL ?? "",
-  },
+	schema: "prisma/schema.prisma",
+	migrations: {
+		path: "prisma/migrations",
+		seed: "tsx prisma/seed.ts",
+	},
+	datasource: {
+		url: process.env.DATABASE_URL ?? "",
+	},
 });

@@ -2,7 +2,13 @@ import { notFound } from "next/navigation";
 import { Breadcrumb } from "../../components/breadcrumb";
 import { PhotoThumbnailControl } from "../../components/photo-thumbnail-control";
 import { StatusBadge } from "../../components/status-badge";
-import { getInventoryItemById } from "../../lib/mock-data";
+import {
+	CATALOG_AVAILABILITY_LABELS,
+	CATALOG_CATEGORY_LABELS,
+} from "../../lib/domain/catalog";
+import { getCatalogItem } from "../../lib/server/catalog";
+import { updateCatalogItemDetailAction } from "../../lib/actions/details";
+import { TrashButton } from "../../components/trash-button";
 
 export default async function InventoryDetailPage({
 	params,
@@ -10,15 +16,15 @@ export default async function InventoryDetailPage({
 	params: Promise<{ id: string }>;
 }) {
 	const { id } = await params;
-	const item = getInventoryItemById(id);
+	const item = await getCatalogItem(id);
 
 	if (!item) {
 		notFound();
 	}
 
 	const availabilityBadge =
-		item.availabilityStatus === "RESERVADO"
-			? "RESERVADO_INVENTARIO"
+		item.availabilityStatus === "RESERVED"
+			? "RESERVED_INVENTORY"
 			: item.availabilityStatus;
 
 	return (
@@ -38,41 +44,38 @@ export default async function InventoryDetailPage({
 							<StatusBadge value={item.active ? "ACTIVO" : "PAUSADO"} />
 						</div>
 					</div>
-					<button className='primary-action min-h-12 rounded-full px-5 py-3 text-base font-black transition'>
-						Guardar cambios
-					</button>
+					<TrashButton entityType='CatalogItem' id={item.id} returnTo='/inventario' />
 				</div>
 			</header>
 
 			<div className='grid min-w-0 flex-1 gap-5 px-5 pb-28 md:px-8 md:pb-8 xl:grid-cols-[minmax(0,1fr)_360px]'>
 				<section className='surface-card min-w-0 p-5 md:p-7'>
-					<div className='mb-6'>
-						<h2 className='text-2xl font-black text-[var(--text-primary)]'>
-							Datos del inventario
-						</h2>
-						<p className='mt-1 text-lg text-[var(--text-secondary)]'>
-							Información visual y operativa usada en cotizaciones.
-						</p>
+						<div className='mb-6'>
+							<h2 className='text-2xl font-black text-[var(--text-primary)]'>
+								Datos del inventario
+							</h2>
 					</div>
-					<form className='grid gap-5 md:grid-cols-2'>
+					<form action={updateCatalogItemDetailAction} className='grid gap-5 md:grid-cols-2'>
+						<input type='hidden' name='id' value={item.id} />
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 							<span>Nombre</span>
-							<input defaultValue={item.name} className='form-control' />
+							<input name='name' defaultValue={item.name} className='form-control' />
 						</label>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 							<span>Categoría</span>
-							<select defaultValue={item.category} className='form-control'>
-								<option value='PERSONAJE'>Personaje</option>
-								<option value='INFLABLE'>Inflable</option>
-								<option value='DECORACION'>Decoración</option>
-								<option value='OTRO'>Otro</option>
+							<select name='category' defaultValue={item.category} className='form-control'>
+								<option value='CHARACTER'>Personaje</option>
+								<option value='INFLATABLE'>Inflable</option>
+								<option value='DECORATION'>Decoración</option>
+								<option value='SERVICE'>Servicio</option>
+								<option value='OTHER'>Otro</option>
 							</select>
 						</label>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 							<span>Estado</span>
-							<select defaultValue={item.active ? "ACTIVO" : "PAUSADO"} className='form-control'>
-								<option value='ACTIVO'>Activo</option>
-								<option value='PAUSADO'>Pausado</option>
+							<select name='active' defaultValue={item.active ? "ACTIVE" : "INACTIVE"} className='form-control'>
+								<option value='ACTIVE'>Activo</option>
+								<option value='INACTIVE'>Pausado</option>
 							</select>
 						</label>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
@@ -81,22 +84,26 @@ export default async function InventoryDetailPage({
 								defaultValue={item.availabilityStatus}
 								className='form-control'
 							>
-								<option value='DISPONIBLE'>Disponible</option>
-								<option value='RESERVADO'>Reservado</option>
-								<option value='MANTENIMIENTO_PENDIENTE'>Mantenimiento</option>
+								<option value='AVAILABLE'>Disponible</option>
+								<option value='RESERVED'>Reservado</option>
+								<option value='MAINTENANCE_PENDING'>Mantenimiento</option>
 							</select>
 						</label>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
 							<span>Descripción</span>
 							<textarea
 								defaultValue={item.description}
+								name='description'
 								className='form-control min-h-28 resize-none py-3 leading-7'
 							/>
 						</label>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
 							<span>Etiquetas</span>
-							<input defaultValue={item.tags.join(", ")} className='form-control' />
+							<input name='tags' defaultValue={item.tags.join(", ")} className='form-control' />
 						</label>
+						<button className='primary-action min-h-12 rounded-full px-5 py-3 text-base font-black transition md:col-span-2'>
+							Guardar cambios
+						</button>
 					</form>
 				</section>
 
@@ -110,8 +117,14 @@ export default async function InventoryDetailPage({
 							/>
 						</div>
 						<div className='flex flex-wrap gap-2'>
-							<StatusBadge value={item.category} />
-							<StatusBadge value={availabilityBadge} />
+							<StatusBadge
+								value={item.category}
+								label={CATALOG_CATEGORY_LABELS[item.category]}
+							/>
+							<StatusBadge
+								value={availabilityBadge}
+								label={CATALOG_AVAILABILITY_LABELS[item.availabilityStatus]}
+							/>
 						</div>
 					</section>
 				</aside>

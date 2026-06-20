@@ -1,9 +1,23 @@
 import Link from "next/link";
 import { PageHeader } from "../../components/page-header";
 import { PackageBuilder } from "./package-builder";
-import { inventoryItems } from "../../lib/mock-data";
+import { listPackageBuilderEntries } from "../../lib/server/packages";
+import { getSettings } from "../../lib/server/settings";
 
-export default function NewPackagePage() {
+export default async function NewPackagePage() {
+	const [entries, settings] = await Promise.all([
+		listPackageBuilderEntries(),
+		getSettings(),
+	]);
+
+	const builderSettings = {
+		quantityDiscountPercent: Number(settings.quantityDiscountPercent),
+		hoursDiscountPercent: Number(settings.hoursDiscountPercent),
+		hoursDiscountMinHours: Number(settings.hoursDiscountMinHours),
+		maxDiscountPercent: Number(settings.maxDiscountPercent),
+		priceRoundingTo: settings.priceRoundingTo,
+	};
+
 	return (
 		<>
 			<PageHeader
@@ -13,7 +27,7 @@ export default function NewPackagePage() {
 					{ label: "Crear paquete" },
 				]}
 				title='Crear paquete'
-				description='Componé un paquete desde el catálogo con precio por tipo de cliente.'
+				description='Componé un paquete desde el catálogo.'
 				actions={
 					<Link
 						href='/paquetes'
@@ -25,7 +39,7 @@ export default function NewPackagePage() {
 			/>
 
 			<div className='px-5 pb-28 md:px-8 md:pb-8'>
-				<PackageBuilder catalog={inventoryItems} />
+				<PackageBuilder entries={entries} settings={builderSettings} />
 			</div>
 		</>
 	);

@@ -129,7 +129,7 @@ campos `externalCalendarEventId`, `syncStatus`, `lastSyncedAt` ya existen en el 
 
 ### Alta (`/eventos/nuevo`)
 - Selector de cliente con búsqueda por teléfono/nombre (o "crear cliente nuevo" inline).
-- Secciones: Cliente y embudo → Fecha y lugar → Personajes y servicios (selector
+- Secciones: Cliente y oportunidad → Fecha y lugar → Personajes y servicios (selector
   desde catálogo con miniaturas) → Colaboradores (con disponibilidad visible).
 - Validación: fecha obligatoria si la etapa inicial ≥ RESERVADO (raro pero posible
   al migrar históricos).

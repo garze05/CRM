@@ -4,7 +4,7 @@ import { MetricCard } from "../components/metric-card";
 import { PageHeader } from "../components/page-header";
 import { SectionCard } from "../components/section-card";
 import { TasksTable } from "./tasks-table";
-import { tasks } from "../lib/mock-data";
+import { listAllTasks } from "../lib/server/tasks";
 
 export default async function TasksPage({
 	searchParams,
@@ -12,11 +12,12 @@ export default async function TasksPage({
 	searchParams: Promise<{ estado?: string }>;
 }) {
 	const { estado } = await searchParams;
+	const tasks = await listAllTasks();
 
-	const pending = tasks.filter(task => task.status === "PENDIENTE").length;
-	const inProgress = tasks.filter(task => task.status === "EN_PROGRESO").length;
+	const pending = tasks.filter(task => task.status === "PENDING").length;
+	const inProgress = tasks.filter(task => task.status === "IN_PROGRESS").length;
 	const automatic = tasks.filter(
-		task => task.origin !== "MANUAL" && task.status === "PENDIENTE",
+		task => task.origin !== "MANUAL" && task.status === "PENDING",
 	).length;
 
 	return (

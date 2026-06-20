@@ -9,6 +9,13 @@ const STAGE_COLORS: Record<string, string> = {
 	REALIZADO: "var(--primary-color)",
 	RECURRENTE: "var(--primary-active)",
 	CANCELADO: "var(--error-color)",
+	PROSPECT: "var(--text-muted)",
+	CONTACTED: "var(--info-color)",
+	QUOTED: "var(--tertiary-color)",
+	RESERVED: "var(--accent-color)",
+	CONFIRMED: "var(--secondary-color)",
+	COMPLETED: "var(--primary-color)",
+	CANCELED: "var(--error-color)",
 };
 
 const STAGE_LABELS: Record<string, string> = {
@@ -20,6 +27,13 @@ const STAGE_LABELS: Record<string, string> = {
 	REALIZADO: "Realizado",
 	RECURRENTE: "Recurrente",
 	CANCELADO: "Cancelado",
+	PROSPECT: "Prospecto",
+	CONTACTED: "Contactado",
+	QUOTED: "Cotizado",
+	RESERVED: "Reservado",
+	CONFIRMED: "Confirmado",
+	COMPLETED: "Realizado",
+	CANCELED: "Cancelado",
 };
 
 /**
@@ -32,7 +46,7 @@ export function FunnelBoard({
 	stages: { label: string; total: number }[];
 }) {
 	return (
-		<ol className='grid list-none gap-3 p-0 sm:grid-cols-3 xl:grid-cols-6'>
+		<ol className='grid list-none gap-3 p-0 sm:grid-cols-3 xl:grid-cols-7'>
 			{stages.map(stage => (
 				<li key={stage.label}>
 					<Link

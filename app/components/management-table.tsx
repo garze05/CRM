@@ -25,7 +25,7 @@ export function ManagementTable<Row extends { id: string }>({
 	return (
 		<div className='max-w-full overflow-x-auto rounded-lg border border-[color:var(--border-color)] bg-[var(--card-color)] shadow-[var(--crisp-shadow)]'>
 			<div
-				className='grid min-w-[860px] bg-[#f0ebe4] px-5 py-4 text-base font-black text-[var(--text-secondary)]'
+				className='grid min-w-[860px] bg-muted px-5 py-3 text-sm font-black text-[var(--text-secondary)]'
 				style={{ gridTemplateColumns }}
 			>
 				{columns.map(column => (
@@ -62,7 +62,7 @@ export function ManagementTable<Row extends { id: string }>({
 					return (
 						<div
 							key={row.id}
-							className='border-t border-[color:var(--border-color)] transition hover:bg-[#f7f2ec]'
+							className='border-t border-[color:var(--border-color)] transition hover:bg-muted'
 						>
 							{content}
 						</div>
@@ -72,7 +72,7 @@ export function ManagementTable<Row extends { id: string }>({
 				return (
 					<div
 						key={row.id}
-						className='relative border-t border-[color:var(--border-color)] transition hover:bg-[#f7f2ec]'
+						className='relative border-t border-[color:var(--border-color)] transition hover:bg-muted'
 					>
 						<Link
 							href={rowHref(row)}

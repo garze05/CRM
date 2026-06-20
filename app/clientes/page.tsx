@@ -2,28 +2,25 @@ import Link from "next/link";
 import { IconLabel } from "../components/icon-label";
 import { PageHeader } from "../components/page-header";
 import { SectionCard } from "../components/section-card";
+import { Button } from "../components/ui/button";
 import { ClientsTable, type ClientRow } from "./clients-table";
-import { clients, getClientEvents } from "../lib/mock-data";
+import { listClients } from "../lib/server/clients";
 
-export default function ClientsPage() {
-	const rows: ClientRow[] = clients.map(client => ({
-		...client,
-		eventsCount: getClientEvents(client.id).length,
-	}));
+export default async function ClientsPage() {
+	const rows: ClientRow[] = await listClients();
 
 	return (
 		<>
 			<PageHeader
 				breadcrumb={[{ label: "Inicio", href: "/" }, { label: "Clientes" }]}
 				title='Clientes'
-				description='Repositorio central de contactos para WhatsApp, seguimiento y cotizaciones.'
+				description='Repositorio central de contactos. La relación vive aquí; el embudo se controla por evento.'
 				actions={
-					<Link
-						href='/clientes/nuevo'
-						className='primary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
-					>
-						<IconLabel label='Nuevo cliente' />
-					</Link>
+					<Button asChild size='lg'>
+						<Link href='/clientes/nuevo'>
+							<IconLabel label='Nuevo cliente' />
+						</Link>
+					</Button>
 				}
 			/>
 

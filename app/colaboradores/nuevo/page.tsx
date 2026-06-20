@@ -2,11 +2,13 @@ import Link from "next/link";
 import { PageHeader } from "../../components/page-header";
 import { PhoneInput } from "../../components/phone-input";
 import { SectionCard } from "../../components/section-card";
-import { inventoryItems } from "../../lib/mock-data";
+import { listActiveCatalogItems } from "../../lib/server/catalog";
 
-const characters = inventoryItems.filter(item => item.category === "PERSONAJE");
+export default async function NewCollaboratorPage() {
+	const characters = (await listActiveCatalogItems()).filter(
+		item => item.category === "CHARACTER",
+	);
 
-export default function NewCollaboratorPage() {
 	return (
 		<>
 			<PageHeader
@@ -16,7 +18,7 @@ export default function NewCollaboratorPage() {
 					{ label: "Nuevo colaborador" },
 				]}
 				title='Nuevo colaborador'
-				description='Alta operativa para asignaciones, disponibilidad y calificación por evento.'
+				description='Alta operativa para asignaciones.'
 				actions={
 					<Link
 						href='/colaboradores'
@@ -30,7 +32,6 @@ export default function NewCollaboratorPage() {
 			<div className='grid min-w-0 gap-5 px-5 pb-28 md:px-8 md:pb-8 xl:grid-cols-[minmax(0,1fr)_360px]'>
 				<SectionCard
 					title='Perfil del colaborador'
-					description='La calificación se calculará desde asignaciones de eventos, no desde este formulario.'
 				>
 					<form className='grid gap-5 md:grid-cols-2'>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
@@ -48,11 +49,11 @@ export default function NewCollaboratorPage() {
 						/>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
 							<span>Rol</span>
-							<select defaultValue='BOTARGA' className='form-control'>
-								<option value='BOTARGA'>Botarga</option>
-								<option value='ANIMADOR'>Animador</option>
-								<option value='LOGISTICA'>Logística</option>
-								<option value='OTRO'>Otro</option>
+							<select defaultValue='MASCOT_COSTUME' className='form-control'>
+								<option value='MASCOT_COSTUME'>Botarga</option>
+								<option value='ENTERTAINER'>Animador</option>
+								<option value='LOGISTICS'>Logística</option>
+								<option value='OTHER'>Otro</option>
 							</select>
 						</label>
 						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>

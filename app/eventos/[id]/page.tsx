@@ -4,16 +4,18 @@ import { PageHeader } from "../../components/page-header";
 import { StarRating } from "../../components/star-rating";
 import { StatusBadge } from "../../components/status-badge";
 import { TaskPanel } from "../../components/task-panel";
+import { getEventDetail, listClientsForSelect } from "../../lib/server/events";
+import { listCollaboratorsForSelect } from "../../lib/server/collaborators";
+import { listTasksForEntity } from "../../lib/server/tasks";
+import { formatCrc, formatDateKey } from "../../lib/format";
 import {
-	collaborators,
-	formatCrc,
-	formatDate,
-	getEventAssignments,
-	getEventById,
-	getEventClient,
-	getEventTasks,
-	quotes,
-} from "../../lib/mock-data";
+	FUNNEL_STAGE_LABELS,
+	PAYMENT_STATUS_LABELS,
+	QUOTE_STATUS_LABELS,
+} from "../../lib/domain/labels";
+import { EventDetailForm } from "./event-detail-form";
+import { AssignmentsPanel, type AssignmentRow } from "./assignments-panel";
+import { TrashButton } from "../../components/trash-button";
 
 export default async function EventDetailPage({
 	params,
@@ -21,22 +23,37 @@ export default async function EventDetailPage({
 	params: Promise<{ id: string }>;
 }) {
 	const { id } = await params;
-	const event = getEventById(id);
+	const event = await getEventDetail(id);
 
 	if (!event) {
 		notFound();
 	}
 
-	const client = getEventClient(event);
-	const isCompleted = event.pipelineStatus === "REALIZADO";
-	const assignments = getEventAssignments(event.id).map(assignment => ({
-		assignment,
-		collaborator: collaborators.find(
-			person => person.id === assignment.collaboratorId,
-		),
+	const [eventTasks, clientOptions, collaboratorOptions] = await Promise.all([
+		listTasksForEntity({ eventId: event.id }),
+		listClientsForSelect(),
+		listCollaboratorsForSelect(),
+	]);
+	const isCompleted = event.funnelStage === "COMPLETED";
+	const paymentStatus = event.reservation?.paymentStatus ?? null;
+	const total =
+		event.reservation?.agreedTotal != null
+			? Number(event.reservation.agreedTotal)
+			: event.quotes[0]?.total != null
+				? Number(event.quotes[0].total)
+				: null;
+	const characters = event.characters.map(c => c.catalogItem.name);
+	const dateKey = event.eventDate
+		? event.eventDate.toISOString().slice(0, 10)
+		: "";
+
+	const assignmentRows: AssignmentRow[] = event.assignments.map(a => ({
+		id: a.id,
+		collaboratorId: a.collaborator.id,
+		collaboratorName: `${a.collaborator.firstName} ${a.collaborator.lastName}`,
+		roleInEvent: a.roleInEvent,
+		rating: a.rating,
 	}));
-	const eventQuotes = quotes.filter(quote => quote.eventId === event.id);
-	const eventTasks = getEventTasks(event.id);
 
 	return (
 		<>
@@ -49,152 +66,50 @@ export default async function EventDetailPage({
 				title={event.name}
 				badges={
 					<div className='flex flex-wrap gap-2'>
-						<StatusBadge value={event.pipelineStatus} />
-						<StatusBadge value={event.paymentStatus} />
+						<StatusBadge
+							value={event.funnelStage}
+							label={FUNNEL_STAGE_LABELS[event.funnelStage]}
+						/>
+						{paymentStatus ? (
+							<StatusBadge
+								value={paymentStatus}
+								label={PAYMENT_STATUS_LABELS[paymentStatus]}
+							/>
+						) : null}
 					</div>
 				}
 				actions={
-					<button className='primary-action min-h-12 rounded-full px-5 py-3 text-base font-black transition'>
-						Guardar cambios
-					</button>
+					<TrashButton entityType='Event' id={event.id} returnTo='/eventos' />
 				}
 			/>
 
-			<div className='grid min-w-0 flex-1 gap-5 px-5 pb-28 md:px-8 md:pb-8 xl:grid-cols-[minmax(0,1fr)_360px]'>
+			<div className='grid min-w-0 flex-1 gap-5 px-5 pb-28 md:px-8 md:pb-8 xl:grid-cols-[minmax(0,1fr)_400px]'>
 				<div className='min-w-0 space-y-5'>
-					<section className='surface-card min-w-0 p-5 md:p-7'>
-						<div className='mb-6'>
-							<h2 className='text-2xl font-black text-[var(--text-primary)]'>
-								Datos del evento
-							</h2>
-							<p className='mt-1 text-lg text-[var(--text-secondary)]'>
-								Información operativa y comercial vinculada al cliente.
-							</p>
-						</div>
-						<form className='grid gap-5 md:grid-cols-2'>
-							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-								<span>Nombre del evento</span>
-								<input defaultValue={event.name} className='form-control' />
-							</label>
-							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-								<span>Cliente</span>
-								<input
-									defaultValue={
-										client ? `${client.firstName} ${client.lastName}` : "Sin cliente"
-									}
-									className='form-control'
-								/>
-							</label>
-							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-								<span>Tipo</span>
-								<select defaultValue={event.type} className='form-control'>
-									<option value='INFANTIL'>Infantil</option>
-									<option value='CORPORATIVO'>Corporativo</option>
-									<option value='INSTITUCIONAL'>Institucional</option>
-								</select>
-							</label>
-							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-								<span>Estado del embudo</span>
-								<select defaultValue={event.pipelineStatus} className='form-control'>
-									<option value='COTIZADO'>Cotizado</option>
-									<option value='RESERVADO'>Reservado</option>
-									<option value='CONFIRMADO'>Confirmado</option>
-									<option value='REALIZADO'>Realizado</option>
-									<option value='CANCELADO'>Cancelado</option>
-								</select>
-							</label>
-							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-								<span>Fecha</span>
-								<input type='date' defaultValue={event.date} className='form-control' />
-							</label>
-							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-								<span>Hora inicio</span>
-								<input
-									type='time'
-									defaultValue={event.startTime}
-									className='form-control'
-								/>
-							</label>
-							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-								<span>Lugar</span>
-								<input defaultValue={event.venueName} className='form-control' />
-							</label>
-							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)]'>
-								<span>Invitados</span>
-								<input
-									type='number'
-									defaultValue={event.guestCount}
-									className='form-control'
-								/>
-							</label>
-							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
-								<span>Dirección</span>
-								<input defaultValue={event.venueAddress} className='form-control' />
-							</label>
-							<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
-								<span>Notas internas</span>
-								<textarea
-									className='form-control min-h-28 resize-none py-3 leading-7'
-									placeholder='Detalles del lugar, trato del cliente, logística y aprendizajes para futuros eventos.'
-								/>
-							</label>
-						</form>
-					</section>
+					<EventDetailForm
+						event={{
+							id: event.id,
+							name: event.name,
+							clientId: event.clientId,
+							eventType: event.eventType,
+							funnelStage: event.funnelStage,
+							eventDate: dateKey,
+							startTime: event.startTime ?? "",
+							guestCount: event.guestCount,
+							honoreeName: event.honoreeName ?? "",
+							honoreeAge: event.honoreeAge,
+							partyTheme: event.partyTheme ?? "",
+							venueAddress: event.venueAddress ?? "",
+							internalNotes: event.internalNotes ?? "",
+						}}
+						clientOptions={clientOptions}
+					/>
 
-					<section className='surface-card min-w-0 p-5 md:p-7'>
-						<div className='mb-4 flex flex-wrap items-center justify-between gap-3'>
-							<h2 className='text-2xl font-black text-[var(--text-primary)]'>
-								Colaboradores asignados
-							</h2>
-							<button className='secondary-action flex min-h-12 w-fit items-center rounded-full px-4 py-3 text-base font-black transition'>
-								Asignar colaborador
-							</button>
-						</div>
-						{assignments.length === 0 ? (
-							<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
-								Sin colaboradores asignados todavía. El sistema validará
-								conflictos de fecha y hora al asignar.
-							</p>
-						) : (
-							<ul className='list-none space-y-3 p-0'>
-								{assignments.map(({ assignment, collaborator }) => (
-									<li
-										key={assignment.id}
-										className='rounded-lg border border-[color:var(--border-color)] bg-[var(--surface-color)] p-4'
-									>
-										<div className='flex flex-wrap items-center justify-between gap-2'>
-											{collaborator ? (
-												<Link
-													href={`/colaboradores/${collaborator.id}`}
-													className='text-lg font-black text-[var(--text-primary)] underline-offset-2 hover:underline'
-												>
-													{collaborator.firstName} {collaborator.lastName}
-												</Link>
-											) : (
-												<span className='text-lg font-black text-[var(--text-muted)]'>
-													Colaborador eliminado
-												</span>
-											)}
-											<StarRating
-												value={assignment.rating}
-												readOnly={!isCompleted}
-												label='Calificación del colaborador'
-												size='sm'
-											/>
-										</div>
-										<p className='mt-1 text-base font-semibold text-[var(--text-secondary)]'>
-											{assignment.roleInEvent}
-										</p>
-										{assignment.note ? (
-											<p className='mt-2 text-base font-semibold text-[var(--text-secondary)]'>
-												Nota: {assignment.note}
-											</p>
-										) : null}
-									</li>
-								))}
-							</ul>
-						)}
-					</section>
+					<AssignmentsPanel
+						eventId={event.id}
+						assignments={assignmentRows}
+						collaboratorOptions={collaboratorOptions}
+						isCompleted={isCompleted}
+					/>
 
 					<section className='surface-card min-w-0 p-5 md:p-7'>
 						<div className='mb-4 flex flex-wrap items-center justify-between gap-3'>
@@ -208,14 +123,14 @@ export default async function EventDetailPage({
 								Nueva cotización
 							</Link>
 						</div>
-						{eventQuotes.length === 0 ? (
-							<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
+						{event.quotes.length === 0 ? (
+							<p className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-5 text-center text-lg font-bold text-[var(--text-secondary)]'>
 								Sin cotizaciones todavía. Solo puede haber una cotización
 								enviada activa; las demás quedan en historial.
 							</p>
 						) : (
 							<ul className='list-none space-y-3 p-0'>
-								{eventQuotes.map(quote => (
+								{event.quotes.map(quote => (
 									<li key={quote.id}>
 										<Link
 											href={`/cotizaciones/${quote.id}`}
@@ -223,16 +138,19 @@ export default async function EventDetailPage({
 										>
 											<div>
 												<p className='text-lg font-black text-[var(--text-primary)]'>
-													{quote.number}
+													{quote.quoteNumber}
 												</p>
 												<p className='mt-1 text-base font-semibold text-[var(--text-secondary)]'>
-													Vigente hasta {formatDate(quote.validUntil)}
+													Vigente hasta {formatDateKey(quote.validUntil)}
 												</p>
 											</div>
 											<div className='flex items-center gap-3'>
-												<StatusBadge value={quote.status} />
+												<StatusBadge
+													value={quote.status}
+													label={QUOTE_STATUS_LABELS[quote.status]}
+												/>
 												<span className='text-lg font-black text-[var(--text-primary)]'>
-													{formatCrc(quote.total)}
+													{formatCrc(Number(quote.total))}
 												</span>
 											</div>
 										</Link>
@@ -241,7 +159,6 @@ export default async function EventDetailPage({
 							</ul>
 						)}
 					</section>
-
 				</div>
 
 				<aside className='min-w-0 space-y-5'>
@@ -251,9 +168,12 @@ export default async function EventDetailPage({
 						</h2>
 						<dl className='mt-5 space-y-4 text-lg'>
 							<div className='border-t border-[color:var(--border-color)] pt-4'>
-								<dt className='font-bold text-[var(--text-secondary)]'>Fecha</dt>
+								<dt className='font-bold text-[var(--text-secondary)]'>
+									Fecha
+								</dt>
 								<dd className='mt-1 font-black text-[var(--text-primary)]'>
-									{formatDate(event.date)} · {event.startTime}
+									{formatDateKey(dateKey || null)}
+									{event.startTime ? ` · ${event.startTime}` : ""}
 								</dd>
 							</div>
 							<div className='border-t border-[color:var(--border-color)] pt-4'>
@@ -261,21 +181,32 @@ export default async function EventDetailPage({
 									Personajes y servicios
 								</dt>
 								<dd className='mt-1 font-black text-[var(--text-primary)]'>
-									{event.characters.length > 0
-										? event.characters.join(", ")
+									{characters.length > 0
+										? characters.join(", ")
 										: "Por definir"}
 								</dd>
 							</div>
 							<div className='border-t border-[color:var(--border-color)] pt-4'>
 								<dt className='font-bold text-[var(--text-secondary)]'>Pago</dt>
 								<dd className='mt-2'>
-									<StatusBadge value={event.paymentStatus} />
+									{paymentStatus ? (
+										<StatusBadge
+											value={paymentStatus}
+											label={PAYMENT_STATUS_LABELS[paymentStatus]}
+										/>
+									) : (
+										<span className='text-base font-semibold text-[var(--text-muted)]'>
+											Sin reservación
+										</span>
+									)}
 								</dd>
 							</div>
 							<div className='border-t border-[color:var(--border-color)] pt-4'>
-								<dt className='font-bold text-[var(--text-secondary)]'>Total</dt>
+								<dt className='font-bold text-[var(--text-secondary)]'>
+									Total
+								</dt>
 								<dd className='mt-1 font-black text-[var(--text-primary)]'>
-									{formatCrc(event.estimatedTotal)}
+									{total !== null ? formatCrc(total) : "Por cotizar"}
 								</dd>
 							</div>
 						</dl>
@@ -283,8 +214,9 @@ export default async function EventDetailPage({
 
 					<TaskPanel
 						title='Tareas del evento'
-						entityHref={`/eventos/${event.id}`}
-						entityLabel={event.name}
+						entityType='event'
+						entityId={event.id}
+						revalidatePath={`/eventos/${event.id}`}
 						tasks={eventTasks}
 					/>
 
@@ -295,7 +227,7 @@ export default async function EventDetailPage({
 						{isCompleted ? (
 							<div className='mt-3'>
 								<StarRating
-									value={null}
+									value={event.rating}
 									label='Calificación del evento'
 									name='eventRating'
 								/>

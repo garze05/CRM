@@ -6,36 +6,18 @@ import {
 	ReservationsTable,
 	type ReservationRow,
 } from "./reservations-table";
-import {
-	events,
-	formatCrc,
-	getEventClient,
-	getMockDocumentCode,
-	quotes,
-} from "../lib/mock-data";
+import { formatCrc } from "../lib/format";
+import { listReservations } from "../lib/server/reservations";
 
-const reservedEvents = events.filter(event =>
-	["RESERVADO", "CONFIRMADO", "REALIZADO"].includes(event.pipelineStatus),
-);
+export default async function ReservationsPage() {
+	const rows: ReservationRow[] = await listReservations();
+	const pendingDeposit = rows.filter(
+		row => row.paymentStatus === "PENDING_DEPOSIT",
+	).length;
+	const depositsReceived = rows.filter(
+		row => row.paymentStatus !== "PENDING_DEPOSIT",
+	).length;
 
-const rows: ReservationRow[] = reservedEvents.map((event, index) => {
-	const quote = quotes.find(item => item.eventId === event.id);
-	const client = getEventClient(event);
-	const half = Math.round(event.estimatedTotal / 2);
-
-	return {
-		...event,
-		clientName: client
-			? `${client.firstName} ${client.lastName}`
-			: "Sin cliente",
-		quoteNumber: quote?.number ?? getMockDocumentCode("C", event.date, 100 + index),
-		reservationNumber: getMockDocumentCode("R", event.date, 100 + index),
-		advancePayment: half,
-		balancePayment: event.estimatedTotal - half,
-	};
-});
-
-export default function ReservationsPage() {
 	return (
 		<>
 			<PageHeader
@@ -44,7 +26,7 @@ export default function ReservationsPage() {
 					{ label: "Reservaciones" },
 				]}
 				title='Reservaciones'
-				description='Control de anticipos, saldos y eventos comercialmente aceptados.'
+				description='Anticipos, saldos y eventos aceptados.'
 				actions={
 					<Link
 						href='/cotizaciones'
@@ -64,29 +46,29 @@ export default function ReservationsPage() {
 					description='El anticipo confirma el evento y el saldo cierra el cobro operativo.'
 				>
 					<div className='mb-5 grid gap-4 md:grid-cols-3'>
-						<div className='rounded-lg border border-[color:var(--border-color)] bg-[#f0ebe4] p-4'>
+						<div className='rounded-lg border border-[color:var(--border-color)] bg-muted p-4'>
 							<p className='text-base font-black text-[var(--text-muted)]'>
 								Pendientes de anticipo
 							</p>
 							<p className='mt-2 text-3xl font-black text-[var(--primary-color)]'>
-								1
+								{pendingDeposit}
 							</p>
 						</div>
-						<div className='rounded-lg border border-[color:var(--border-color)] bg-[#f0ebe4] p-4'>
+						<div className='rounded-lg border border-[color:var(--border-color)] bg-muted p-4'>
 							<p className='text-base font-black text-[var(--text-muted)]'>
 								Anticipos recibidos
 							</p>
 							<p className='mt-2 text-3xl font-black text-[var(--secondary-color)]'>
-								1
+								{depositsReceived}
 							</p>
 						</div>
-						<div className='rounded-lg border border-[color:var(--border-color)] bg-[#f0ebe4] p-4'>
+						<div className='rounded-lg border border-[color:var(--border-color)] bg-muted p-4'>
 							<p className='text-base font-black text-[var(--text-muted)]'>
 								Total reservado
 							</p>
 							<p className='mt-2 text-3xl font-black text-[var(--text-primary)]'>
 								{formatCrc(
-									rows.reduce((total, row) => total + row.estimatedTotal, 0),
+									rows.reduce((total, row) => total + row.agreedTotal, 0),
 								)}
 							</p>
 						</div>

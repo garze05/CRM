@@ -1,6 +1,35 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+/* Habilita el modo oscuro vía la clase `.dark` (next-themes la coloca en <html>). */
+@custom-variant dark (&:is(.dark *));
 
 :root {
+	--radius: 0.5rem;
+
+	/* --- Tokens semánticos shadcn (puente sobre la paleta de marca) ---
+	   Los componentes shadcn referencian SIEMPRE estos tokens, nunca hex.
+	   Ver DESIGN.md §3. */
+	--background: var(--background-color);
+	--foreground: var(--text-primary);
+	--card: var(--card-color);
+	--card-foreground: var(--text-primary);
+	--popover: var(--surface-color);
+	--popover-foreground: var(--text-primary);
+	--primary: var(--primary-color);
+	--primary-foreground: var(--on-primary);
+	--secondary: var(--secondary-color);
+	--secondary-foreground: #ffffff;
+	--muted: #f0ebe4;
+	--muted-foreground: var(--text-muted);
+	--accent: var(--accent-color);
+	--accent-foreground: var(--on-accent);
+	--destructive: var(--error-color);
+	--destructive-foreground: #ffffff;
+	--border: var(--border-color);
+	--input: var(--border-color);
+	--ring: var(--accent-color);
+
 	--primary-color: #a64600;
 	--primary-hover: #bf5608;
 	--primary-active: #843400;
@@ -15,6 +44,7 @@
 	--background-color: #f7f5ef;
 	--surface-color: #fffdf8;
 	--card-color: #fffefa;
+	--input-bg: #f3f0eb;
 
 	--border-color: #ead8cd;
 
@@ -29,6 +59,11 @@
 
 	--on-primary: #ffffff;
 	--on-accent: #3d1b00;
+
+	/* Tonos extra para badges de estado (tipos de cliente especiales). */
+	--badge-purple: #6d4ac2;
+	--badge-pink: #b03070;
+
 	--soft-shadow: 0 16px 40px rgba(77, 51, 31, 0.08);
 	--crisp-shadow: 0 6px 18px rgba(77, 51, 31, 0.08);
 
@@ -53,6 +88,7 @@
 	--background-color: #171513;
 	--surface-color: #24201d;
 	--card-color: #201d1a;
+	--input-bg: #2c2724;
 
 	--border-color: #4b3930;
 
@@ -67,11 +103,42 @@
 
 	--on-primary: #ffffff;
 	--on-accent: #211000;
+
+	/* Override de tokens semánticos shadcn que no se derivan de la marca. */
+	--secondary-foreground: #06302d;
+	--muted: #2c2724;
+	--destructive-foreground: #2a0608;
+
+	/* Versiones más claras para legibilidad sobre superficies oscuras. */
+	--badge-purple: #c4b0f5;
+	--badge-pink: #f0a8cb;
 }
 
 @theme inline {
-	--color-background: var(--background-color);
-	--color-foreground: var(--text-primary);
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
 }
 
 body {
@@ -133,7 +200,7 @@ textarea {
 	min-height: 2.75rem;
 	width: 100%;
 	border: 1px solid var(--border-color);
-	background: #f3f0eb;
+	background: var(--input-bg);
 	padding-inline: 1rem;
 	color: var(--text-primary);
 	font-size: 1rem;
@@ -142,7 +209,26 @@ textarea {
 }
 
 .form-control-with-leading-icon {
-	padding-inline-start: 3.75rem;
+	padding-inline-start: 3.25rem;
+}
+
+.search-control {
+	min-height: 2.75rem;
+	width: 100%;
+	border: 1px solid var(--border-color);
+	border-radius: 8px;
+	background: var(--input-bg);
+	padding-inline: 3.25rem 1rem;
+	color: var(--text-primary);
+	font-size: 1rem;
+	font-weight: 650;
+	outline: none;
+}
+
+.search-control:focus {
+	border-color: var(--accent-color);
+	background: var(--surface-color);
+	box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-color) 22%, transparent);
 }
 
 .form-control:focus {
@@ -162,7 +248,7 @@ textarea {
 	padding-inline: 0.875rem;
 	border: 1px solid var(--border-color);
 	border-radius: 8px;
-	background: #f3f0eb;
+	background: var(--input-bg);
 }
 
 .phone-input .PhoneInputCountryIcon {
@@ -215,18 +301,6 @@ textarea {
 	line-height: 1;
 }
 
-.min-h-12 {
-	min-height: 2.5rem;
-}
-
-.min-h-14 {
-	min-height: 2.75rem;
-}
-
-.h-14 {
-	height: 2.75rem;
-}
-
 .primary-action {
 	background: var(--primary-color);
 	color: var(--on-primary);
@@ -245,4 +319,32 @@ textarea {
 
 .secondary-action:hover {
 	border-color: var(--primary-color);
+}
+
+@keyframes toast-slide-in {
+	from {
+		transform: translateX(calc(100% + 1rem));
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+@keyframes toast-timer {
+	from {
+		width: 100%;
+	}
+	to {
+		width: 0%;
+	}
+}
+
+.toast-enter {
+	animation: toast-slide-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.toast-timer {
+	animation: toast-timer linear forwards;
 }

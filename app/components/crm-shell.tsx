@@ -6,8 +6,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { logout } from "../lib/actions/auth";
+import { ThemeToggle } from "./theme-toggle";
 
 addCollection(materialSymbolsIcons);
+
+export type ShellUser = {
+	name: string;
+	email: string;
+	initials: string;
+	image?: string | null;
+};
 
 type NavigationItem = {
 	label: string;
@@ -84,12 +93,6 @@ const navigationGroups = [
 	},
 ];
 
-const mockUser = {
-	name: "Huberth Rodríguez",
-	role: "Administrador",
-	initials: "HR",
-};
-
 const accountItems = [
 	{
 		label: "Papelería",
@@ -137,7 +140,7 @@ function NavigationLink({
 			className={`flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-[0.95rem] font-extrabold transition ${
 				isActive
 					? "bg-[var(--accent-color)] text-[var(--on-accent)] shadow-sm"
-					: "text-[var(--text-secondary)] hover:bg-[#f0ebe4] hover:text-[var(--primary-color)]"
+					: "text-[var(--text-secondary)] hover:bg-muted hover:text-[var(--primary-color)]"
 			}`}
 		>
 			<Icon icon={item.icon} className='h-5 w-5 shrink-0' aria-hidden='true' />
@@ -184,18 +187,28 @@ function NavigationContent({ onNavigate }: { onNavigate?: () => void }) {
 	);
 }
 
-function SidebarUser() {
+function SidebarUser({ user }: { user: ShellUser }) {
 	return (
 		<div className='mb-5 flex items-center gap-3'>
-			<div className='grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[var(--accent-color)] text-sm font-black text-[var(--on-accent)]'>
-				{mockUser.initials}
-			</div>
+			{user.image ? (
+				<Image
+					src={user.image}
+					alt={`Foto de perfil de ${user.name}`}
+					width={44}
+					height={44}
+					className='h-11 w-11 shrink-0 rounded-full object-cover'
+				/>
+			) : (
+				<div className='grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[var(--accent-color)] text-sm font-black text-[var(--on-accent)]'>
+					{user.initials}
+				</div>
+			)}
 			<div className='min-w-0'>
 				<p className='truncate text-[0.95rem] font-black text-[var(--primary-color)]'>
-					{mockUser.name}
+					{user.name}
 				</p>
-				<p className='text-sm font-semibold text-[var(--text-secondary)]'>
-					{mockUser.role}
+				<p className='truncate text-xs font-semibold text-[var(--text-secondary)]'>
+					{user.email}
 				</p>
 			</div>
 		</div>
@@ -204,7 +217,7 @@ function SidebarUser() {
 
 function AccountActions({ onNavigate }: { onNavigate?: () => void }) {
 	return (
-		<div className='mt-auto border-t border-[color:var(--border-color)] pt-4'>
+		<div className='border-t border-[color:var(--border-color)] mt-4 pt-4'>
 			<div className='space-y-1.5'>
 				{accountItems.map(item => (
 					<NavigationLink key={item.label} item={item} onClick={onNavigate} />
@@ -214,10 +227,16 @@ function AccountActions({ onNavigate }: { onNavigate?: () => void }) {
 	);
 }
 
-function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+function SidebarContent({
+	user,
+	onNavigate,
+}: {
+	user: ShellUser;
+	onNavigate?: () => void;
+}) {
 	return (
 		<>
-			<SidebarUser />
+			<SidebarUser user={user} />
 			<NavigationContent onNavigate={onNavigate} />
 			<AccountActions onNavigate={onNavigate} />
 		</>
@@ -239,12 +258,12 @@ function GlobalSearch() {
 						<input
 							type='search'
 							placeholder='Buscar cliente o evento'
-							className='h-11 w-full rounded-lg border border-[color:var(--border-color)] bg-[#efede8] pl-11 pr-4 text-sm font-bold text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[color:var(--accent-color)] focus:bg-[var(--surface-color)] focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--accent-color)_20%,transparent)]'
+							className='search-control h-11 min-h-11 bg-[var(--input-bg)] text-sm'
 						/>
 					</label>
 					<button
 						type='button'
-						className='flex h-11 shrink-0 items-center gap-2 rounded-lg bg-[var(--secondary-color)] px-4 text-sm font-black text-white shadow-[var(--crisp-shadow)] transition hover:bg-[var(--secondary-hover)]'
+						className='flex h-11 shrink-0 items-center gap-2 rounded-lg bg-[var(--secondary-color)] px-4 text-sm font-black text-secondary-foreground shadow-[var(--crisp-shadow)] transition hover:bg-[var(--secondary-hover)]'
 					>
 						<Icon
 							icon='material-symbols:mic-rounded'
@@ -254,17 +273,22 @@ function GlobalSearch() {
 						<span>Voz</span>
 					</button>
 				</div>
-				<Link
-					href='/'
-					className='flex h-11 shrink-0 items-center gap-2 rounded-lg px-3 text-sm font-black text-[var(--text-secondary)] transition hover:bg-[#f0ebe4] hover:text-[var(--primary-color)]'
-				>
-					<Icon
-						icon='material-symbols:logout-rounded'
-						className='h-5 w-5 shrink-0'
-						aria-hidden='true'
-					/>
-					<span>Cerrar sesión</span>
-				</Link>
+				<div className='flex shrink-0 items-center gap-2'>
+					<ThemeToggle />
+					<form action={logout}>
+						<button
+							type='submit'
+							className='flex h-11 shrink-0 items-center gap-2 rounded-lg px-3 text-sm font-black text-[var(--text-secondary)] transition hover:bg-[var(--muted)] hover:text-[var(--primary-color)]'
+						>
+							<Icon
+								icon='material-symbols:logout-rounded'
+								className='h-5 w-5 shrink-0'
+								aria-hidden='true'
+							/>
+							<span>Cerrar sesión</span>
+						</button>
+					</form>
+				</div>
 			</div>
 		</header>
 	);
@@ -294,7 +318,7 @@ function MobileNavigation() {
 						className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg px-1 text-xs font-black transition ${
 							isActive
 								? "bg-[var(--accent-color)] text-[var(--on-accent)]"
-								: "text-[var(--text-secondary)] hover:bg-[#f0ebe4]"
+								: "text-[var(--text-secondary)] hover:bg-muted"
 						}`}
 					>
 						<Icon
@@ -310,12 +334,23 @@ function MobileNavigation() {
 	);
 }
 
-export function CrmShell({ children }: { children: ReactNode }) {
+export function CrmShell({
+	user,
+	children,
+}: {
+	user: ShellUser | null;
+	children: ReactNode;
+}) {
 	const pathname = usePathname();
 
-	// La vista pública del catálogo vive fuera del shell autenticado
-	// (en la fase 1 esto se formaliza con el grupo de rutas (app) + middleware).
-	if (pathname.startsWith("/catalogo")) {
+	// La vista pública del catálogo y el login viven fuera del shell autenticado.
+	// El middleware ya garantiza que el resto de rutas tengan sesión, pero si por
+	// alguna razón no hay usuario, renderizamos el contenido sin shell.
+	if (
+		pathname.startsWith("/catalogo") ||
+		pathname.startsWith("/login") ||
+		!user
+	) {
 		return <main id='contenido-principal'>{children}</main>;
 	}
 
@@ -323,12 +358,12 @@ export function CrmShell({ children }: { children: ReactNode }) {
 		<main className='min-h-screen bg-[var(--background-color)] text-[var(--text-primary)]'>
 			<a
 				href='#contenido-principal'
-				className='sr-only z-50 rounded-lg bg-[var(--primary-color)] px-4 py-3 text-base font-black text-white focus:not-sr-only focus:absolute focus:left-4 focus:top-4'
+				className='sr-only z-50 rounded-lg bg-[var(--primary-color)] px-4 py-3 text-base font-black text-primary-foreground focus:not-sr-only focus:absolute focus:left-4 focus:top-4'
 			>
 				Saltar al contenido principal
 			</a>
 			<div className='flex min-h-screen'>
-				<aside className='sticky top-0 hidden h-screen w-60 shrink-0 flex-col overflow-y-auto border-r border-[color:var(--border-color)] bg-[var(--surface-color)] px-4 py-5 text-[var(--text-primary)] lg:flex'>
+				<aside className='sticky top-0 hidden h-screen w-70 shrink-0 flex-col overflow-y-auto border-r border-[color:var(--border-color)] bg-[var(--surface-color)] px-4 py-5 text-[var(--text-primary)] lg:flex'>
 					<Link href='/' className='mb-4 block'>
 						<Image
 							src='/okidokicrm_black_logo.png'
@@ -336,13 +371,16 @@ export function CrmShell({ children }: { children: ReactNode }) {
 							width={220}
 							height={80}
 							priority
-							className='h-auto max-h-28 w-full object-contain'
+							className='h-auto max-h-24 w-full object-contain'
 						/>
 					</Link>
-					<SidebarContent />
+					<SidebarContent user={user} />
 				</aside>
 
-				<section id='contenido-principal' className='flex min-w-0 flex-1 flex-col'>
+				<section
+					id='contenido-principal'
+					className='flex min-w-0 flex-1 flex-col'
+				>
 					<GlobalSearch />
 
 					{children}

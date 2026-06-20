@@ -1,4 +1,11 @@
 import type { ReactNode } from "react";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "./ui/card";
 
 export function SectionCard({
 	action,
@@ -12,23 +19,21 @@ export function SectionCard({
 	title?: string;
 }) {
 	return (
-		<section className='surface-card min-w-0 p-4 md:p-5'>
+		<Card className="min-w-0">
 			{title ? (
-				<div className='mb-5 flex flex-col gap-3 md:flex-row md:items-start md:justify-between'>
-					<div>
-						<h2 className='text-2xl font-black text-[var(--text-primary)]'>
-							{title}
-						</h2>
+				<CardHeader>
+					<div className="min-w-0">
+						<CardTitle>{title}</CardTitle>
 						{description ? (
-							<p className='mt-1 text-lg text-[var(--text-secondary)]'>
-								{description}
-							</p>
+							<CardDescription>{description}</CardDescription>
 						) : null}
 					</div>
-					{action}
-				</div>
+					{action ? <div className="shrink-0">{action}</div> : null}
+				</CardHeader>
 			) : null}
-			{children}
-		</section>
+			<CardContent className={title ? undefined : "pt-4 md:pt-5"}>
+				{children}
+			</CardContent>
+		</Card>
 	);
 }

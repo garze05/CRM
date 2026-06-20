@@ -2,12 +2,13 @@ import Link from "next/link";
 import { IconLabel } from "../components/icon-label";
 import { PageHeader } from "../components/page-header";
 import { SectionCard } from "../components/section-card";
-
-// Regla del MVP: la aplicación NO asume paquetes ni servicios iniciales.
-// Estas listas se llenan desde el creador de paquetes y la migración de
-// precios del Sheets (fase 2); mientras tanto los estados vacíos guían.
-const packages: never[] = [];
-const services: never[] = [];
+import { StatusBadge } from "../components/status-badge";
+import { formatCrc } from "../lib/format";
+import { SERVICE_PRICE_TYPE_LABELS } from "../lib/domain/package-builder";
+import { listPackages, listServices } from "../lib/server/packages";
+import { PackageItemsDisclosure } from "./package-items-disclosure";
+import { getSettings } from "../lib/server/settings";
+import { packagePriceBreakdown } from "../lib/domain/pricing";
 
 export default async function PackagesPage({
 	searchParams,
@@ -16,6 +17,20 @@ export default async function PackagesPage({
 }) {
 	const { tab } = await searchParams;
 	const activeTab = tab === "servicios" ? "servicios" : "paquetes";
+	const [packages, services, settings] = await Promise.all([
+		listPackages(),
+		listServices(),
+		getSettings(),
+	]);
+	const pricingSettings = {
+		surchargeEducationalPercent: Number(settings.surchargeEducationalPercent),
+		surchargeCorporatePercent: Number(settings.surchargeCorporatePercent),
+		surchargeShoppingCenterPercent: Number(
+			settings.surchargeShoppingCenterPercent,
+		),
+		surchargeAgencyPercent: Number(settings.surchargeAgencyPercent),
+		priceRoundingTo: settings.priceRoundingTo,
+	};
 
 	return (
 		<>
@@ -25,14 +40,23 @@ export default async function PackagesPage({
 					{ label: "Paquetes y servicios" },
 				]}
 				title='Paquetes y servicios'
-				description='La oferta comercial: paquetes por tipo de cliente y servicios adicionales.'
+				description='Oferta comercial y precios base.'
 				actions={
-					<Link
-						href='/paquetes/nuevo'
-						className='primary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
-					>
-						<IconLabel label='Crear paquete' />
-					</Link>
+					activeTab === "servicios" ? (
+						<Link
+							href='/paquetes/servicios/nuevo'
+							className='primary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
+						>
+							<IconLabel label='Crear servicio' />
+						</Link>
+					) : (
+						<Link
+							href='/paquetes/nuevo'
+							className='primary-action flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
+						>
+							<IconLabel label='Crear paquete' />
+						</Link>
+					)
 				}
 			/>
 
@@ -40,7 +64,7 @@ export default async function PackagesPage({
 				<SectionCard>
 					<nav
 						aria-label='Sección de oferta'
-						className='mb-5 flex w-fit rounded-full border border-[color:var(--border-color)] bg-[var(--surface-color)] p-1'
+						className='mb-5 flex w-fit bg-[var(--surface-color)] p-1'
 					>
 						<Link
 							href='/paquetes'
@@ -48,7 +72,7 @@ export default async function PackagesPage({
 							className={`min-h-10 rounded-full px-5 py-2 text-base font-black transition ${
 								activeTab === "paquetes"
 									? "bg-[var(--accent-color)] text-[var(--on-accent)]"
-									: "text-[var(--text-secondary)] hover:bg-[#f0ebe4]"
+									: "text-[var(--text-secondary)] hover:bg-muted"
 							}`}
 						>
 							Paquetes
@@ -59,7 +83,7 @@ export default async function PackagesPage({
 							className={`min-h-10 rounded-full px-5 py-2 text-base font-black transition ${
 								activeTab === "servicios"
 									? "bg-[var(--accent-color)] text-[var(--on-accent)]"
-									: "text-[var(--text-secondary)] hover:bg-[#f0ebe4]"
+									: "text-[var(--text-secondary)] hover:bg-muted"
 							}`}
 						>
 							Servicios adicionales
@@ -68,7 +92,7 @@ export default async function PackagesPage({
 
 					{activeTab === "paquetes" ? (
 						packages.length === 0 ? (
-							<div className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-10 text-center'>
+							<div className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-10 text-center'>
 								<p className='text-2xl font-black text-[var(--text-primary)]'>
 									Sin paquetes todavía
 								</p>
@@ -84,20 +108,115 @@ export default async function PackagesPage({
 									<IconLabel label='Crear el primer paquete' />
 								</Link>
 							</div>
-						) : null
+						) : (
+							<ul className='grid list-none gap-3 p-0 md:grid-cols-2 xl:grid-cols-3'>
+								{packages.map(item => (
+									<li
+										key={item.id}
+										className='rounded-lg border border-[color:var(--border-color)] bg-[var(--surface-color)] p-4'
+									>
+										<div className='flex items-start justify-between gap-3'>
+											<div>
+												<p className='text-lg font-black text-[var(--text-primary)]'>
+													{item.name}
+												</p>
+												<p className='mt-1 text-base font-semibold text-[var(--text-secondary)]'>
+													{item.durationHours} h · {item.itemCount} ítems
+												</p>
+											</div>
+											<StatusBadge value={item.active ? "ACTIVO" : "PAUSADO"} />
+										</div>
+										<PackageItemsDisclosure items={item.items} />
+										<div className='mt-4 space-y-2 text-base'>
+											<p className='font-black text-[var(--text-primary)]'>
+												Precio base: {formatCrc(item.basePrice)}
+											</p>
+											<dl className='grid gap-1 text-sm font-semibold text-[var(--text-secondary)]'>
+												{packagePriceBreakdown(
+													item.basePrice,
+													pricingSettings,
+												).map(row => (
+													<div
+														key={row.clientType}
+														className='flex items-center justify-between gap-2'
+													>
+														<dt>{row.label}</dt>
+														<dd className='font-black text-[var(--text-primary)]'>
+															{formatCrc(row.price)}
+														</dd>
+													</div>
+												))}
+											</dl>
+										</div>
+										<Link
+											href={`/paquetes/${item.id}/editar`}
+											className='secondary-action mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-full px-4 py-2 text-base font-black transition'
+										>
+											<IconLabel
+												icon='material-symbols:edit-rounded'
+												label='Editar paquete'
+											/>
+										</Link>
+									</li>
+								))}
+							</ul>
+						)
 					) : services.length === 0 ? (
-						<div className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f7f2ec] p-10 text-center'>
+						<div className='rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-10 text-center'>
 							<p className='text-2xl font-black text-[var(--text-primary)]'>
 								Sin servicios adicionales todavía
 							</p>
 							<p className='mx-auto mt-2 max-w-xl text-lg font-semibold text-[var(--text-secondary)]'>
-								Los servicios à la carte (hora adicional, pintacaritas,
-								transporte especial…) se importarán desde el catálogo de precios
-								actual durante la migración de datos, y podrán administrarse
-								aquí.
+								Los servicios à la carte (sonido, animación, inflables, hora
+								adicional…) sirven para armar paquetes o venderse sueltos. Creá
+								el primero para empezar.
 							</p>
+							<Link
+								href='/paquetes/servicios/nuevo'
+								className='primary-action mx-auto mt-5 flex min-h-12 w-fit items-center gap-2 rounded-full px-5 py-3 text-base font-black transition'
+							>
+								<IconLabel label='Crear el primer servicio' />
+							</Link>
 						</div>
-					) : null}
+					) : (
+						<ul className='grid list-none gap-3 p-0 md:grid-cols-2 xl:grid-cols-3'>
+							{services.map(service => (
+								<li
+									key={service.id}
+									className='rounded-lg border border-[color:var(--border-color)] bg-[var(--surface-color)] p-4'
+								>
+									<div className='flex items-start justify-between gap-3'>
+										<div>
+											<p className='text-lg font-black text-[var(--text-primary)]'>
+												{service.name}
+											</p>
+											<p className='mt-1 text-base font-semibold text-[var(--text-secondary)]'>
+												{service.category ?? "General"} · Precio{" "}
+												{SERVICE_PRICE_TYPE_LABELS[service.priceType] ??
+													service.priceType}
+											</p>
+										</div>
+										<StatusBadge
+											value={service.active ? "ACTIVO" : "PAUSADO"}
+										/>
+									</div>
+									<p className='mt-4 text-xl font-black text-[var(--primary-color)]'>
+										{formatCrc(service.unitPrice)}
+										{service.priceType === "PER_HOUR" ? "/h" : ""}
+									</p>
+									<Link
+										href={`/paquetes/servicios/${service.id}/editar`}
+										className='secondary-action mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-full px-4 py-2 text-base font-black transition'
+									>
+										<IconLabel
+											icon='material-symbols:edit-rounded'
+											label='Editar servicio'
+										/>
+									</Link>
+								</li>
+							))}
+						</ul>
+					)}
 				</SectionCard>
 			</div>
 		</>

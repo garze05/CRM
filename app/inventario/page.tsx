@@ -3,15 +3,17 @@ import { IconLabel } from "../components/icon-label";
 import { PageHeader } from "../components/page-header";
 import { SectionCard } from "../components/section-card";
 import { InventoryTable } from "./inventory-table";
-import { inventoryItems } from "../lib/mock-data";
+import { listCatalogItems } from "../lib/server/catalog";
 
-export default function InventoryPage() {
+export default async function InventoryPage() {
+	const inventoryItems = await listCatalogItems();
+
 	return (
 		<>
 			<PageHeader
 				breadcrumb={[{ label: "Inicio", href: "/" }, { label: "Catálogo" }]}
 				title='Catálogo'
-				description='Personajes, inflables y decoración: alimenta las cotizaciones, el creador de paquetes y la vista pública.'
+				description='Personajes, inflables y decoración para cotizaciones y vista pública.'
 				actions={
 					<Link
 						href='/inventario/nuevo'
@@ -24,7 +26,7 @@ export default function InventoryPage() {
 
 			<div className='space-y-5 px-5 pb-28 md:px-8 md:pb-8'>
 				<SectionCard>
-					<div className='mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-dashed border-[color:var(--border-color)] bg-[#f0ebe4] p-4 text-lg text-[var(--text-secondary)]'>
+					<div className='mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-dashed border-[color:var(--border-color)] bg-muted p-4 text-lg text-[var(--text-secondary)]'>
 						<span>
 							Este catálogo se comparte con clientes mediante la vista pública
 							(sin precios).

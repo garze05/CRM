@@ -1,0 +1,1402 @@
+{
+  "services": [
+    {
+      "name": "Show de Magia",
+      "category": "Shows",
+      "unitPrice": 134000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Botarga de Extra Lujo",
+      "category": "Botargas",
+      "unitPrice": 55000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Botarga Staff",
+      "category": "Botargas",
+      "unitPrice": 45000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Botarga Alquilada",
+      "category": "Botargas",
+      "unitPrice": 50000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Botarguero",
+      "category": "Botargas",
+      "unitPrice": 14000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Asistente de Botarga",
+      "category": "Botargas",
+      "unitPrice": 10000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Animación",
+      "category": "Animación",
+      "unitPrice": 59000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Pintacaritas",
+      "category": "Animación",
+      "unitPrice": 36000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Inflables Staff",
+      "category": "Inflables",
+      "unitPrice": 27000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Inflables Alquilado",
+      "category": "Inflables",
+      "unitPrice": 54000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Cuidador de Inflable",
+      "category": "Inflables",
+      "unitPrice": 14000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Toro Mecánico",
+      "category": "Shows",
+      "unitPrice": 161000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Zanquero 2 patas",
+      "category": "Animación",
+      "unitPrice": 47000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Zanquero 4 patas",
+      "category": "Animación",
+      "unitPrice": 54000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Payasos",
+      "category": "Animación",
+      "unitPrice": 61000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Micrófono",
+      "category": "Sonido",
+      "unitPrice": 2000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Parlante",
+      "category": "Sonido",
+      "unitPrice": 6000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Mezcladora",
+      "category": "Sonido",
+      "unitPrice": 14000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Amplificación de Sonido Básica",
+      "category": "Sonido",
+      "unitPrice": 7000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Amplificación de Sonido Especial",
+      "category": "Sonido",
+      "unitPrice": 21000.0,
+      "priceType": "FIXED"
+    },
+    {
+      "name": "Show de Santa",
+      "category": "Shows",
+      "unitPrice": 70000.0,
+      "priceType": "FIXED"
+    }
+  ],
+  "characters": [
+    {
+      "name": "Mario Bros",
+      "category": "CHARACTER",
+      "description": "Super Mario. Popularidad: Alta",
+      "tags": [
+        "Super Mario",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Luigi Bros",
+      "category": "CHARACTER",
+      "description": "Super Mario. Popularidad: Baja",
+      "tags": [
+        "Super Mario",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Chase",
+      "category": "CHARACTER",
+      "description": "Paw Patrol. Popularidad: Alta",
+      "tags": [
+        "Paw Patrol",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Skye",
+      "category": "CHARACTER",
+      "description": "Paw Patrol. Popularidad: Alta",
+      "tags": [
+        "Paw Patrol",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Marshall",
+      "category": "CHARACTER",
+      "description": "Paw Patrol. Popularidad: Alta",
+      "tags": [
+        "Paw Patrol",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Bob Esponja",
+      "category": "CHARACTER",
+      "description": "Bob Esponja. Popularidad: Alta",
+      "tags": [
+        "Bob Esponja",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Patricio Estrella",
+      "category": "CHARACTER",
+      "description": "Bob Esponja. Popularidad: Baja",
+      "tags": [
+        "Bob Esponja",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Darth Vader",
+      "category": "CHARACTER",
+      "description": "Star Wars. Popularidad: Alta. Incluye: Espada láser",
+      "tags": [
+        "Star Wars",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Stormtrooper",
+      "category": "CHARACTER",
+      "description": "Star Wars. Popularidad: Alta. Incluye: Arma negra",
+      "tags": [
+        "Star Wars",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Kevin",
+      "category": "CHARACTER",
+      "description": "Los Minions. Popularidad: Alta",
+      "tags": [
+        "Los Minions",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Stuart",
+      "category": "CHARACTER",
+      "description": "Los Minions. Popularidad: Alta",
+      "tags": [
+        "Los Minions",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Mickey",
+      "category": "CHARACTER",
+      "description": "Mickey Mouse. Popularidad: Alta",
+      "tags": [
+        "Mickey Mouse",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Minnie",
+      "category": "CHARACTER",
+      "description": "Mickey Mouse. Popularidad: Alta",
+      "tags": [
+        "Mickey Mouse",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Spiderman",
+      "category": "CHARACTER",
+      "description": "Los Vengadores. Popularidad: Media",
+      "tags": [
+        "Los Vengadores",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Iron Man",
+      "category": "CHARACTER",
+      "description": "Los Vengadores. Popularidad: Baja",
+      "tags": [
+        "Los Vengadores",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Capitán América",
+      "category": "CHARACTER",
+      "description": "Los Vengadores. Popularidad: Baja. Incluye: Escudo",
+      "tags": [
+        "Los Vengadores",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Batman",
+      "category": "CHARACTER",
+      "description": "Los Vengadores. Popularidad: Baja",
+      "tags": [
+        "Los Vengadores",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Alegría",
+      "category": "CHARACTER",
+      "description": "Intensamente. Popularidad: Baja",
+      "tags": [
+        "Intensamente",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Ansiedad",
+      "category": "CHARACTER",
+      "description": "Intensamente. Popularidad: Baja",
+      "tags": [
+        "Intensamente",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Bluey",
+      "category": "CHARACTER",
+      "description": "Bluey. Popularidad: Baja",
+      "tags": [
+        "Bluey",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Woody",
+      "category": "CHARACTER",
+      "description": "Toy Story. Popularidad: Media",
+      "tags": [
+        "Toy Story",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Buzz Lighyear",
+      "category": "CHARACTER",
+      "description": "Toy Story. Popularidad: Media",
+      "tags": [
+        "Toy Story",
+        "Botarga Staff"
+      ],
+      "hourlyPrice": 45000.0,
+      "active": true
+    },
+    {
+      "name": "Cubito",
+      "category": "CHARACTER",
+      "description": "Pandilla OkiDoki. Popularidad: Baja. Incluye: Batería Cargada",
+      "tags": [
+        "Pandilla OkiDoki",
+        "Botarga de Extra Lujo"
+      ],
+      "hourlyPrice": 55000.0,
+      "active": true
+    },
+    {
+      "name": "Pandy",
+      "category": "CHARACTER",
+      "description": "Pandilla OkiDoki. Popularidad: Baja. Incluye: Batería Cargada",
+      "tags": [
+        "Pandilla OkiDoki",
+        "Botarga de Extra Lujo"
+      ],
+      "hourlyPrice": 55000.0,
+      "active": true
+    },
+    {
+      "name": "Nachito",
+      "category": "CHARACTER",
+      "description": "Pandilla OkiDoki. Popularidad: Baja. Incluye: Batería Cargada",
+      "tags": [
+        "Pandilla OkiDoki",
+        "Botarga de Extra Lujo"
+      ],
+      "hourlyPrice": 55000.0,
+      "active": true
+    },
+    {
+      "name": "Husky",
+      "category": "CHARACTER",
+      "description": "Pandilla OkiDoki. Popularidad: Baja. Incluye: Batería Cargada",
+      "tags": [
+        "Pandilla OkiDoki",
+        "Botarga de Extra Lujo"
+      ],
+      "hourlyPrice": 55000.0,
+      "active": true
+    },
+    {
+      "name": "Pepe Black",
+      "category": "CHARACTER",
+      "description": "Pandilla OkiDoki. Popularidad: Baja. Incluye: Batería Cargada",
+      "tags": [
+        "Pandilla OkiDoki",
+        "Botarga de Extra Lujo"
+      ],
+      "hourlyPrice": 55000.0,
+      "active": true
+    },
+    {
+      "name": "Chepe Cofy",
+      "category": "CHARACTER",
+      "description": "Pandilla OkiDoki. Popularidad: Baja. Incluye: Batería Cargada",
+      "tags": [
+        "Pandilla OkiDoki",
+        "Botarga de Extra Lujo"
+      ],
+      "hourlyPrice": 55000.0,
+      "active": true
+    },
+    {
+      "name": "Sonic",
+      "category": "CHARACTER",
+      "description": "Sonic The Hedgehog. Popularidad: Baja",
+      "tags": [
+        "Sonic The Hedgehog",
+        "Botarga Alquilada"
+      ],
+      "hourlyPrice": 50000.0,
+      "active": true
+    }
+  ],
+  "settings": {
+    "quantityDiscountPercent": 15.0,
+    "hoursDiscountPercent": 15.0,
+    "hoursDiscountMinHours": 2.0,
+    "surchargeEducationalPercent": 5.0,
+    "surchargeCorporatePercent": 10.0,
+    "surchargeShoppingCenterPercent": 10.0,
+    "surchargeAgencyPercent": 15.0
+  },
+  "users": [
+    {
+      "email": "grodriguezov@gmail.com",
+      "name": "Gabriel Rodríguez Ovares"
+    },
+    {
+      "email": "huberth.ovares@okidoki.cr",
+      "name": "Huberth Rodriguez Ovares"
+    },
+    {
+      "email": "huberth.montero@okidoki.cr",
+      "name": "Huberth Rodríguez Montero"
+    }
+  ],
+  "clients": [
+    {
+      "externalId": "C1",
+      "firstName": "Erik",
+      "lastName": "Orantes",
+      "phone": {
+        "e164": "+50642078621",
+        "country": "CR",
+        "formatted": "4207 8621"
+      },
+      "type": "FAMILY",
+      "companyName": null,
+      "companyPhone": null,
+      "notes": "Primer cliente pago del nuevo OkiDoki\nFuente de adquisición: InEventos\nEstado histórico (Sheets): Evento Realizado",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2025-09-01T00:00:00Z",
+      "lastContactAt": "2025-09-04T00:00:00Z"
+    },
+    {
+      "externalId": "C2",
+      "firstName": "Massiel",
+      "lastName": "Villalobos",
+      "phone": {
+        "e164": "+50664147823",
+        "country": "CR",
+        "formatted": "6414 7823"
+      },
+      "type": "EDUCATIONAL",
+      "companyName": null,
+      "companyPhone": "+50664147823",
+      "notes": "Fuente de adquisición: Otro\nEstado histórico (Sheets): Perdido",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2025-08-26T00:00:00Z",
+      "lastContactAt": "2025-08-27T00:00:00Z"
+    },
+    {
+      "externalId": "C3",
+      "firstName": "Jana",
+      "lastName": "Jiménez",
+      "phone": {
+        "e164": "+50670052727",
+        "country": "CR",
+        "formatted": "7005 2727"
+      },
+      "type": "CORPORATE",
+      "companyName": "Akila CR Experiencias Inmobiliarias",
+      "companyPhone": "+50670052727",
+      "notes": "Fuente de adquisición: InEventos\nEstado histórico (Sheets): Perdido",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2025-08-26T00:00:00Z",
+      "lastContactAt": "2025-08-28T00:00:00Z"
+    },
+    {
+      "externalId": "C4",
+      "firstName": "Maryuri",
+      "lastName": "Valverde",
+      "phone": {
+        "e164": "+50688403230",
+        "country": "CR",
+        "formatted": "8840 3230"
+      },
+      "type": "FAMILY",
+      "companyName": null,
+      "companyPhone": null,
+      "notes": "Fuente de adquisición: Llamada\nEstado histórico (Sheets): Evento Realizado",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2025-09-08T00:00:00Z",
+      "lastContactAt": "2025-09-08T00:00:00Z"
+    },
+    {
+      "externalId": "C5",
+      "firstName": "Amanda",
+      "lastName": "Dixon",
+      "phone": {
+        "e164": "+50686774922",
+        "country": "CR",
+        "formatted": "8677 4922"
+      },
+      "type": "FAMILY",
+      "companyName": null,
+      "companyPhone": null,
+      "notes": "Fuente de adquisición: Ads (Ig/Fb)\nEstado histórico (Sheets): Dormido",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2025-10-02T00:00:00Z",
+      "lastContactAt": "2025-10-02T00:00:00Z"
+    },
+    {
+      "externalId": "C6",
+      "firstName": "Charlee",
+      "lastName": "",
+      "phone": {
+        "e164": "+50660289669",
+        "country": "CR",
+        "formatted": "6028 9669"
+      },
+      "type": "FAMILY",
+      "companyName": null,
+      "companyPhone": null,
+      "notes": "Fuente de adquisición: Ads (Ig/Fb)\nEstado histórico (Sheets): Perdido",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2026-06-16T23:51:38Z",
+      "lastContactAt": "2026-06-16T23:51:38Z"
+    },
+    {
+      "externalId": "C7",
+      "firstName": "Katherine",
+      "lastName": "",
+      "phone": {
+        "e164": "+50683128997",
+        "country": "CR",
+        "formatted": "8312 8997"
+      },
+      "type": "FAMILY",
+      "companyName": null,
+      "companyPhone": null,
+      "notes": "Fuente de adquisición: Ads (Ig/Fb)\nEstado histórico (Sheets): Dormido",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2026-06-16T23:51:38Z",
+      "lastContactAt": "2026-06-16T23:51:38Z"
+    },
+    {
+      "externalId": "C8",
+      "firstName": "Oscar",
+      "lastName": "Calderón",
+      "phone": {
+        "e164": "+50687530190",
+        "country": "CR",
+        "formatted": "8753 0190"
+      },
+      "type": "FAMILY",
+      "companyName": null,
+      "companyPhone": null,
+      "notes": "Fuente de adquisición: Otro\nEstado histórico (Sheets): Dormido",
+      "responsibleEmail": "huberth.ovares@okidoki.cr",
+      "firstContactAt": "2025-10-03T00:00:00Z",
+      "lastContactAt": "2025-10-07T00:00:00Z"
+    },
+    {
+      "externalId": "C9",
+      "firstName": "Andrea",
+      "lastName": "Mora",
+      "phone": {
+        "e164": "+50683461918",
+        "country": "CR",
+        "formatted": "8346 1918"
+      },
+      "type": "FAMILY",
+      "companyName": null,
+      "companyPhone": null,
+      "notes": "Cliente de 2024\nFuente de adquisición: Cliente viejo\nEstado histórico (Sheets): Evento Realizado",
+      "responsibleEmail": "huberth.montero@okidoki.cr",
+      "firstContactAt": "2025-10-03T00:00:00Z",
+      "lastContactAt": "2025-10-07T00:00:00Z"
+    },
+    {
+      "externalId": "C10",
+      "firstName": "Rebeca",
+      "lastName": "Murilllo",
+      "phone": {
+        "e164": "+50685591717",
+        "country": "CR",
+        "formatted": "8559 1717"
+      },
+      "type": "CORPORATE",
+      "companyName": "Cityzen",
+      "companyPhone": "+50685591717",
+      "notes": "Fuente de adquisición: Llamada\nEstado histórico (Sheets): Perdido",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2025-10-22T00:00:00Z",
+      "lastContactAt": "2025-10-22T00:00:00Z"
+    },
+    {
+      "externalId": "C11",
+      "firstName": "Rashel",
+      "lastName": "Obregon",
+      "phone": {
+        "e164": "+50660672911",
+        "country": "CR",
+        "formatted": "6067 2911"
+      },
+      "type": "FAMILY",
+      "companyName": null,
+      "companyPhone": "+50660672911",
+      "notes": "Fuente de adquisición: Ads (Ig/Fb)\nEstado histórico (Sheets): Prospecto",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2025-11-01T00:00:00Z",
+      "lastContactAt": "2025-11-01T00:00:00Z"
+    },
+    {
+      "externalId": "C12",
+      "firstName": "Liliana",
+      "lastName": "Gamboa",
+      "phone": {
+        "e164": "+50687965007",
+        "country": "CR",
+        "formatted": "8796 5007"
+      },
+      "type": "CORPORATE",
+      "companyName": "Cooperativa Apacoop",
+      "companyPhone": "+50687965007",
+      "notes": "Fuente de adquisición: Cliente viejo\nEstado histórico (Sheets): Prospecto",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2025-10-14T00:00:00Z",
+      "lastContactAt": "2025-10-29T00:00:00Z"
+    },
+    {
+      "externalId": "C13",
+      "firstName": "Jose",
+      "lastName": "Daniel Vargas",
+      "phone": {
+        "e164": "+50664291069",
+        "country": "CR",
+        "formatted": "6429 1069"
+      },
+      "type": "FAMILY",
+      "companyName": null,
+      "companyPhone": null,
+      "notes": "Fuente de adquisición: Ads (Ig/Fb)\nEstado histórico (Sheets): Prospecto",
+      "responsibleEmail": "huberth.ovares@okidoki.cr",
+      "firstContactAt": "2025-11-03T00:00:00Z",
+      "lastContactAt": "2025-11-04T00:00:00Z"
+    },
+    {
+      "externalId": "C14",
+      "firstName": "Byron",
+      "lastName": "",
+      "phone": {
+        "e164": "+50684485441",
+        "country": "CR",
+        "formatted": "8448 5441"
+      },
+      "type": "FAMILY",
+      "companyName": null,
+      "companyPhone": null,
+      "notes": "Fuente de adquisición: Otro\nEstado histórico (Sheets): Prospecto",
+      "responsibleEmail": "huberth.ovares@okidoki.cr",
+      "firstContactAt": "2025-11-04T00:00:00Z",
+      "lastContactAt": "2025-11-04T00:00:00Z"
+    },
+    {
+      "externalId": "C15",
+      "firstName": "Raquel",
+      "lastName": "Romero",
+      "phone": {
+        "e164": "+50689391647",
+        "country": "CR",
+        "formatted": "8939 1647"
+      },
+      "type": "FAMILY",
+      "companyName": null,
+      "companyPhone": null,
+      "notes": "Fuente de adquisición: Ads (Ig/Fb)\nEstado histórico (Sheets): Prospecto",
+      "responsibleEmail": "huberth.ovares@okidoki.cr",
+      "firstContactAt": "2025-11-04T00:00:00Z",
+      "lastContactAt": "2025-11-04T00:00:00Z"
+    },
+    {
+      "externalId": "C16",
+      "firstName": "Cliente",
+      "lastName": "(C16)",
+      "phone": {
+        "e164": "+50685802397",
+        "country": "CR",
+        "formatted": "8580 2397"
+      },
+      "type": "FAMILY",
+      "companyName": null,
+      "companyPhone": null,
+      "notes": "Fuente de adquisición: Ads (Ig/Fb)\nEstado histórico (Sheets): Prospecto",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2025-11-05T00:00:00Z",
+      "lastContactAt": "2025-11-05T00:00:00Z"
+    },
+    {
+      "externalId": "C17",
+      "firstName": "Mannfred",
+      "lastName": "",
+      "phone": {
+        "e164": "+50685368011",
+        "country": "CR",
+        "formatted": "8536 8011"
+      },
+      "type": "FAMILY",
+      "companyName": null,
+      "companyPhone": null,
+      "notes": "Fuente de adquisición: Ads (Ig/Fb)\nEstado histórico (Sheets): Prospecto",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2025-11-05T00:00:00Z",
+      "lastContactAt": "2025-11-06T00:00:00Z"
+    },
+    {
+      "externalId": "C18",
+      "firstName": "Ankara",
+      "lastName": "Navarro",
+      "phone": {
+        "e164": "+50670608552",
+        "country": "CR",
+        "formatted": "7060 8552"
+      },
+      "type": "CORPORATE",
+      "companyName": "Golfside Condominio",
+      "companyPhone": "+50670608552",
+      "notes": "Fuente de adquisición: Cliente viejo\nEstado histórico (Sheets): Activo",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2025-11-21T00:00:00Z",
+      "lastContactAt": "2025-11-25T00:00:00Z"
+    },
+    {
+      "externalId": "C19",
+      "firstName": "Cliente",
+      "lastName": "(C19)",
+      "phone": {
+        "e164": "+50672291812",
+        "country": "CR",
+        "formatted": "7229 1812"
+      },
+      "type": "FAMILY",
+      "companyName": null,
+      "companyPhone": null,
+      "notes": "Fuente de adquisición: Cliente viejo\nEstado histórico (Sheets): Prospecto",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2025-11-27T00:00:00Z",
+      "lastContactAt": "2025-11-27T00:00:00Z"
+    },
+    {
+      "externalId": "C20",
+      "firstName": "Ana",
+      "lastName": "Lucía Barquero",
+      "phone": {
+        "e164": "+50685634693",
+        "country": "CR",
+        "formatted": "8563 4693"
+      },
+      "type": "CORPORATE",
+      "companyName": "Residencial El Bosque",
+      "companyPhone": "+50685634693",
+      "notes": "Fuente de adquisición: Cliente viejo\nEstado histórico (Sheets): Activo",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2025-12-03T00:00:00Z",
+      "lastContactAt": "2025-12-03T00:00:00Z"
+    },
+    {
+      "externalId": "C21",
+      "firstName": "Viviana",
+      "lastName": "Vargas",
+      "phone": {
+        "e164": "+50684427518",
+        "country": "CR",
+        "formatted": "8442 7518"
+      },
+      "type": "CORPORATE",
+      "companyName": "Petróleos DELTA Costa Rica S.A",
+      "companyPhone": "+50684427518",
+      "notes": "Fuente de adquisición: Otro\nEmail: vvargas@petrodelta.com\nEstado histórico (Sheets): Activo",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2026-01-06T00:00:00Z",
+      "lastContactAt": "2026-01-06T00:00:00Z"
+    },
+    {
+      "externalId": "C22",
+      "firstName": "Jennifer",
+      "lastName": "Porras",
+      "phone": {
+        "e164": "+50688430401",
+        "country": "CR",
+        "formatted": "8843 0401"
+      },
+      "type": "CORPORATE",
+      "companyName": null,
+      "companyPhone": null,
+      "notes": "Fuente de adquisición: Otro\nEstado histórico (Sheets): Activo",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2026-01-07T00:00:00Z",
+      "lastContactAt": "2026-01-07T00:00:00Z"
+    },
+    {
+      "externalId": "C23",
+      "firstName": "Ana",
+      "lastName": "Murillo",
+      "phone": {
+        "e164": "+50687109402",
+        "country": "CR",
+        "formatted": "8710 9402"
+      },
+      "type": "FAMILY",
+      "companyName": null,
+      "companyPhone": null,
+      "notes": "Fuente de adquisición: Otro\nEstado histórico (Sheets): Activo",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2026-01-08T00:00:00Z",
+      "lastContactAt": "2026-01-08T00:00:00Z"
+    },
+    {
+      "externalId": "C24",
+      "firstName": "Angioleth",
+      "lastName": "Gómez",
+      "phone": {
+        "e164": "+50688367256",
+        "country": "CR",
+        "formatted": "8836 7256"
+      },
+      "type": "EDUCATIONAL",
+      "companyName": "Centro Infantil Renzo Zingone",
+      "companyPhone": "+50688367256",
+      "notes": "Fuente de adquisición: Otro\nEstado histórico (Sheets): Activo",
+      "responsibleEmail": "huberth.montero@okidoki.cr",
+      "firstContactAt": "2026-01-19T00:00:00Z",
+      "lastContactAt": "2026-01-19T00:00:00Z"
+    },
+    {
+      "externalId": "C25",
+      "firstName": "Damaris",
+      "lastName": "Godínez",
+      "phone": {
+        "e164": "+50660591564",
+        "country": "CR",
+        "formatted": "6059 1564"
+      },
+      "type": "CORPORATE",
+      "companyName": "Ufinet Costa Rica",
+      "companyPhone": "+50660591564",
+      "notes": "Fuente de adquisición: Recomendación\nEstado histórico (Sheets): Prospecto",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2026-03-06T00:00:00Z",
+      "lastContactAt": "2026-03-06T00:00:00Z"
+    },
+    {
+      "externalId": "C26",
+      "firstName": "Alejandra",
+      "lastName": "Bolaños",
+      "phone": {
+        "e164": "+50683301434",
+        "country": "CR",
+        "formatted": "8330 1434"
+      },
+      "type": "FAMILY",
+      "companyName": null,
+      "companyPhone": null,
+      "notes": "Fuente de adquisición: Otro\nEstado histórico (Sheets): Activo",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2026-03-06T00:00:00Z",
+      "lastContactAt": "2026-03-06T00:00:00Z"
+    },
+    {
+      "externalId": "C27",
+      "firstName": "Prueba",
+      "lastName": "Rodriguez",
+      "phone": {
+        "e164": "+50660839570",
+        "country": "CR",
+        "formatted": "6083 9570"
+      },
+      "type": "CORPORATE",
+      "companyName": "Patitos S.A",
+      "companyPhone": "+50660839570",
+      "notes": "Fuente de adquisición: Otro\nEstado histórico (Sheets): Activo",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2026-03-16T00:00:00Z",
+      "lastContactAt": "2026-03-16T00:00:00Z"
+    },
+    {
+      "externalId": "C28",
+      "firstName": "Johanna",
+      "lastName": "",
+      "phone": {
+        "e164": "+50662845157",
+        "country": "CR",
+        "formatted": "6284 5157"
+      },
+      "type": "FAMILY",
+      "companyName": null,
+      "companyPhone": null,
+      "notes": "Fuente de adquisición: Recomendación\nEstado histórico (Sheets): Activo",
+      "responsibleEmail": "grodriguezov@gmail.com",
+      "firstContactAt": "2026-05-07T00:00:00Z",
+      "lastContactAt": "2026-05-07T00:00:00Z"
+    }
+  ],
+  "events": [
+    {
+      "externalId": "25234",
+      "clientExternalId": "C1",
+      "name": "Celebración de Cumpleaños de Diego Fernando",
+      "eventType": "CHILDREN",
+      "funnelStage": "COMPLETED",
+      "eventDate": "2025-09-06",
+      "startTime": "15:00",
+      "durationHours": 0.75,
+      "venueAddress": "250 Mts Sur de la Contraloría de la República, Sabana Sur, San Jose, Mata Redonda.",
+      "guestCount": 18,
+      "honoreeName": "Diego Fernando",
+      "honoreeAge": null,
+      "rating": 4,
+      "internalNotes": "Tipo de evento (Sheets): Celebración de Cumpleaños\nProductos solicitados: Show de Magia\nPagos (histórico): abono 30000, saldo 30000\nSubido a redes: sí\nDocumentos: 20250609_ShowDeMagia_ErikOrantes"
+    },
+    {
+      "externalId": "25223",
+      "clientExternalId": "C2",
+      "name": "Día del Niño",
+      "eventType": "INSTITUTIONAL",
+      "funnelStage": "QUOTED",
+      "eventDate": "2025-09-09",
+      "startTime": "13:00",
+      "durationHours": 0.75,
+      "venueAddress": "Liceo de Laguna, Alajuela, Zarcero",
+      "guestCount": 200,
+      "honoreeName": null,
+      "honoreeAge": null,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Día del Niño\nProductos solicitados: Show de Magia\nDocumentos: 20252608_DiaDelNiño_MassielVillalobos"
+    },
+    {
+      "externalId": "25222",
+      "clientExternalId": "C3",
+      "name": "Activación de Marca",
+      "eventType": "CORPORATE",
+      "funnelStage": "QUOTED",
+      "eventDate": "2025-10-18",
+      "startTime": "12:00",
+      "durationHours": 3.0,
+      "venueAddress": "Heredia Centro, por Pirro",
+      "guestCount": null,
+      "honoreeName": null,
+      "honoreeAge": null,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Activación de Marca\nProductos solicitados: Inflable Pequeño, Zanquero, Pintacaritas, Personaje Estándar\nInformación extra: Falta definir hora\nDocumentos: 20252608_ActivacionAkilaCR_JanaJimenez"
+    },
+    {
+      "externalId": "25235",
+      "clientExternalId": "C4",
+      "name": "Celebración de Cumpleaños",
+      "eventType": "CHILDREN",
+      "funnelStage": "QUOTED",
+      "eventDate": "2025-09-20",
+      "startTime": "14:00",
+      "durationHours": 1.0,
+      "venueAddress": "Heredia por el Hospital San Vicente de Paul",
+      "guestCount": 15,
+      "honoreeName": null,
+      "honoreeAge": 2,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Celebración de Cumpleaños\nProductos solicitados: Pintacaritas,  Animación, Personaje Estándar"
+    },
+    {
+      "externalId": "25238",
+      "clientExternalId": "C5",
+      "name": "Celebración de Cumpleaños",
+      "eventType": "CHILDREN",
+      "funnelStage": "QUOTED",
+      "eventDate": "2025-12-13",
+      "startTime": null,
+      "durationHours": null,
+      "venueAddress": null,
+      "guestCount": 30,
+      "honoreeName": null,
+      "honoreeAge": 1,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Celebración de Cumpleaños\nProductos solicitados: Toro Mecánico, Animación\nInformación extra: Temática granja. Falta definir ubicación, hora y homenajeado"
+    },
+    {
+      "externalId": "25239",
+      "clientExternalId": "C6",
+      "name": "Celebración de Cumpleaños de Valentina",
+      "eventType": "CHILDREN",
+      "funnelStage": "QUOTED",
+      "eventDate": "2025-11-15",
+      "startTime": "14:00",
+      "durationHours": 1.0,
+      "venueAddress": null,
+      "guestCount": 20,
+      "honoreeName": "Valentina",
+      "honoreeAge": 6,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Celebración de Cumpleaños\nProductos solicitados: Paquete Inflable (Alquilado), Personaje en vivo x 2, Payasos\nInformación extra: Falta definir ubicación"
+    },
+    {
+      "externalId": "25240",
+      "clientExternalId": "C7",
+      "name": "Celebración de Cumpleaños",
+      "eventType": "CHILDREN",
+      "funnelStage": "RESERVED",
+      "eventDate": "2025-11-08",
+      "startTime": null,
+      "durationHours": null,
+      "venueAddress": "San Rafael de Alajuela",
+      "guestCount": 15,
+      "honoreeName": null,
+      "honoreeAge": 7,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Celebración de Cumpleaños\nProductos solicitados: Paquete Inflable (Alquilado) T.I, Animación\nInformación extra: Falta definir duración, hora y nombre de homenajeado"
+    },
+    {
+      "externalId": "25241",
+      "clientExternalId": "C8",
+      "name": "Celebración de Cumpleaños de Nicolás",
+      "eventType": "CHILDREN",
+      "funnelStage": "QUOTED",
+      "eventDate": "2026-02-15",
+      "startTime": null,
+      "durationHours": null,
+      "venueAddress": "Barrio San Nicolás, Cartago",
+      "guestCount": 50,
+      "honoreeName": "Nicolás",
+      "honoreeAge": 4,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Celebración de Cumpleaños\nProductos solicitados: Paquete Lujo\nInformación extra: Temática Minecraft. Falta definir hora, duracion 3 horas\nDuración (original): 3 horas inflable, 1 hora Botarga, 1 hora pintacaritas, 35 mins a 2 horas animador"
+    },
+    {
+      "externalId": "25242",
+      "clientExternalId": "C9",
+      "name": "Celebración de Cumpleaños de Evy",
+      "eventType": "CHILDREN",
+      "funnelStage": "COMPLETED",
+      "eventDate": "2025-11-01",
+      "startTime": "10:30",
+      "durationHours": null,
+      "venueAddress": "Ciudad Colón, San José",
+      "guestCount": 20,
+      "honoreeName": "Evy",
+      "honoreeAge": 7,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Celebración de Cumpleaños\nProductos solicitados: Paquete Lujo\nInformación extra: Temática Sonic\nDuración (original): 4 horas de inflable y amplificación de sonido, 2 horas animación, 1 hora botarga\nDocumentos: 25242_CumpleañosPaqueteLujo_AndreaMora"
+    },
+    {
+      "externalId": "25243",
+      "clientExternalId": "C10",
+      "name": "Halloween",
+      "eventType": "CHILDREN",
+      "funnelStage": "CANCELED",
+      "eventDate": "2025-10-31",
+      "startTime": "16:00",
+      "durationHours": null,
+      "venueAddress": "Centro Comercial Rivera de Belén",
+      "guestCount": null,
+      "honoreeName": null,
+      "honoreeAge": null,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Halloween\nProductos solicitados: Paquete Básico x2, Transporte\nDuración (original): De 2 a 3 horas"
+    },
+    {
+      "externalId": "25244",
+      "clientExternalId": "C12",
+      "name": "Activación de Marca",
+      "eventType": "CORPORATE",
+      "funnelStage": "QUOTED",
+      "eventDate": "2025-12-07",
+      "startTime": "18:00",
+      "durationHours": 2.0,
+      "venueAddress": "San Pablo de León Cortez",
+      "guestCount": null,
+      "honoreeName": null,
+      "honoreeAge": null,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Activación de Marca\nProductos solicitados: 2x Botarga de Extra Lujo, Transporte\nInformación extra: Gigantes: Oso Pandy (Panda) y Perro Husky"
+    },
+    {
+      "externalId": "25245",
+      "clientExternalId": "C13",
+      "name": "Celebración de Cumpleaños",
+      "eventType": "CHILDREN",
+      "funnelStage": "QUOTED",
+      "eventDate": "2025-11-15",
+      "startTime": "13:00",
+      "durationHours": 3.0,
+      "venueAddress": "Palmares de Alajuela",
+      "guestCount": 16,
+      "honoreeName": null,
+      "honoreeAge": 6,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Celebración de Cumpleaños\nInformación extra: falta nombre de cumpleañer@"
+    },
+    {
+      "externalId": "25246",
+      "clientExternalId": "C14",
+      "name": "Celebración de Cumpleaños de Lorenzo",
+      "eventType": "CHILDREN",
+      "funnelStage": "QUOTED",
+      "eventDate": "2025-12-19",
+      "startTime": "12:00",
+      "durationHours": 3.0,
+      "venueAddress": "Cacao, Alajuela",
+      "guestCount": 20,
+      "honoreeName": "Lorenzo",
+      "honoreeAge": 5,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Celebración de Cumpleaños\nInformación extra: Stitch e inflable Fortaleza"
+    },
+    {
+      "externalId": "25247",
+      "clientExternalId": "C15",
+      "name": "Celebración de Cumpleaños",
+      "eventType": "CHILDREN",
+      "funnelStage": "QUOTED",
+      "eventDate": "2025-11-29",
+      "startTime": null,
+      "durationHours": 3.0,
+      "venueAddress": "San Isidro, Cartago , El Guarco",
+      "guestCount": null,
+      "honoreeName": null,
+      "honoreeAge": null,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Celebración de Cumpleaños\nInformación extra: Personajes de Dragon Ball Z"
+    },
+    {
+      "externalId": "25248",
+      "clientExternalId": "C16",
+      "name": "Celebración de Cumpleaños",
+      "eventType": "CHILDREN",
+      "funnelStage": "QUOTED",
+      "eventDate": null,
+      "startTime": null,
+      "durationHours": 1.0,
+      "venueAddress": "La Perla de Siquirres, Limón",
+      "guestCount": null,
+      "honoreeName": null,
+      "honoreeAge": 11,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Celebración de Cumpleaños\nProductos solicitados: 2x Botarga Alquilada, 2x Botarguero"
+    },
+    {
+      "externalId": "26100",
+      "clientExternalId": "C17",
+      "name": "Celebración de Cumpleaños",
+      "eventType": "CHILDREN",
+      "funnelStage": "QUOTED",
+      "eventDate": "2026-01-10",
+      "startTime": "12:00",
+      "durationHours": 1.0,
+      "venueAddress": "Quepos",
+      "guestCount": 20,
+      "honoreeName": null,
+      "honoreeAge": 6,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Celebración de Cumpleaños\nProductos solicitados: Botarga Alquilada, Botarguero, Transporte"
+    },
+    {
+      "externalId": "25249",
+      "clientExternalId": "C18",
+      "name": "Show Navideño",
+      "eventType": "CHILDREN",
+      "funnelStage": "CONFIRMED",
+      "eventDate": "2025-12-13",
+      "startTime": "19:30",
+      "durationHours": 2.0,
+      "venueAddress": "Golfside Condominio",
+      "guestCount": null,
+      "honoreeName": null,
+      "honoreeAge": null,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Show Navideño\nProductos solicitados: Show de Santa, 2x Botarga Staff, 3x Botarguero, Botarga de Extra Lujo\nInformación extra: Incluye Minnie y Mickye Navideño, Santa y Gigante Polar OkiDoki"
+    },
+    {
+      "externalId": "26101",
+      "clientExternalId": "C19",
+      "name": "Celebración de Cumpleaños",
+      "eventType": "CHILDREN",
+      "funnelStage": "PROSPECT",
+      "eventDate": "2026-06-06",
+      "startTime": null,
+      "durationHours": null,
+      "venueAddress": null,
+      "guestCount": null,
+      "honoreeName": null,
+      "honoreeAge": null,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Celebración de Cumpleaños\nProductos solicitados: Botarga Alquilada, Botarguero, Amplificación de Sonido Básica, Transporte"
+    },
+    {
+      "externalId": "25250",
+      "clientExternalId": "C20",
+      "name": "Show Navideño",
+      "eventType": "CHILDREN",
+      "funnelStage": "QUOTED",
+      "eventDate": "2025-12-07",
+      "startTime": "18:00",
+      "durationHours": 1.5,
+      "venueAddress": "Residencial El Bosque La Garita, Provincia de Alajuela",
+      "guestCount": null,
+      "honoreeName": null,
+      "honoreeAge": null,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Show Navideño\nProductos solicitados: Show de Santa, Botarguero, Botarga Staff, Botarga de Extra Lujo\nInformación extra: Personaje adicional por 15 minutos por bonificación"
+    },
+    {
+      "externalId": "26102",
+      "clientExternalId": "C21",
+      "name": "Activación de Marca",
+      "eventType": "CORPORATE",
+      "funnelStage": "QUOTED",
+      "eventDate": "2026-01-11",
+      "startTime": null,
+      "durationHours": null,
+      "venueAddress": null,
+      "guestCount": null,
+      "honoreeName": null,
+      "honoreeAge": null,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Activación de Marca"
+    },
+    {
+      "externalId": "26103",
+      "clientExternalId": "C22",
+      "name": "Mall",
+      "eventType": "CORPORATE",
+      "funnelStage": "QUOTED",
+      "eventDate": "2026-01-30",
+      "startTime": "10:00",
+      "durationHours": 1.0,
+      "venueAddress": "Terrazas Lindora",
+      "guestCount": null,
+      "honoreeName": null,
+      "honoreeAge": null,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Mall\nProductos solicitados: Botarga Staff, Botarguero"
+    },
+    {
+      "externalId": "26104",
+      "clientExternalId": "C23",
+      "name": "Celebración de Cumpleaños",
+      "eventType": "CHILDREN",
+      "funnelStage": "QUOTED",
+      "eventDate": "2026-02-15",
+      "startTime": "14:00",
+      "durationHours": 1.5,
+      "venueAddress": "Grecia San Roque",
+      "guestCount": 15,
+      "honoreeName": null,
+      "honoreeAge": null,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Celebración de Cumpleaños\nProductos solicitados: Botarga Staff, Botarguero, Animación"
+    },
+    {
+      "externalId": "26105",
+      "clientExternalId": "C21",
+      "name": "Activación de Marca",
+      "eventType": "CORPORATE",
+      "funnelStage": "QUOTED",
+      "eventDate": null,
+      "startTime": null,
+      "durationHours": 4.0,
+      "venueAddress": null,
+      "guestCount": null,
+      "honoreeName": null,
+      "honoreeAge": null,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Activación de Marca\nProductos solicitados: Botarguero, Asistente de Botarga"
+    },
+    {
+      "externalId": "26106",
+      "clientExternalId": "C24",
+      "name": "Recibimiento de Clases",
+      "eventType": "INSTITUTIONAL",
+      "funnelStage": "QUOTED",
+      "eventDate": "2026-02-02",
+      "startTime": "07:00",
+      "durationHours": 2.0,
+      "venueAddress": "Centro Infantil Renzo Zingone Parque Industrial Zeta Cartago",
+      "guestCount": 55,
+      "honoreeName": null,
+      "honoreeAge": null,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Recibimiento de Clases\nProductos solicitados: Botarguero, Botarga Staff, Animación"
+    },
+    {
+      "externalId": "26107",
+      "clientExternalId": "C25",
+      "name": "Actividad Empresarial",
+      "eventType": "CORPORATE",
+      "funnelStage": "COMPLETED",
+      "eventDate": "2026-03-15",
+      "startTime": null,
+      "durationHours": 2.0,
+      "venueAddress": "Complejo Recreativo Villa Maria, Alajuela",
+      "guestCount": null,
+      "honoreeName": null,
+      "honoreeAge": null,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Actividad Empresarial\nProductos solicitados: Husky:2h, Nachito:2h\nInformación extra: 2 espacios de 1 hora cada uno"
+    },
+    {
+      "externalId": "26108",
+      "clientExternalId": "C26",
+      "name": "Celebración de Cumpleaños",
+      "eventType": "CHILDREN",
+      "funnelStage": "QUOTED",
+      "eventDate": "2026-03-14",
+      "startTime": null,
+      "durationHours": 1.0,
+      "venueAddress": "San Pablo de Heredia",
+      "guestCount": 50,
+      "honoreeName": null,
+      "honoreeAge": null,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Celebración de Cumpleaños\nProductos solicitados: Marshall"
+    },
+    {
+      "externalId": "26109",
+      "clientExternalId": "C27",
+      "name": "Actividad Empresarial",
+      "eventType": "CORPORATE",
+      "funnelStage": "PROSPECT",
+      "eventDate": "2026-03-16",
+      "startTime": null,
+      "durationHours": 2.0,
+      "venueAddress": "Jacó, Puntarenas",
+      "guestCount": null,
+      "honoreeName": null,
+      "honoreeAge": null,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Actividad Empresarial\nProductos solicitados: Sonic, Animación, Mario Bros, Luigi Bros"
+    },
+    {
+      "externalId": "26110",
+      "clientExternalId": "C28",
+      "name": "Celebración de Cumpleaños",
+      "eventType": "CHILDREN",
+      "funnelStage": "QUOTED",
+      "eventDate": null,
+      "startTime": null,
+      "durationHours": 0.5,
+      "venueAddress": "Centro Infantil Renzo Zingone Parque Industrial Zeta Cartago",
+      "guestCount": 9,
+      "honoreeName": null,
+      "honoreeAge": 5,
+      "rating": null,
+      "internalNotes": "Tipo de evento (Sheets): Celebración de Cumpleaños\nProductos solicitados: Sonic"
+    }
+  ]
+}
