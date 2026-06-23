@@ -13,6 +13,13 @@ function str(formData: FormData, key: string): string {
 	return String(formData.get(key) ?? "").trim();
 }
 
+function coordinate(formData: FormData, key: string): number | null {
+	const raw = str(formData, key);
+	if (!raw) return null;
+	const n = Number(raw);
+	return Number.isFinite(n) ? n : null;
+}
+
 export type SettingsState = { ok?: boolean; error?: string };
 
 export async function updateSettingsAction(
@@ -32,6 +39,8 @@ export async function updateSettingsAction(
 			transportRatePerKm: num(formData, "transportRatePerKm"),
 			transportFreeKm: num(formData, "transportFreeKm"),
 			transportOriginAddress: str(formData, "transportOriginAddress"),
+			transportOriginLat: coordinate(formData, "transportOriginLat"),
+			transportOriginLng: coordinate(formData, "transportOriginLng"),
 			quantityDiscountPercent: num(formData, "quantityDiscountPercent"),
 			hoursDiscountPercent: num(formData, "hoursDiscountPercent"),
 			hoursDiscountMinHours: num(formData, "hoursDiscountMinHours"),

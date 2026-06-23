@@ -1,5 +1,14 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+OkiDoki CRM is a commercial-management CRM for kids' and corporate events.
+
+## Documentation
+
+- [`AGENTS.md`](AGENTS.md) — contributor/agent guide: stack, layout, conventions.
+- [`CONTEXT.md`](CONTEXT.md) — domain language and model (entities, sales funnel, flow).
+- [`docs/adr/`](docs/adr/) — Architecture Decision Records (the *why* behind the design).
+- [`DESIGN.md`](DESIGN.md) — design system and inclusive UI/UX rules.
+
 ## Getting Started
 
 First, run the development server:

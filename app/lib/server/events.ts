@@ -253,6 +253,8 @@ export type CreateEventData = {
 	partyTheme: string | null;
 	venueName: string | null;
 	venueAddress: string | null;
+	venueLat: number | null;
+	venueLng: number | null;
 	venueType: string | null;
 };
 
@@ -300,6 +302,8 @@ export async function createEvent(
 			partyTheme: data.partyTheme || null,
 			venueName: data.venueName || null,
 			venueAddress: data.venueAddress || null,
+			venueLat: data.venueLat ?? null,
+			venueLng: data.venueLng ?? null,
 			venueType: (data.venueType || null) as never,
 		},
 		select: { id: true },
@@ -320,7 +324,10 @@ export type UpdateEventData = {
 	honoreeName: string | null;
 	honoreeAge: number | null;
 	partyTheme: string | null;
+	venueName: string | null;
 	venueAddress: string | null;
+	venueLat: number | null;
+	venueLng: number | null;
 	internalNotes: string | null;
 };
 
@@ -373,7 +380,10 @@ export async function updateEvent(
 			honoreeName: data.honoreeName || null,
 			honoreeAge: data.honoreeAge ?? null,
 			partyTheme: data.partyTheme || null,
+			venueName: data.venueName || null,
 			venueAddress: data.venueAddress || null,
+			venueLat: data.venueLat ?? null,
+			venueLng: data.venueLng ?? null,
 			internalNotes: data.internalNotes || null,
 		},
 	});

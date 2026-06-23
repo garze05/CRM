@@ -25,6 +25,8 @@ export type SettingsUpdate = {
 	transportRatePerKm: number;
 	transportFreeKm: number;
 	transportOriginAddress: string;
+	transportOriginLat: number | null;
+	transportOriginLng: number | null;
 	quantityDiscountPercent: number;
 	hoursDiscountPercent: number;
 	hoursDiscountMinHours: number;

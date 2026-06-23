@@ -235,11 +235,13 @@ function SidebarContent({
 	onNavigate?: () => void;
 }) {
 	return (
-		<>
-			<SidebarUser user={user} />
-			<NavigationContent onNavigate={onNavigate} />
+		<div className='flex h-full flex-col justify-between'>
+			<div className='space-y-4'>
+				<SidebarUser user={user} />
+				<NavigationContent onNavigate={onNavigate} />
+			</div>
 			<AccountActions onNavigate={onNavigate} />
-		</>
+		</div>
 	);
 }
 

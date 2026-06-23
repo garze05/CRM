@@ -3,6 +3,16 @@
 Commercial-management CRM for kids' and corporate events. Read this before working
 here; it's short on purpose.
 
+## Start here
+
+- [`CONTEXT.md`](CONTEXT.md) — the domain language and model: entities, the sales
+  funnel and its gating rules, document numbering, and the end-to-end flow. Read it
+  before touching domain logic.
+- [`docs/adr/`](docs/adr/) — Architecture Decision Records: *why* the stack, the
+  package-based quoting model, the pricing/rendering split, auth, etc. are the way they
+  are. Don't re-litigate a decision without reading (and superseding) its ADR.
+- [`DESIGN.md`](DESIGN.md) — the visual language and inclusive UI/UX rules.
+
 ## Stack
 
 - **Next.js 16** (App Router) · **React 19** · **TypeScript**

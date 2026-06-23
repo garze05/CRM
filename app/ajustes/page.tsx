@@ -13,6 +13,12 @@ export default async function SettingsPage() {
 		depositLeadTimeDays: settings.depositLeadTimeDays,
 		taxRatePercent: Number(settings.taxRate) * 100,
 		transportOriginAddress: settings.transportOriginAddress,
+		transportOriginLat: settings.transportOriginLat
+			? Number(settings.transportOriginLat)
+			: null,
+		transportOriginLng: settings.transportOriginLng
+			? Number(settings.transportOriginLng)
+			: null,
 		transportBasePrice: Number(settings.transportBasePrice),
 		transportRatePerKm: Number(settings.transportRatePerKm),
 		transportFreeKm: settings.transportFreeKm,

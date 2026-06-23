@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { AddressPicker } from "../../components/address-picker";
 import { ClientCombobox, type ComboOption } from "../../components/client-combobox";
 import { DateTimeField } from "../../components/date-time-field";
 import { updateEventAction, type UpdateEventState } from "../actions";
@@ -19,7 +20,10 @@ export type EventFormData = {
 	honoreeName: string;
 	honoreeAge: number | null;
 	partyTheme: string;
+	venueName: string;
 	venueAddress: string;
+	venueLat: number | null;
+	venueLng: number | null;
 	internalNotes: string;
 };
 
@@ -157,15 +161,20 @@ export function EventDetailForm({
 						placeholder='Ej. Mario Bros, princesas, dinosaurios…'
 					/>
 				</label>
-				<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
-					<span>Dirección</span>
-					<input
-						name='venueAddress'
-						defaultValue={event.venueAddress}
-						className='form-control'
-						placeholder='Dirección exacta del lugar'
-					/>
-				</label>
+				<AddressPicker
+					label='Dirección'
+					addressName='venueAddress'
+					placeNameName='venueName'
+					latName='venueLat'
+					lngName='venueLng'
+					defaultAddress={event.venueAddress}
+					defaultPlaceName={event.venueName}
+					defaultLat={event.venueLat}
+					defaultLng={event.venueLng}
+					placeholder='Dirección exacta del lugar'
+					hint='Elegí una sugerencia para guardar las coordenadas del evento.'
+					className='md:col-span-2'
+				/>
 				<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
 					<span>Notas internas</span>
 					<textarea

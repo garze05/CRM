@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { AddressPicker } from "../../components/address-picker";
 import { SectionCard } from "../../components/section-card";
 import { DateTimeField } from "../../components/date-time-field";
 import {
@@ -184,15 +185,20 @@ export function NewEventForm({
 								<option value='OUTDOOR'>Exterior</option>
 							</select>
 						</label>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
-							<span>Dirección</span>
-							<input
-								name='venueAddress'
-								defaultValue={values?.venueAddress}
-								className='form-control'
-								placeholder='Dirección exacta del lugar'
-							/>
-						</label>
+						<AddressPicker
+							label='Dirección'
+							addressName='venueAddress'
+							placeNameName='venueName'
+							latName='venueLat'
+							lngName='venueLng'
+							defaultAddress={values?.venueAddress}
+							defaultPlaceName={values?.venueName}
+							defaultLat={values?.venueLat ? Number(values.venueLat) : null}
+							defaultLng={values?.venueLng ? Number(values.venueLng) : null}
+							placeholder='Dirección exacta del lugar'
+							hint='Elegí una sugerencia para guardar las coordenadas del evento.'
+							className='md:col-span-2'
+						/>
 					</div>
 				</SectionCard>
 			</div>

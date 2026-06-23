@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { AddressPicker } from "../components/address-picker";
 import { SectionCard } from "../components/section-card";
 import { updateSettingsAction, type SettingsState } from "./actions";
 
@@ -15,6 +16,8 @@ export type SettingsFormValues = {
 	transportBasePrice: number;
 	transportRatePerKm: number;
 	transportFreeKm: number;
+	transportOriginLat: number | null;
+	transportOriginLng: number | null;
 	quantityDiscountPercent: number;
 	hoursDiscountPercent: number;
 	hoursDiscountMinHours: number;
@@ -127,14 +130,18 @@ export function SettingsForm({ values }: { values: SettingsFormValues }) {
 					description='Base del cálculo de transporte (Google Maps suma la distancia).'
 				>
 					<div className='grid gap-5 md:grid-cols-2'>
-						<label className='space-y-2 text-lg font-bold text-[var(--text-primary)] md:col-span-2'>
-							<span>Dirección de origen</span>
-							<input
-								name='transportOriginAddress'
-								defaultValue={values.transportOriginAddress}
-								className='form-control'
-							/>
-						</label>
+						<AddressPicker
+							label='Dirección de origen'
+							addressName='transportOriginAddress'
+							latName='transportOriginLat'
+							lngName='transportOriginLng'
+							defaultAddress={values.transportOriginAddress}
+							defaultLat={values.transportOriginLat}
+							defaultLng={values.transportOriginLng}
+							placeholder='Dirección de salida para transporte'
+							hint='Esta ubicación es el punto base para calcular transporte.'
+							className='md:col-span-2'
+						/>
 						<NumberField
 							name='transportBasePrice'
 							label='Tarifa base'

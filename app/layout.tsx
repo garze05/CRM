@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CrmShell, type ShellUser } from "./components/crm-shell";
+import { GoogleMapsProvider } from "./components/google-maps-provider";
 import { ThemeProvider } from "./components/theme-provider";
 import { ToastProvider } from "./components/toast";
 import { bypassUser, isAuthBypassEnabled } from "./lib/auth-bypass";
@@ -55,7 +56,9 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <ToastProvider>
-            <CrmShell user={user}>{children}</CrmShell>
+            <GoogleMapsProvider>
+              <CrmShell user={user}>{children}</CrmShell>
+            </GoogleMapsProvider>
           </ToastProvider>
         </ThemeProvider>
       </body>

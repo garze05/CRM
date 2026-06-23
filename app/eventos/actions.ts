@@ -17,6 +17,13 @@ const ALL_FUNNEL_STAGES = [
 ];
 const ALL_EVENT_TYPES = ["CHILDREN", "CORPORATE", "INSTITUTIONAL"];
 
+function coordinate(formData: FormData, key: string): number | null {
+	const raw = String(formData.get(key) ?? "").trim();
+	if (!raw) return null;
+	const n = Number(raw);
+	return Number.isFinite(n) ? n : null;
+}
+
 export type NewEventState = {
 	error?: string;
 	fieldErrors?: Partial<
@@ -52,6 +59,8 @@ export async function createEventAction(
 			partyTheme: String(formData.get("partyTheme") ?? ""),
 			venueName: String(formData.get("venueName") ?? ""),
 			venueAddress: String(formData.get("venueAddress") ?? ""),
+			venueLat: String(formData.get("venueLat") ?? ""),
+			venueLng: String(formData.get("venueLng") ?? ""),
 			venueType: String(formData.get("venueType") ?? ""),
 	};
 
@@ -120,6 +129,8 @@ export async function createEventAction(
 			partyTheme: parsed.data.partyTheme || null,
 			venueName: parsed.data.venueName || null,
 			venueAddress: parsed.data.venueAddress || null,
+			venueLat: coordinate(formData, "venueLat"),
+			venueLng: coordinate(formData, "venueLng"),
 			venueType: parsed.data.venueType || null,
 	});
 
@@ -175,7 +186,10 @@ export async function updateEventAction(
 			honoreeName: String(formData.get("honoreeName") ?? "").trim() || null,
 			honoreeAge,
 			partyTheme: String(formData.get("partyTheme") ?? "").trim() || null,
-		venueAddress: String(formData.get("venueAddress") ?? "") || null,
+			venueName: String(formData.get("venueName") ?? "").trim() || null,
+			venueAddress: String(formData.get("venueAddress") ?? "") || null,
+			venueLat: coordinate(formData, "venueLat"),
+			venueLng: coordinate(formData, "venueLng"),
 		internalNotes: String(formData.get("internalNotes") ?? "") || null,
 	});
 

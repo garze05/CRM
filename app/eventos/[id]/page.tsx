@@ -98,7 +98,10 @@ export default async function EventDetailPage({
 							honoreeName: event.honoreeName ?? "",
 							honoreeAge: event.honoreeAge,
 							partyTheme: event.partyTheme ?? "",
+							venueName: event.venueName ?? "",
 							venueAddress: event.venueAddress ?? "",
+							venueLat: event.venueLat ? Number(event.venueLat) : null,
+							venueLng: event.venueLng ? Number(event.venueLng) : null,
 							internalNotes: event.internalNotes ?? "",
 						}}
 						clientOptions={clientOptions}
